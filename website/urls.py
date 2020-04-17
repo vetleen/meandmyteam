@@ -4,6 +4,7 @@ from . import views
 import os
 from django.conf import settings
 
+'''
 print ('Django running with the following settings...')
 print ('CSRF_COOKIE_SECURE:')
 print ('OS says: %s'%(os.environ.get('CSRF_COOKIE_SECURE', "Not set")))
@@ -23,7 +24,7 @@ print ('Django says: %s'%(settings.SECURE_BROWSER_XSS_FILTER))
 print ('SECURE_CONTENT_TYPE_NOSNIFF:')
 print ('OS says: %s'%(os.environ.get('SECURE_CONTENT_TYPE_NOSNIFF', "Not set")))
 print ('Django says: %s'%(settings.SECURE_CONTENT_TYPE_NOSNIFF))
-
+'''
 
 urlpatterns = [
 
