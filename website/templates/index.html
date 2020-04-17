@@ -1,0 +1,69 @@
+{% extends "base_generic.html" %}
+{% load static %}
+{% block content %}
+<!-- Front page banner begins -->
+<div class="jumbotron jumbotron-fluid" style="">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12 text-center">
+        <p>&nbsp;</p>
+        <h1 class="display-4 main-page-headline">Great leaders lead happy people.</h1>
+          <p class="lead text-white">
+            <!-- Software to help you increase employee satisfaction and loyalty. -->
+            Automatic employee satisfaction tracking.
+          </p><br />
+        <a class="btn btn-warning btn-lg" href="{% url 'sign-up'%}" role="button">Try for free</a>
+        <p class="text-white"><small>Pick a plan, cancel anytime.</small></p>
+      </div> <!-- col -->
+    </div><!-- row -->
+  </div><!-- container -->
+</div><!-- jumbotron -->
+
+<!-- Social proof box begins -->
+<div class="social-proof py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-2 lead text-center">
+        &nbsp;
+      </div> <!-- col -->
+      <div class="col-sm-2 lead text-center">
+        A+ Realestate
+      </div> <!-- col -->
+      <div class="col-sm-2 lead text-center">
+        Busy B Business
+      </div> <!-- col -->
+      <div class="col-sm-2 lead text-center">
+        Cee Corp.
+      </div> <!-- col -->
+      <div class="col-sm-2 lead text-center">
+        Double DeeDee's
+      </div> <!-- col -->
+      <div class="col-sm-2 lead text-center">
+        &nbsp;
+      </div> <!-- col -->
+    </div><!-- row -->
+  </div><!-- container -->
+</div>
+<div class="container">
+
+<!-- three steps explanation begins -->
+  <div class="row">
+    <div class="col-sm-4 text-center pt-5 pb-4">
+      <h5><strong>Add employees to track</strong></h5>
+      <img src="{% static 'images/survey-employees.svg' %}" class="img-fluid" width="50%" alt="Add employees that you want to track." />
+      <p>Add each employee who's satisfaction you want to track. All we need is an email address.</p>
+    </div>
+    <div class="col-sm-4 text-center pt-5 pb-4">
+      <h5><strong>Employees answer quarterly survey</strong></h5>
+      <img src="{% static 'images/employees-respond-to-survey.svg' %}" class="img-fluid" width="50%" alt="Employees answer simple questions." />
+      <p>Each employee receives a quartely (or you can set a custom interval) survey with key questions regarding their satisfaction. </p>
+    </div>
+    <div class="col-sm-4 text-center pt-5 pb-4">
+      <h5><strong>Always be ahead of the curve</strong></h5>
+      <img src="{% static 'images/analyze-employee-data.svg' %}" class="img-fluid" width="50%" alt="Access beautifully processed data about employee satisfaction." />
+      <p>Data over time shows employee satisfaction snap-shot and trends. See where efforts to increase satisfaction and retention will have the biggest impact. </p>
+    </div>
+  </div> <!-- row -->
+
+</div><!-- container -->
+{% endblock %}

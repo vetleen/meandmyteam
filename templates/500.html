@@ -1,0 +1,17 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center pt-4">
+    <div  class="alert alert-danger col-lg-6 alert-dismissible fade show" role="alert">
+      <h4 class="alert-heading"> Server error </h4>
+      <hr>
+      <p> Oh no! There was a server error. This is totally our fault, and we are working hard to fix it!</p>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div> <!-- row -->
+</div><!-- container -->
+
+{% endblock %}

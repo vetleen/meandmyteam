@@ -1,0 +1,33 @@
+
+{% load widget_tweaks %}
+
+      <form method="post">
+        {% csrf_token %}
+        {% for hidden_field in form.hidden_fields %}
+          {{ hidden_field }}
+        {% endfor %}
+
+        {% for field in form.visible_fields %}
+        <div class="form-group">
+          {{ field.label_tag }}
+          {% if form.is_bound %}
+            {% if field.errors %}
+              {% render_field field class="form-control is-invalid" %}
+              {% for error in field.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field field class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field field class="form-control" %}
+          {% endif %}
+          {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+          {% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit"  class="btn btn-primary">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button>
+      </form>

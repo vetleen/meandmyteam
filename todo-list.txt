@@ -1,0 +1,33 @@
+##Vetletemplate:
+
+
+
+##MeAndMyTeam
+
+add plans to sign-up-process
+
+#programming
+#Product #1
+add product model and related view logic
+add support for manually adding employees
+add data visuallization on web
+add report-generator (I see there are heroku addons for html->pdf)
+
+#fun stuff
+design logo
+add screenshots to show of products on front page
+create "customers" for social-proof bar
+add impact stories to front page, and possibly own page
+add about us explaining scientific background of test (if any...)
+
+
+#external services
+pick and connect domain
+
+set up basic email
+email-integration and password reset
+chat-box
+stripe-integration
+SEO?
+Google ads
+Get someone top help get tests to work on Heorku CI (step 1 - is app.json correct)

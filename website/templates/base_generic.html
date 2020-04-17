@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    {% load static %}
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon/favicon.ico' %}"/>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom-styles.css' %}">
+<style>
+  .bd-placeholder-img {
+    font-size: 1.125rem;
+    text-anchor: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  @media (min-width: 768px) {
+    .bd-placeholder-img-lg {
+      font-size: 3.5rem;
+    }
+  }
+</style>
+    {% block title %}<title>Employee satisfaction tracking | MeAndMyTeam </title>{% endblock %}
+  </head>
+  <body class="d-flex flex-column h-100">
+  <header>
+    {% block navbar %}
+    <!-- navbar begins -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light d-flex flex-column sticky-footer-wrapper">
+      <div class="container">
+          <!-- Logo -->
+            <a class="navbar-brand" href="{% url 'index' %}">MeAndMyTeam</a>
+            <!-- collapse feature -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- main menu feature -->
+            <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+              <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item {% if request.path == '/dashboard/' %}active{% endif %}">
+                  <a class="nav-link" href="{% url 'dashboard' %}"> Dashboard {% if request.path == '/dashboard/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Account
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'change-password'%}">Change password</a>
+                    <a class="dropdown-item" href="{% url 'edit-account'%}">Edit account</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">Log out</a>
+                  </div>
+                </li>
+                {% else %}
+                <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+                  <a class="nav-link" href="{% url 'index' %}">Home {% if request.path == '/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+                </li>
+                <li class="nav-item {% if request.path == '/accounts/login/' %}active{% endif %}">
+                  <a class="nav-link" href="{% url 'loginc'%}">Login {% if request.path == '/login/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+                </li>
+                <li class="nav-item {% if request.path == '/sign-up' %}active{% endif %}">
+                  <a class="nav-link" href="{% url 'sign-up'%}">Sign up{% if request.path == '/sign-up/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+                </li>
+                {% endif %}
+              </ul>
+              <span class="navbar-text">
+                {% if user.is_authenticated %}(currently logged in as: {{ user.get_username }}){% endif %}
+              </span>
+              <!--
+              <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn my-2 my-sm-0" type="submit">Search</button>
+              </form>
+            -->
+            </div><!-- navbar -->
+      </div><!-- container -->
+    </nav>
+  </header>
+{% endblock %}
+{# Path: {{ request.path }} #}
+
+<main role="main" class="flex-shrink-0">
+{% block content %}{% endblock %}
+</main>
+
+{% block footer %}
+{% include "includeable/footer.html" %}
+{% endblock %}
+<script src="{% static 'js/jquery-3.4.1.slim.min.js' %}"></script>
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>
