@@ -63,10 +63,10 @@ class DashboardViewTest(TestCase):
         #Test that anonymous users are redirected properly
         response = self.client.get('/dashboard/', follow=True, secure=True)
         my_message = yellow('DashboardViewTest: anonymous users should be redirected when attempting to GET at this address')
-        self.assertRedirects(response, 'https://testserver/login/?next=/dashboard/', 302, 200, msg_prefix=my_message)
+        self.assertRedirects(response, '/login/?next=/dashboard/', 302, 200, msg_prefix=my_message)
         response = self.client.post('/dashboard/', follow=True, secure=True)
         my_message = yellow('DashboardViewTest: anonymous users should be redirected when attempting to POST to this address')
-        self.assertRedirects(response, 'https://testserver/login/?next=/dashboard/', 302, 200, msg_prefix=my_message)
+        self.assertRedirects(response, '/login/?next=/dashboard/', 302, 200, msg_prefix=my_message)
 
     def test_authenitcated_users(self):
         #log in
@@ -109,7 +109,7 @@ class IndexViewTest(TestCase):
         response = self.client.post('/', self.credentials, follow=True, secure=True)
         #assert get dashboard
         my_message = yellow(' Active user was not correctly redirected when trying to reach front page: ')
-        self.assertRedirects(response, 'https://testserver/dashboard/', 302, 200, msg_prefix=my_message)
+        self.assertRedirects(response, '/dashboard/', 302, 200, msg_prefix=my_message)
         #assert correct template
         self.assertTemplateNotUsed(response, 'index.html', my_message)
         self.assertTemplateUsed(response, 'dashboard.html', my_message)
@@ -131,7 +131,7 @@ class SignUpViewTest(TestCase):
         self.assertTrue(response.context['user'].is_active)
         users_w_uname = User.objects.filter(username = signup_credentials['username']).count()
         self.assertEqual(users_w_uname, 1, yellow("Signup-view should create exactly 1 user with the same username, not %s")%(users_w_uname))
-        self.assertRedirects(response, 'https://testserver/dashboard/', 302, 200, msg_prefix="Expected user to be redirected to dashboard after sign-up")
+        self.assertRedirects(response, '/dashboard/', 302, 200, msg_prefix="Expected user to be redirected to dashboard after sign-up")
         self.assertContains(response, 'Welcome aboard.', msg_prefix=yellow("expected a newly signed on user to be greeted by a hearty \'Welcome aboard.\'"))
 
         #test that signup is not possible with existing username
@@ -334,10 +334,10 @@ class ChangePasswordViewTest(TestCase):
         #Test that login is required
         response = self.client.get('/change-password/', follow=True, secure=True)
         my_message = yellow('ChangePasswordViewTest: anonymous users should be redirected when attempting to GET at this address')
-        self.assertRedirects(response, 'https://testserver/login/?next=/change-password/', 302, 200, msg_prefix=my_message)
+        self.assertRedirects(response, '/login/?next=/change-password/', 302, 200, msg_prefix=my_message)
         response = self.client.post('/change-password/', follow=True, secure=True)
         my_message = yellow('ChangePasswordViewTest: anonymous users should be redirected when attempting to POST to this address')
-        self.assertRedirects(response, 'https://testserver/login/?next=/change-password/', 302, 200, msg_prefix=my_message)
+        self.assertRedirects(response, '/login/?next=/change-password/', 302, 200, msg_prefix=my_message)
 
     def test_get_requests(self):
         #correct credentials
@@ -430,10 +430,10 @@ class EditAccountViewTest(TestCase):
         #Test that anonymous users are redirected properly
         response = self.client.get('/edit-account/', follow=True, secure=True)
         my_message = yellow('EditAccountViewTest: anonymous users should be redirected when attempting to GET at this address')
-        self.assertRedirects(response, 'https://testserver/login/?next=/edit-account/', 302, 200, msg_prefix=my_message)
+        self.assertRedirects(response, '/login/?next=/edit-account/', 302, 200, msg_prefix=my_message)
         response = self.client.post('/edit-account/', follow=True, secure=True)
         my_message = yellow('EditAccountViewTest: anonymous users should be redirected when attempting to POST to this address')
-        self.assertRedirects(response, 'https://testserver/login/?next=/edit-account/', 302, 200, msg_prefix=my_message)
+        self.assertRedirects(response, '/login/?next=/edit-account/', 302, 200, msg_prefix=my_message)
 
     #Test loggeed in users are shown proper page
     def test_authenitcated_users_can_visit_site(self):
