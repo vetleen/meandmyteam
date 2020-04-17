@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from website.forms import ChangePasswordForm, SignUpForm, LoginForm, EditAccountForm
+from website.models import Subscriber, Plan
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
@@ -161,7 +162,13 @@ def edit_account_view(request):
         #If we receive POST data
         context = {
             'form': form,
-            'submit_button_text': 'Update account details'
+            'submit_button_text': 'Update account details',
+            'is_active': request.user.subscriber.is_active(),
+            'plan': request.user.subscriber.plan,
+            'date_current_plan_expires': request.user.subscriber.date_current_plan_expires,
+            'paid_plan': request.user.subscriber.plan.is_paid,
+            'payment_interval': request.user.subscriber.payment_interval
+
         }
         if request.method == 'POST':
             # Create a form instance and populate it with data from the request (binding):

@@ -56,7 +56,7 @@ class Subscriber(models.Model):
         default='',
         help_text='Payment interval',
     )
-
+    #maybe it would be more interesting with a get_status-function, including an expired-value
     def is_active(self):
         #print('Plan expires: %s'%(self.date_current_plan_expires))
         date_today=datetime.date.today()
