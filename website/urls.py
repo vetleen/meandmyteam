@@ -4,27 +4,26 @@ from . import views
 import os
 from django.conf import settings
 
-print ('OS says: %s'%(os.environ.get('CSRF_COOKIE_SECURE', "fuzzballs")))
+print ('Django running with the following settings...')
+print ('CSRF_COOKIE_SECURE:')
+print ('OS says: %s'%(os.environ.get('CSRF_COOKIE_SECURE', "Not set")))
 print ('Django says: %s'%(settings.CSRF_COOKIE_SECURE))
-print ('')
-print ('OS says: %s'%(os.environ.get('SESSION_COOKIE_SECURE', "fuzzballs")))
+print ('SESSION_COOKIE_SECURE:')
+print ('OS says: %s'%(os.environ.get('SESSION_COOKIE_SECURE', "Not set")))
 print ('Django says: %s'%(settings.SESSION_COOKIE_SECURE))
-print ('')
-print ('OS says: %s'%(os.environ.get('X_FRAME_OPTIONS', "fuzzballs")))
+print ('X_FRAME_OPTIONS:')
+print ('OS says: %s'%(os.environ.get('X_FRAME_OPTIONS', "Not set")))
 print ('Django says: %s'%(settings.X_FRAME_OPTIONS))
-print ('')
-print ('OS says: %s'%(os.environ.get('SECURE_SSL_REDIRECT', "fuzzballs")))
+print ('SECURE_SSL_REDIRECT:')
+print ('OS says: %s'%(os.environ.get('SECURE_SSL_REDIRECT', "Not set")))
 print ('Django says: %s'%(settings.SECURE_SSL_REDIRECT))
-print ('')
-print ('OS says: %s'%(os.environ.get('SECURE_BROWSER_XSS_FILTER', "fuzzballs")))
+print ('SECURE_BROWSER_XSS_FILTER:')
+print ('OS says: %s'%(os.environ.get('SECURE_BROWSER_XSS_FILTER', "Not set")))
 print ('Django says: %s'%(settings.SECURE_BROWSER_XSS_FILTER))
-print ('')
-print ('OS says: %s'%(os.environ.get('SECURE_CONTENT_TYPE_NOSNIFF', "fuzzballs")))
+print ('SECURE_CONTENT_TYPE_NOSNIFF:')
+print ('OS says: %s'%(os.environ.get('SECURE_CONTENT_TYPE_NOSNIFF', "Not set")))
 print ('Django says: %s'%(settings.SECURE_CONTENT_TYPE_NOSNIFF))
-print ('')
-#print ('OS says: %s'%(os.environ.get('SECURE_HSTS_SECONDS', "fuzzballs")))
-#print ('Django says: %s'%(settings.SECURE_HSTS_SECONDS))
-#print ('')
+
 
 urlpatterns = [
 

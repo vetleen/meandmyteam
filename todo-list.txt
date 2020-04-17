@@ -1,7 +1,3 @@
-##Vetletemplate:
-
-
-
 ##MeAndMyTeam
 
 add plans to sign-up-process
@@ -30,4 +26,4 @@ chat-box
 stripe-integration
 SEO?
 Google ads
-Get someone top help get tests to work on Heorku CI (step 1 - is app.json correct)
+Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)
