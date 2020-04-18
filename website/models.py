@@ -22,7 +22,7 @@ class Plan(models.Model):
     description = models.CharField(max_length=255, help_text='A short description of the plan')
     monthly_price = models.DecimalField(max_digits=10, decimal_places=2, help_text='Montly price')
     yearly_price = models.DecimalField(max_digits=10, decimal_places=2, help_text='Yearly price')
-
+    #allowed_nr_of_employees
     IS_PAID = (
         ('n', 'No'),
         ('y', 'Yes'),
@@ -43,6 +43,8 @@ class Subscriber(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, null=True) #default free / no plan?
     date_current_plan_expires = models.DateField(default=timezone.now)
+    #custom price?
+    #trial?
 
     PAYMENT_INTERVALS = (
         ('m', 'Monthly'),

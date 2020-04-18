@@ -1,0 +1,78 @@
+{% extends "base_generic.html" %}
+{% load static %}
+{% block content %}
+<div class="container">
+
+  {% include "includeable/message_displayer.html" %}
+
+  <div class="row justify-content-center pt-5">
+      <div class="col-sm-3">
+      <div class="card h-100">
+        <img src="{% static 'images/small-business-plan.svg' %}" style="height: 10rem;" class="card-img-top pt-2" alt="...">
+        <div class="card-body">
+          <h5 class="card-title text-center">{{ plans.p1.name }}</h5>
+          <h3 class="card-subtitle mb-2 text-info text-center">${{ plans.p1.monthly_price }}/month </h3>
+          <h6 class="card-subtitle mb-2 text-muted text-center"><span class="badge badge-secondary">Or ${{ plans.p1.yearly_price }}/year</span></h6>
+          <p class="card-text">{{ plans.p1.description }}.</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">One month free <span class="badge badge-success">Free trial!</span></li>
+          <li class="list-group-item">Up to 10 employees tracked</li>
+          <li class="list-group-item">Pay monthly or yearly</li>
+        </ul>
+        <div class="text-center {% if request.user.subscriber.plan == plans.p1 %}pt-2 pb-3{% else %} py-4{% endif %}">
+          {% if request.user.subscriber.plan == plans.p1 %} <small class="text-muted">You are on this plan</small><br />{% endif %}
+          <a class="btn {% if request.user.subscriber.plan == plans.p1 %}btn-secondary disabled{% else %} btn-dark {% endif %}" href="#" role="button">Choose</a>
+        </div>
+      </div><!-- card -->
+      </div><!-- col -->
+
+
+      <div class="col-sm-3">
+      <div class="card h-100">
+        <img src="{% static 'images/standard-plan.svg' %}" style="height: 10rem;" class="card-img-top pt-2" alt="...">
+        <div class="card-body">
+          <h5 class="card-title text-center">{{ plans.p2.name }}</h5>
+          <h3 class="card-subtitle mb-2 text-info text-center">${{ plans.p2.monthly_price }}/month </h3>
+          <h6 class="card-subtitle mb-2 text-muted text-center"><span class="badge badge-secondary">Or ${{ plans.p2.yearly_price }}/year</span></h6>
+          <p class="card-text">{{ plans.p2.description }}.</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">One month free <span class="badge badge-success">Free trial!</span></li>
+          <li class="list-group-item">Up to 10 employees tracked</li>
+          <li class="list-group-item">Pay monthly or yearly</li>
+        </ul>
+        <div class="text-center {% if request.user.subscriber.plan == plans.p2 %}pt-2 pb-3{% else %} py-4{% endif %}">
+          {% if request.user.subscriber.plan == plans.p2 %} <small class="text-muted">You are on this plan</small><br />{% endif %}
+          <a class="btn {% if request.user.subscriber.plan == plans.p2 %}btn-secondary disabled{% else %} btn-dark {% endif %}" href="#" role="button">Choose</a>
+        </div>
+      </div><!-- card -->
+      </div><!-- col -->
+
+
+      <div class="col-sm-3">
+      <div class="card h-100">
+        <img src="{% static 'images/enterprise-plan.svg' %}" style="height: 10rem;" class="card-img-top pt-2" alt="...">
+        <div class="card-body">
+          <h5 class="card-title text-center">{{ plans.p3.name }}</h5>
+          <h3 class="card-subtitle mb-2 text-info text-center">Contact us </h3>
+          <h6 class="card-subtitle mb-2 text-muted text-center"><span class="badge badge-secondary">from $4.99/year/employee </span></h6>
+          <p class="card-text">{{ plans.p3.description }}.</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">One month free <span class="badge badge-success">Free trial!</span></li>
+          <li class="list-group-item">Up to 10 employees tracked</li>
+          <li class="list-group-item">Pay monthly or yearly</li>
+        </ul>
+        <div class="text-center {% if request.user.subscriber.plan == plans.p3 %}pt-2 pb-3{% else %} py-4{% endif %}">
+          {% if request.user.subscriber.plan == plans.p3 %} <small class="text-muted">You are on this plan</small><br />{% endif %}
+          <a class="btn {% if request.user.subscriber.plan == plans.p3 %}btn-secondary disabled{% else %} btn-dark {% endif %}" href="#" role="button">Choose</a>
+        </div>
+      </div><!-- card -->
+      </div><!-- col -->
+
+  </div><!-- row -->
+
+</div><!-- container -->
+
+{% endblock %}

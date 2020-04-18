@@ -190,3 +190,38 @@ def edit_account_view(request):
         #this should never occcur
         messages.error(request, "Can't edit profile when you are not logged in.", extra_tags='alert alert-danger')
         return HttpResponseRedirect(reverse('loginc'))
+
+@login_required
+def your_plan_view(request):
+    """View function for viewing and updating your plan"""
+    return render(request, 'current_plan.html')
+
+
+def choose_plan_view(request):
+    """View function for choosing a plan"""
+    plans = {}
+
+    smb_plan = Plan.objects.get(name="Small business")
+    stdrd_plan = Plan.objects.get(name="Standard")
+    ent_plan = Plan.objects.get(name="Enterprise")
+    #print('The three plans are; %s, %s and %s.'%(smb_plan, stdrd_plan, ent_plan))
+    plans = {
+        'p1': smb_plan,
+        'p2': stdrd_plan,
+        'p3': ent_plan
+    }
+    context = {
+        'plans': plans,
+    }
+    #if user is anonymous
+    ## -> SHow plans with buttons that lead to sign up (we'll add some memory later)
+
+    #if user is authenitcated
+
+    #if user already has a plan
+    ## -> SHow active plan differently, buttons should read "change to"
+
+    #if user doesn't have a plan
+    ## -> Show plans, buttons say "Pick plan"
+
+    return render(request, 'choose_plan.html', context)

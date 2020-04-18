@@ -4,7 +4,7 @@
 <div class="container">
   <div class="row pt-4">
     <div class="col-lg-6">
-      <h3> Change account details </h3>
+      <h3> Profile </h3>
     </div>
   </div> <!-- row -->
   {% include "includeable/message_displayer.html" %}
@@ -13,27 +13,5 @@
 {% include "includeable/form_renderer.html" %}
     </div><!-- col -->
   </div> <!-- row -->
-  <div class="row pt-4">
-    <div class="col-lg-12">
-      <h3> Subscription details </h3>
-    </div>
-  </div> <!-- row -->
-  <div class="row">
-    <div class="col-lg-12">
-
-
-      {% if paid_plan == "y" %}
-
-      Your plan is <a href="#"> {{ plan }}</a> billed {% if payment_interval == "m" %} monthly. {% else %} yearly. {% endif %}<br />
-      <small>Expires: {{ date_current_plan_expires }}.</small>
-
-      {% else %}
-        You do not currently have an active plan. <br />
-        <a href="#">Pick a plan</a>
-      {% endif %}
-
-    </div>
-  </div> <!-- row -->
 </div><!-- container -->
-
 {% endblock %}

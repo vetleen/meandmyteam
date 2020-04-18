@@ -1,0 +1,25 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="row pt-4">
+    <div class="col-lg-6">
+      <h3> Your plan </h3>
+    </div>
+  </div> <!-- row -->
+  {% include "includeable/message_displayer.html" %}
+  <div class="row">
+    <div class="col-lg-12">
+
+      {% if request.user.subscriber.plan.is_paid == "y" %}
+      Your plan is <a href="#"> {{ request.user.subscriber.plan }}</a> billed {% if request.user.subscriber.payment_interval == "m" %} monthly. {% else %} yearly. {% endif %}<br />
+      <small>Expires: {{ request.user.subscriber.date_current_plan_expires }}.</small>
+      {% else %}
+        You do not currently have an active plan. <br />
+        <a href="{% url 'choose-plan'%}">Pick a plan</a>
+      {% endif %}
+    </div>
+  </div> <!-- row -->
+</div><!-- container -->
+
+{% endblock %}
