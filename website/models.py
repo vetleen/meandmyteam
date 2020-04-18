@@ -73,7 +73,7 @@ class Plan(models.Model):
 
 class Subscriber(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, null=True) #default free / no plan?
+    plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, blank=True, null=True) #default free / no plan?
     date_current_plan_expires = models.DateField(default=timezone.now)
     custom_price = models.DecimalField(max_digits=10, blank=True, null=True, decimal_places=2, help_text='Special price for this Subscriber (leave blank to use the plan\'s price.)')
 
