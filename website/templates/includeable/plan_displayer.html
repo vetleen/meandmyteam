@@ -1,0 +1,47 @@
+{% load static %}
+
+{% if zipped_plans %}{% for plan, illustration in zipped_plans %}
+<div class="col-lg-3 pb-4">
+  <div class="card h-100">
+    <img src="{% static illustration %}" style="height: 10rem;" class="card-img-top pt-2" alt="...">
+    <div class="card-body">
+      <h5 class="card-title text-center {% if plan.can_be_picked %}text-body{% else %}text-secondary{% endif %}"> {{ plan.name }}</h5>
+      {% if plan.show_price %}
+      <h3 class="card-subtitle mb-2 text-info text-center">${{ plan.monthly_price }}/month </h3>
+      <h6 class="card-subtitle mb-2 text-muted text-center"><span class="badge badge-dark">Or ${{ plan.yearly_price }}/year</span></h6>
+      {% else %}
+      <h3 class="card-subtitle mb-2 text-info text-center"> Contact us </h3>
+      <h6 class="card-subtitle mb-2 text-muted text-center"><span class="badge badge-dark">vetleengesbak@gmail.com</span></h6>
+      {% endif %}
+      <p class="card-text {% if plan.can_be_picked %}text-body{% else %}text-secondary{% endif %}">{{ plan.description }}.</p>
+    </div>
+    {% if plan.sales_argument and show_sales_arguments %}
+    <ul class="list-group list-group-flush">
+      {% for arg in plan.sales_argument.all %}<li class="list-group-item {% if plan.can_be_picked %}text-body{% else %}text-secondary{% endif %}">{{ arg }} {% if arg.badge_text %}<span class="badge badge-{{ arg.badge_type }}">{{ arg.badge_text }}</span>{% endif %}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    <div class="text-center
+    {% if request.user.subscriber.plan == plan %}pt-3 pb-4{% else %} py-4{% endif %}
+    {% if show_sales_arguments %}{% else %}card-footer{% endif %}
+    ">
+      {% if request.user.subscriber.plan == plan %}
+        <small class="text-muted">You are on this plan</small><br />
+        {% if request.user.subscriber.status == "active" %}<span class="badge badge-success">Expires: {{ request.user.subscriber.date_current_plan_expires }}.</span>{% endif %}
+        {% if request.user.subscriber.status == "expired" %}<span class="badge badge-warning">Expired: {{ request.user.subscriber.date_current_plan_expires }}.</span>{% endif %}
+        {% if request.user.subscriber.status == "inactive" %}<span class="badge badge-warning">You havent picked a plan yet.</span>{% endif %}
+      {% else %}
+        <a class="btn
+          {% if plan.can_be_picked %}
+              btn-dark
+          {% else %}
+              btn-secondary disabled
+          {% endif %}
+            " href="#" role="button">
+          {% if plan.can_be_picked %}Choose{% else %}Available soon{% endif %}
+        </a>
+      {% endif %}
+
+    </div>
+  </div><!-- card -->
+</div><!-- col -->
+{% endfor %}{% endif %}

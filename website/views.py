@@ -162,13 +162,7 @@ def edit_account_view(request):
         #If we receive POST data
         context = {
             'form': form,
-            'submit_button_text': 'Update account details',
-            'is_active': request.user.subscriber.is_active(),
-            'plan': request.user.subscriber.plan,
-            'date_current_plan_expires': request.user.subscriber.date_current_plan_expires,
-            'paid_plan': request.user.subscriber.plan.is_paid,
-            'payment_interval': request.user.subscriber.payment_interval
-
+            'submit_button_text': 'Update account details'
         }
         if request.method == 'POST':
             # Create a form instance and populate it with data from the request (binding):
@@ -194,24 +188,30 @@ def edit_account_view(request):
 @login_required
 def your_plan_view(request):
     """View function for viewing and updating your plan"""
-    return render(request, 'current_plan.html')
+    if request.user.subscriber.status() == 'inactive':
+        messages.info(request, 'You haven\'t picked a plan yet.', extra_tags='alert alert-info')
+        return HttpResponseRedirect(reverse('choose-plan'))
+    else:
+        illustrations = ['images/small-business-plan.svg']
+        plans = [request.user.subscriber.plan]
+        zipped_plans = zip(plans, illustrations)
+        context = {
+            'zipped_plans': zipped_plans,
+            'show_sales_arguments': False,
+        }
+        return render(request, 'current_plan.html', context)
 
 
 def choose_plan_view(request):
     """View function for choosing a plan"""
-    plans = {}
 
-    smb_plan = Plan.objects.get(name="Small business")
-    stdrd_plan = Plan.objects.get(name="Standard")
-    ent_plan = Plan.objects.get(name="Enterprise")
     #print('The three plans are; %s, %s and %s.'%(smb_plan, stdrd_plan, ent_plan))
-    plans = {
-        'p1': smb_plan,
-        'p2': stdrd_plan,
-        'p3': ent_plan
-    }
+    illustrations = ['images/small-business-plan.svg', 'images/standard-plan.svg', 'images/enterprise-plan.svg']
+    plans = Plan.objects.filter(can_be_viewed=True).order_by('monthly_price')[:3]
+    zipped_plans = zip(plans, illustrations)
     context = {
-        'plans': plans,
+        'zipped_plans': zipped_plans,
+        'show_sales_arguments': True,
     }
     #if user is anonymous
     ## -> SHow plans with buttons that lead to sign up (we'll add some memory later)
