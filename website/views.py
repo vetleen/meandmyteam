@@ -103,12 +103,14 @@ def sign_up(request):
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data['username'], form.cleaned_data['password'])
             user.save()
-            messages.success(request, 'Welcome aboard. This is your dashboard, where you can....', extra_tags='alert alert-success')
+            subscriber = Subscriber(user=user)
+            subscriber.save()
+            messages.success(request, 'Welcome aboard. Let\'s pick a plan.', extra_tags='alert alert-success')
             if user is not None:
                 auth.login(request, user)
             # redirect to a new URL:
 
-            return HttpResponseRedirect(reverse('dashboard'))
+            return HttpResponseRedirect(reverse('choose-plan'))
 
     return render(request, 'sign_up_form.html', context)
 
@@ -140,9 +142,11 @@ def login_view(request):
                 #print("user is: %s" % request.user)
                 #print("user is authenticated?: %s" % request.user.is_authenticated)
                 messages.success(request, 'You have logged in.', extra_tags='alert alert-success')
+                s = Subscriber.objects.get(user__username=request.user.username)
+                s = s.sync_with_stripe_plan()
                 return HttpResponseRedirect(request.GET.get('next', '/'))
             else:
-                #i don't see this happening, as my form validation should take care of this
+                #I don't see this happening, as my form validation should take care of this
                 messages.error(request, "Username and password did not match, please try again.", extra_tags='alert alert-warning')
     else:
         #make context
@@ -193,7 +197,9 @@ def edit_account_view(request):
 @login_required
 def your_plan_view(request):
     """View function for viewing and updating your plan"""
-    if request.user.subscriber.status() == 'inactive':
+    s=Subscriber.objects.get(user__username=request.user.username)
+    #print(s.update_plan_from_stripe_plan())
+    if request.user.subscriber.status == 'inactive':
         messages.info(request, 'You haven\'t picked a plan yet.', extra_tags='alert alert-info')
         return HttpResponseRedirect(reverse('choose-plan'))
     else:
@@ -234,8 +240,7 @@ def choose_plan_view(request):
 @login_required
 def set_up_subscription(request):
     ''' a view for setting subscription and redirecting to stripes checkout page '''
-    #Get or make stripe customer object
-    #stripe_customer = None
+    #Make a if catch that redirects already subscibed userv - this page is only for new subscriptions
 
     if request.user.subscriber.stripe_id is not None:
         stripe_customer = stripe.Customer.retrieve(request.user.subscriber.stripe_id)
@@ -259,7 +264,7 @@ def set_up_subscription(request):
         payment_method_types=['card'],
         subscription_data={
             'items': [{
-            'plan': 'plan_H7nTHThryy8L62', #'plan_H7llhUT5A1sOUP', #This is the 14.99 Small Business Plan (hopefully)
+            'plan': 'plan_H7nTHThryy8L62', #Since we only have one plan. in future, make choose-plan a forms and get it from cleaned_data
             }],
           },
           success_url=request.build_absolute_uri(reverse('set-up-subscription-success'))+'?stripe_session_id={CHECKOUT_SESSION_ID}', #'http:127.0.0.1:8000/set-up-subscription-success/?stripe_session_id={CHECKOUT_SESSION_ID}', #
@@ -277,38 +282,24 @@ def set_up_subscription(request):
 @login_required
 def set_up_subscription_success(request):
     ''' a view for receiving success message from stripe '''
-    #TODO:
-    #confirm that this exact subscription was created, and if so:
-        #update database with date_expires, plan and interval
-        #make sure that we test at the right points in time that a new payment has been made
-    #if not:
-        #start subscription anyway
-        #error message saying you can try again, but we will check manually,
-        #send a notification to admin
-
-    # GET stripes session-id and retrieve the session, from this retrieve the subscription_id and save it to db
+    # GET stripes session-id and retrieve the session,
     stripe_session_id = request.GET['stripe_session_id']
     completed_stripe_session = stripe.checkout.Session.retrieve(stripe_session_id)
-    #print(completed_stripe_session)
+
+    # Update the Subscriber object with the proper plan
     s=Subscriber.objects.get(user__username=request.user.username)
     s.stripe_subscription_id = completed_stripe_session.subscription
     s.save()
-
+    s = s.sync_with_stripe_plan()
+    #print('in the view we have a Subscriber: %s, with a stripe_subscription_id: %s.name'%(s.user.username, s.stripe_subscription_id))
     #Check that the subscription is now active or trialing
-    stripe_subscription = stripe.Subscription.retrieve(completed_stripe_session.subscription)
-    def evaluate_success(status):
-        if status == 'active':
-            return True
-        elif status == 'trialing':
-            return True
-        else:
-            return False
-
-    if evaluate_success(stripe_subscription.status): #Possible values are incomplete, incomplete_expired, trialing, active, past_due, canceled, or unpaid.
+    status = request.user.subscriber.status
+    #print('in the view we call status and get: %s'%(status))
+    if (status == 'active') or (status == 'trialing'): #Possible values are incomplete, trialing, active, expired, 'unable to charge'
         messages.success(request, 'You have succesfully set up a subscription', extra_tags='alert alert-success')
         return HttpResponseRedirect(reverse('your-plan'))
     else:
-        messages.error(request, 'Oh no. This rarely (never?) happens. Our payment provider sent you to this page because you completed subscription setup, but when we double check, the status-message, which we expected to be "completed" is "%s" instead. Don\'t worry though. We are looking in to the matter.'%(completed_stripe_session.payment_intent), extra_tags='alert alert-warning')
+        messages.error(request, 'Oh no. This rarely (never?) happens. Our payment provider sent you to this page because you completed subscription setup, but when we check your subscription status, the status-message, which we expected to be "active" or "trialing" is "%s" instead.'%(status), extra_tags='alert alert-warning')
         return HttpResponseRedirect(reverse('your-plan'))
 
 @login_required

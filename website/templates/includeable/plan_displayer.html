@@ -27,7 +27,15 @@
       {% if request.user.subscriber.plan == plan %}
         <small class="text-muted">You are on this plan</small><br />
         {% if request.user.subscriber.status == "active" %}<span class="badge badge-success">Expires: {{ request.user.subscriber.date_current_plan_expires }}.</span>{% endif %}
-        {% if request.user.subscriber.status == "expired" %}<span class="badge badge-warning">Expired: {{ request.user.subscriber.date_current_plan_expires }}.</span>{% endif %}
+        {% if request.user.subscriber.status == "trialing" %}<span class="badge badge-success">Expires: {{ request.user.subscriber.date_current_plan_expires }}.</span>{% endif %}
+        {% if request.user.subscriber.status == "expired" %}
+          <span class="badge badge-warning">Your old plan: {{ request.user.subscriber.date_current_plan_expires }}.</span>
+          <a class="btn btn-dark" href="{% url 'set-up-subscription' %}" role="button"> Restart </a>
+        {% endif %}
+        {% if request.user.subscriber.status == "unable to charge" %}
+          <span class="badge badge-warning">Your old plan: {{ request.user.subscriber.date_current_plan_expires }}.</span>
+          <a class="btn btn-dark" href="{% url 'set-up-subscription' %}" role="button"> Update payment method </a>
+        {% endif %}
         {% if request.user.subscriber.status == "inactive" %}<span class="badge badge-warning">You havent picked a plan yet.</span>{% endif %}
       {% else %}
         <a class="btn

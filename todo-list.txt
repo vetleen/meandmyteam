@@ -35,3 +35,4 @@ stripe-integration
 SEO?
 Google ads
 Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)
+password validation for signup
