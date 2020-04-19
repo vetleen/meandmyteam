@@ -31,7 +31,7 @@ class SalesArgument(models.Model):
         default=None,
         help_text='Should a badge accompany the argument?',
     )
-    badge_text = models.CharField(max_length=255, blank=True, default=None, help_text='What should the badge (if any) say?')
+    badge_text = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='What should the badge (if any) say?')
     is_active = models.BooleanField(default=True, help_text='Is this argument active (supposed to be visible)?')
 
     def __str__(self):
@@ -92,6 +92,10 @@ class Subscriber(models.Model):
         default='',
         help_text='Payment interval',
     )
+    #stripe
+    stripe_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='Subscribers Customer object ID in Stripe API')
+    stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='Subscribers Subscription object ID in Stripe API')
+
     def payment_amount(self):
         ''' return the amount due at each payment time. Does not currently account for any employees over included-limit '''
         if custom_price is not None:

@@ -4,10 +4,11 @@ prettier current user in nav
 more info in edit profile AND in sing up
 
 #dev
+
 allow users to pick their own plan (use forms for csrf?)
 add illustrations as DB-field for plan, and use that to display them in the plan-displayer
 tests for new views and models
-
+cancel plan
 
 #Product #1
 add product model and related view logic

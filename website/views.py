@@ -234,31 +234,86 @@ def choose_plan_view(request):
 @login_required
 def set_up_subscription(request):
     ''' a view for setting subscription and redirecting to stripes checkout page '''
-    print(reverse('set-up-subscription-success')+'?stripe_session_id={CHECKOUT_SESSION_ID}')
+    #Get or make stripe customer object
+    #stripe_customer = None
+
+    if request.user.subscriber.stripe_id is not None:
+        stripe_customer = stripe.Customer.retrieve(request.user.subscriber.stripe_id)
+        print("retrieved customer with id %s"%(stripe_customer.id))
+        #user has already got a stripe id and any choosing of plan shjould refledct that
+    else:
+        #user does not have astripe customer id, and we should make one
+        stripe_customer = stripe.Customer.create(
+            description="Test Customer from set_up_subscription_view",
+            email=request.user.email,
+            )
+        print("created customer with id %s"%(stripe_customer.id))
+
+        s=Subscriber.objects.get(user__username=request.user.username)
+        s.stripe_id=stripe_customer.id
+        s.save()
+        s2=Subscriber.objects.get(user__username=request.user.username)
+
     stripe_session = stripe.checkout.Session.create(
+        customer=stripe_customer.id,
         payment_method_types=['card'],
         subscription_data={
             'items': [{
             'plan': 'plan_H7nTHThryy8L62', #'plan_H7llhUT5A1sOUP', #This is the 14.99 Small Business Plan (hopefully)
             }],
           },
-          success_url=reverse('set-up-subscription-success')+'?stripe_session_id={CHECKOUT_SESSION_ID}', #'http:127.0.0.1:8000/set-up-subscription-success/?stripe_session_id={CHECKOUT_SESSION_ID}', #
-          cancel_url=reverse('set-up-subscription-cancel') #'http:127.0.0.1:8000/set-up-subscription-cancel/',
+          success_url=request.build_absolute_uri(reverse('set-up-subscription-success'))+'?stripe_session_id={CHECKOUT_SESSION_ID}', #'http:127.0.0.1:8000/set-up-subscription-success/?stripe_session_id={CHECKOUT_SESSION_ID}', #
+          cancel_url=request.build_absolute_uri(reverse('set-up-subscription-cancel'))#reverse('set-up-subscription-cancel') #'http:127.0.0.1:8000/set-up-subscription-cancel/',
         )
+    #TODO:
+
     context = {
         'stripe_session': stripe_session,
         'stripe_pk': stripe_pk,
     }
-    return render(request, 'set_up_subscription.html', context)
+
+    return render(request, 'set_up_subscription.html', context) #should just redirect to stripe?
 
 @login_required
 def set_up_subscription_success(request):
     ''' a view for receiving success message from stripe '''
-    messages.success(request, 'You have succesfully set up a subscription', extra_tags='alert alert-success')
-    return HttpResponseRedirect(reverse('your-plan'))
+    #TODO:
+    #confirm that this exact subscription was created, and if so:
+        #update database with date_expires, plan and interval
+        #make sure that we test at the right points in time that a new payment has been made
+    #if not:
+        #start subscription anyway
+        #error message saying you can try again, but we will check manually,
+        #send a notification to admin
+
+    # GET stripes session-id and retrieve the session, from this retrieve the subscription_id and save it to db
+    stripe_session_id = request.GET['stripe_session_id']
+    completed_stripe_session = stripe.checkout.Session.retrieve(stripe_session_id)
+    #print(completed_stripe_session)
+    s=Subscriber.objects.get(user__username=request.user.username)
+    s.stripe_subscription_id = completed_stripe_session.subscription
+    s.save()
+
+    #Check that the subscription is now active or trialing
+    stripe_subscription = stripe.Subscription.retrieve(completed_stripe_session.subscription)
+    def evaluate_success(status):
+        if status == 'active':
+            return True
+        elif status == 'trialing':
+            return True
+        else:
+            return False
+
+    if evaluate_success(stripe_subscription.status): #Possible values are incomplete, incomplete_expired, trialing, active, past_due, canceled, or unpaid.
+        messages.success(request, 'You have succesfully set up a subscription', extra_tags='alert alert-success')
+        return HttpResponseRedirect(reverse('your-plan'))
+    else:
+        messages.error(request, 'Oh no. This rarely (never?) happens. Our payment provider sent you to this page because you completed subscription setup, but when we double check, the status-message, which we expected to be "completed" is "%s" instead. Don\'t worry though. We are looking in to the matter.'%(completed_stripe_session.payment_intent), extra_tags='alert alert-warning')
+        return HttpResponseRedirect(reverse('your-plan'))
 
 @login_required
 def set_up_subscription_cancel(request):
     ''' a view for receiving error message from stripe '''
+
     messages.error(request, 'The subscription setup process was cancelled. Try again?', extra_tags='alert alert-danger')
-    return HttpResponseRedirect(reverse('your-plan'))
+    return HttpResponseRedirect(reverse('choose-plan'))
