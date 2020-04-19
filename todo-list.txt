@@ -1,10 +1,14 @@
 ##MeAndMyTeam
 
-add plans to sign-up-process
+prettier current user in nav
+more info in edit profile AND in sing up
+
+#dev
+allow users to pick their own plan (use forms for csrf?)
+add illustrations as DB-field for plan, and use that to display them in the plan-displayer
+tests for new views and models
 
 
-
-#programming
 #Product #1
 add product model and related view logic
 add support for manually adding employees
@@ -12,6 +16,7 @@ add data visuallization on web
 add report-generator (I see there are heroku addons for html->pdf)
 
 #fun stuff
+
 design logo
 add screenshots to show of products on front page
 create "customers" for social-proof bar

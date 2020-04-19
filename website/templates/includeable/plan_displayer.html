@@ -36,7 +36,7 @@
           {% else %}
               btn-secondary disabled
           {% endif %}
-            " href="#" role="button">
+            " href="{% url 'set-up-subscription' %}" role="button">
           {% if plan.can_be_picked %}Choose{% else %}Available soon{% endif %}
         </a>
       {% endif %}

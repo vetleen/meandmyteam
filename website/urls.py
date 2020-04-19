@@ -36,6 +36,9 @@ urlpatterns = [
     path('edit-account/', views.edit_account_view, name='edit-account'),
     path('your-plan/', views.your_plan_view, name='your-plan'),
     path('choose-plan/', views.choose_plan_view, name='choose-plan'),
+    path('set-up-subscription/', views.set_up_subscription, name='set-up-subscription'),
+    path('set-up-subscription-success/', views.set_up_subscription_success, name='set-up-subscription-success'),
+    path('set-up-subscription-cancel/', views.set_up_subscription_cancel, name='set-up-subscription-cancel'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
 
 ]

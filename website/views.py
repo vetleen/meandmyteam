@@ -1,13 +1,13 @@
-from django.shortcuts import render
+from django.conf import settings
 
 from website.forms import ChangePasswordForm, SignUpForm, LoginForm, EditAccountForm
 from website.models import Subscriber, Plan
-from django.views import generic
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView #dont think this is needed anymore
 
+from django.views import generic
+from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
-
 from django.urls import reverse
 from django.urls import reverse_lazy
 
@@ -15,8 +15,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash, login, authenticate
 from django.contrib import auth
-
 from django.contrib import messages
+
+
+import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+stripe_pk = settings.STRIPE_PUBLISHABLE_KEY
+stripe_sk = settings.STRIPE_SECRET_KEY
 #from catalog.models import ...
 
 # Create your views here.
@@ -225,3 +230,35 @@ def choose_plan_view(request):
     ## -> Show plans, buttons say "Pick plan"
 
     return render(request, 'choose_plan.html', context)
+
+@login_required
+def set_up_subscription(request):
+    ''' a view for setting subscription and redirecting to stripes checkout page '''
+    print(reverse('set-up-subscription-success')+'?stripe_session_id={CHECKOUT_SESSION_ID}')
+    stripe_session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        subscription_data={
+            'items': [{
+            'plan': 'plan_H7nTHThryy8L62', #'plan_H7llhUT5A1sOUP', #This is the 14.99 Small Business Plan (hopefully)
+            }],
+          },
+          success_url=reverse('set-up-subscription-success')+'?stripe_session_id={CHECKOUT_SESSION_ID}', #'http:127.0.0.1:8000/set-up-subscription-success/?stripe_session_id={CHECKOUT_SESSION_ID}', #
+          cancel_url=reverse('set-up-subscription-cancel') #'http:127.0.0.1:8000/set-up-subscription-cancel/',
+        )
+    context = {
+        'stripe_session': stripe_session,
+        'stripe_pk': stripe_pk,
+    }
+    return render(request, 'set_up_subscription.html', context)
+
+@login_required
+def set_up_subscription_success(request):
+    ''' a view for receiving success message from stripe '''
+    messages.success(request, 'You have succesfully set up a subscription', extra_tags='alert alert-success')
+    return HttpResponseRedirect(reverse('your-plan'))
+
+@login_required
+def set_up_subscription_cancel(request):
+    ''' a view for receiving error message from stripe '''
+    messages.error(request, 'The subscription setup process was cancelled. Try again?', extra_tags='alert alert-danger')
+    return HttpResponseRedirect(reverse('your-plan'))

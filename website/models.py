@@ -67,6 +67,9 @@ class Plan(models.Model):
     )
     sales_argument = models.ManyToManyField(SalesArgument, blank=True, help_text='Select sales arguments for this plan')
 
+    ##Stripe integration
+    # stripe_plan_id
+
     def __str__(self):
         """String for representing the Plan object (in Admin site etc.)."""
         return self.name

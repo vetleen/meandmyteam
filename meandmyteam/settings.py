@@ -165,5 +165,10 @@ SECURE_CONTENT_TYPE_NOSNIFF= os.environ.get('SECURE_CONTENT_TYPE_NOSNIFF', False
 #Click the “Query” button.
 #Your response should be “Not found”.
 
+# Stripe
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_KSHWYtZDDXM7JyT3bYh7FwFo00DLnvv5oo')
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'pk_test_hCfN72HDs7hq5Vi5B1puaMnR00GhpS0vZN')
+
+
 # Activate Django-Heroku.
 django_heroku.settings(locals())
