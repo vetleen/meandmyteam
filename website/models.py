@@ -78,10 +78,11 @@ class Plan(models.Model):
 
 class Subscriber(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, blank=True, null=True) #default free / no plan?
+    plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, blank=True, null=True)
     date_current_plan_expires = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='The date the current strupe subscription ends')
     status = models.CharField(max_length=35, blank=True, null=True, default=None, help_text='The subscrition status of the Subscriber')
     date_last_synced_with_stripe = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='The date this object was synced with Stripe')
+    flagged_interest_in_plan = models.CharField(max_length=60, blank=True, null=True, help_text='Subscriber is interested in this plan')
 
     #stripe
     stripe_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='Subscribers Customer object ID in Stripe API')
@@ -90,20 +91,20 @@ class Subscriber(models.Model):
     def sync_with_stripe_plan(self):
         stripe_subscription = stripe.Subscription.retrieve(self.stripe_subscription_id)
 
-        #Set the plan
+        #Update the plan
         plan_to_set = Plan.objects.get(stripe_plan_id=stripe_subscription.plan.id)
         self.plan = plan_to_set
 
-        #Set expiry date
+        #Update the plans expiery date
         self.date_current_plan_expires = datetime.datetime.fromtimestamp(stripe_subscription.current_period_end).date()
 
-        #Set status of the Subscriber
+        #Update status of the Subscriber
         if stripe_subscription.status == 'active':
             val_to_set = 'active'
         if stripe_subscription.status == 'trialing':
             val_to_set =  'trialing'
         if stripe_subscription.status == 'canceled':
-            val_to_set =  'expired'
+            val_to_set =  'canceled'
         if stripe_subscription.status == 'unpaid':
             val_to_set =  'expired'
         if stripe_subscription.status == 'incomplete':
@@ -114,6 +115,7 @@ class Subscriber(models.Model):
             val_to_set =  'unable to charge'
         self.status = val_to_set
 
+        #Update the day this account was synced
         self.date_last_synced_with_stripe = datetime.date.today()
 
         self.save()

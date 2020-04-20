@@ -55,6 +55,8 @@
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="{% url 'change-password'%}">Change password</a>
                     <a class="dropdown-item" href="{% url 'edit-account'%}">Your profile</a>
+
+                    {% if user.subscriber.status == 'active' or user.subscriber.status == 'trialing' or user.subscriber.status == 'expired' or user.subscriber.status == 'unable to charge' %}
                     <a class="dropdown-item" href="{% url 'your-plan'%}">Your plan
                       {% if request.user.subscriber.status == 'active' %}
                         <span class="badge badge-success">Active</span>
@@ -62,12 +64,17 @@
                         <span class="badge badge-success">Active</span>
                       {% elif request.user.subscriber.status == 'expired' %}
                         <span class="badge badge-warning">Expired</span>
+                      {% elif request.user.subscriber.status == 'canceled' %}
+                        <span class="badge badge-warning">Canceled</span>
                       {% elif request.user.subscriber.status == 'unable to charge' %}
                         <span class="badge badge-warning">Update payment method</span>
                       {% else %}
                         <span class="badge badge-secondary">No active plan</span>
                       {% endif %}</a>
+                    {% else %}
                     <a class="dropdown-item" href="{% url 'choose-plan'%}">Choose a plan</a>
+                    {% endif %}
+
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">Log out</a>
                   </div>

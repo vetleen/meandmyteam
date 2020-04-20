@@ -1,5 +1,7 @@
 {% load static %}
 
+
+
 {% if zipped_plans %}{% for plan, illustration in zipped_plans %}
 <div class="col-lg-3 pb-4">
   <div class="card h-100">
@@ -14,42 +16,86 @@
       <h6 class="card-subtitle mb-2 text-muted text-center"><span class="badge badge-dark">vetleengesbak@gmail.com</span></h6>
       {% endif %}
       <p class="card-text {% if plan.can_be_picked %}text-body{% else %}text-secondary{% endif %}">{{ plan.description }}.</p>
+
     </div>
     {% if plan.sales_argument and show_sales_arguments %}
     <ul class="list-group list-group-flush">
       {% for arg in plan.sales_argument.all %}<li class="list-group-item {% if plan.can_be_picked %}text-body{% else %}text-secondary{% endif %}">{{ arg }} {% if arg.badge_text %}<span class="badge badge-{{ arg.badge_type }}">{{ arg.badge_text }}</span>{% endif %}</li>{% endfor %}
     </ul>
     {% endif %}
+    {% if show_footer %}
     <div class="text-center
     {% if request.user.subscriber.plan == plan %}pt-3 pb-4{% else %} py-4{% endif %}
     {% if show_sales_arguments %}{% else %}card-footer{% endif %}
     ">
-      {% if request.user.subscriber.plan == plan %}
-        <small class="text-muted">You are on this plan</small><br />
-        {% if request.user.subscriber.status == "active" %}<span class="badge badge-success">Expires: {{ request.user.subscriber.date_current_plan_expires }}.</span>{% endif %}
-        {% if request.user.subscriber.status == "trialing" %}<span class="badge badge-success">Expires: {{ request.user.subscriber.date_current_plan_expires }}.</span>{% endif %}
-        {% if request.user.subscriber.status == "expired" %}
-          <span class="badge badge-warning">Your old plan: {{ request.user.subscriber.date_current_plan_expires }}.</span>
-          <a class="btn btn-dark" href="{% url 'set-up-subscription' %}" role="button"> Restart </a>
-        {% endif %}
-        {% if request.user.subscriber.status == "unable to charge" %}
-          <span class="badge badge-warning">Your old plan: {{ request.user.subscriber.date_current_plan_expires }}.</span>
-          <a class="btn btn-dark" href="{% url 'set-up-subscription' %}" role="button"> Update payment method </a>
-        {% endif %}
-        {% if request.user.subscriber.status == "inactive" %}<span class="badge badge-warning">You havent picked a plan yet.</span>{% endif %}
-      {% else %}
-        <a class="btn
-          {% if plan.can_be_picked %}
-              btn-dark
-          {% else %}
-              btn-secondary disabled
-          {% endif %}
-            " href="{% url 'set-up-subscription' %}" role="button">
-          {% if plan.can_be_picked %}Choose{% else %}Available soon{% endif %}
-        </a>
-      {% endif %}
 
+        {% if request.user.subscriber.plan == plan %}
+
+          {% if request.user.subscriber.status == "active" %}
+
+            <span class="badge badge-success">Paid in full until: {{ request.user.subscriber.date_current_plan_expires }}.</span><br />
+            <small><a href="{% url 'cancel-plan' %}" class="text-danger">(cancel this plan)</a></small>
+          {% endif %}
+          {% if request.user.subscriber.status == "trialing" %}
+            <small class="text-muted">You are trialing this plan</small><br />
+            <span class="badge badge-success">Trial ends: {{ request.user.subscriber.date_current_plan_expires }}.</span>
+          {% endif %}
+          {% if request.user.subscriber.status == "expired" %}
+            <span class="badge badge-warning">Expired: {{ request.user.subscriber.date_current_plan_expires }}.</span>
+            <form action="{% url 'set-up-subscription' %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" role="submit" class="btn btn-dark" name="chosen_plan" value="{{ plan.name }}"> Restart</button>
+            </form>
+          {% endif %}
+          {% if request.user.subscriber.status == "unable to charge" %}
+            <span class="badge badge-warning">Expired: {{ request.user.subscriber.date_current_plan_expires }}.</span>
+            <form action="{% url 'set-up-subscription' %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" role="submit" class="btn btn-dark" name="chosen_plan" value="{{ plan.name }}"> Update payment method </button>
+            </form>
+          {% endif %}
+          {% if request.user.subscriber.status == "inactive" %}
+            <span class="badge badge-warning">You havent picked a plan yet.</span>
+          {% endif %}
+
+        {% elif request.user.subscriber.plan %}
+          {% if plan.can_be_picked %}
+          <form action="#" method="POST">
+            {% csrf_token %}
+            <button type="submit" role="submit" class="btn btn-dark" name="chosen_plan" value="{{ plan.name }}"> Change plan</button>
+          </form>
+          {% else %}
+            <span class="badge badge-dark">This plan is unavailable right now.</span><br />
+
+            {% if request.user.subscriber.flagged_interest_in_plan == plan.name %}
+            <small class="text-muted">(You are interested in this plan)</small><br />
+            {% else %}
+            <form action="{% url 'show-interest-in-unavailable-plan' %}?next={{request.path}}" method="POST">
+              {% csrf_token %}
+              <button type="submit" role="submit" class="btn btn-link btn-sm" name="chosen_plan" value="{{ plan.name }}"><span style="font-size:small;">(Let us know you are interested)</span></button>
+            </form>
+            {% endif %}
+          {% endif %}
+        {% else %}
+          {% if plan.can_be_picked %}
+            <form action="{% url 'set-up-subscription' %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" role="submit" class="btn btn-dark" name="chosen_plan" value="{{ plan.name }}"> Choose plan</button>
+            </form>
+          {% else %}
+            <span class="badge badge-dark">This plan is unavailable right now.</span><br />
+            {% if request.user.subscriber.flagged_interest_in_plan == plan.name %}
+              <small class="text-muted">(You are interested in this plan)</small><br />
+            {% else %}
+            <form action="{% url 'show-interest-in-unavailable-plan' %}?next={{request.path}}" method="POST">
+              {% csrf_token %}
+              <button type="submit" role="submit" class="btn btn-link btn-sm" name="chosen_plan" value="{{ plan.name }}"><span style="font-size:small;">(Let us know you are interested)</span></button>
+            </form>
+            {% endif %}
+          {% endif %}
+        {% endif %}
     </div>
+    {% endif %}
   </div><!-- card -->
 </div><!-- col -->
 {% endfor %}{% endif %}

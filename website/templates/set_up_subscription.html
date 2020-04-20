@@ -8,9 +8,6 @@ var stripe = Stripe('{{ stripe_pk }}');
 function myFunction(){
   document.getElementById("error-message").innerHTML = "myFunction is called";
   stripe.redirectToCheckout({
-  // Make the id field from the Checkout Session creation API response
-  // available to this file, so you can provide it as parameter here
-  // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
   sessionId: '{{ stripe_session.id }}'
 }).then(function (result) {
   // If `redirectToCheckout` fails due to a browser or network
@@ -30,18 +27,22 @@ function myFunction(){
 {% block content %}
 <div class="container">
   <div class="row pt-4">
-    <div class="col-lg-6">
+    <div class="col-sm-12">
       <h3> Confirm plan and go to our payment provider </h3>
-    </div>
-  </div> <!-- row -->
-<div class="row justify-content-center pt-2">
-{% include "includeable/message_displayer.html" %}
+    </div><!-- col -->
+    <div class="col-sm-12">
+      <p></p>
+    </div><!-- col -->
   </div><!-- row -->
-  <div class="row justify-content-center pt-2">
-    <p>You have chosen to PAY. Go to payments-provider:  <button onclick="myFunction()">Go to stripe</button> </p>
-    <br />
-    <p id="error-message"></p>
-    <p>Use this: 4242424242424242</p>
+    <div class="row justify-content-center">
+  {% include "includeable/message_displayer.html" %}
+  {% include "includeable/plan_displayer.html" %}
+
+    <div class="col-sm-12 text-center">
+      <button class="btn btn-success" onclick="myFunction()">Set up payments</button>
+      <a href="{% url 'choose-plan'%}" class="btn btn-warning">Chose a different plan</a>
+    </div> <!-- col -->
+    <div id="error-message" class="col-sm-12 text-center">&nbsp;</div>
   </div><!-- row -->
 </div><!-- container -->
 

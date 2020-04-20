@@ -122,3 +122,15 @@ class EditAccountForm(forms.Form):
                 params={'taken_email': self.cleaned_data['username']}
             )
         return self.cleaned_data['username']
+
+        
+class ChoosePlanForm(forms.Form):
+    chosen_plan = forms.CharField(max_length = 50)
+
+    def clean_chosen_plan(self):
+        return self.cleaned_data['chosen_plan']
+class CancelPlanForm(forms.Form):
+    cancel_plan = forms.BooleanField(required=True)
+
+    def clean_cancel_plan(self):
+        return self.cleaned_data['cancel_plan']
