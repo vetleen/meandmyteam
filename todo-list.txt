@@ -1,7 +1,8 @@
 ##MeAndMyTeam
 
 prettier current user in nav
-more info in edit profile AND in sing up
+more info in edit profile AND in sign up
+users deciding to resignup before their last billing period expired, should not be billed doubly.
 
 #dev
 

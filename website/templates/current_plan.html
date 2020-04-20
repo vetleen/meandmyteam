@@ -7,7 +7,7 @@
       <h3> Your plan </h3>
     </div>
   </div> <!-- row -->
-<div class="row justify-content-center pt-2">
+<div class="row justify-content-left pt-2">
 {% include "includeable/message_displayer.html" %}
   </div><!-- row -->
 {% if request.user.subscriber.plan.is_paid == "y" %}
@@ -15,7 +15,7 @@
     {% include "includeable/plan_displayer.html" %}
   <div class="w-100"></div>
   <div class="col-sm-3 text-center">
-    <a href="{% url 'change-plan'%}" class="btn btn-primary" role="button">Change plan</a>
+    <a href="{% url 'change-plan'%}" class="btn btn-secondary" role="button">Change plan</a>
   </div><!-- col -->
 
   </div><!-- row -->

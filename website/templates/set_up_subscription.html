@@ -5,8 +5,7 @@
 <script>
 var stripe = Stripe('{{ stripe_pk }}');
 
-function myFunction(){
-  document.getElementById("error-message").innerHTML = "myFunction is called";
+function stripeRedirect(){
   stripe.redirectToCheckout({
   sessionId: '{{ stripe_session.id }}'
 }).then(function (result) {
@@ -39,7 +38,7 @@ function myFunction(){
   {% include "includeable/plan_displayer.html" %}
 
     <div class="col-sm-12 text-center">
-      <button class="btn btn-success" onclick="myFunction()">Set up payments</button>
+      <button class="btn btn-success" onclick="stripeRedirect()">Set up payments</button>
       <a href="{% url 'choose-plan'%}" class="btn btn-warning">Chose a different plan</a>
     </div> <!-- col -->
     <div id="error-message" class="col-sm-12 text-center">&nbsp;</div>

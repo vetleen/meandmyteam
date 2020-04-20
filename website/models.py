@@ -70,7 +70,7 @@ class Plan(models.Model):
     sales_argument = models.ManyToManyField(SalesArgument, blank=True, help_text='Select sales arguments for this plan')
 
     ##Stripe integration
-    stripe_plan_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='This Plans Plan-object ID in Stripe API')
+    stripe_plan_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='This Plans Plan-object ID in Stripe API, format should be "plan_H7nTHThryy8L62".')
 
     def __str__(self):
         """String for representing the Plan object (in Admin site etc.)."""
@@ -89,6 +89,9 @@ class Subscriber(models.Model):
     stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='Subscribers Subscription object ID in Stripe API')
 
     def sync_with_stripe_plan(self):
+        if self.stripe_subscription_id is None:
+            #avoid errors caused by tryiong to retrieve a stripe-subscription that's not there.
+            return self
         stripe_subscription = stripe.Subscription.retrieve(self.stripe_subscription_id)
 
         #Update the plan

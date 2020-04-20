@@ -240,12 +240,18 @@ def cancel_plan_view(request):
                 messages.success(request, 'Your plan was cancelled!', extra_tags='alert alert-success')
             else:
                 messages.error(request, 'Oh no! We tried to cancel your subscription with our payment provider, but was unable to. Please try again later, or drop us an email to let us know this happened, and we will get right on fixing it!', extra_tags='alert alert-warning')
-            s = s.sync_with_stripe_plan()
+            s = request.user.subscriber.sync_with_stripe_plan()
             return HttpResponseRedirect(reverse('your-plan'))
         else:
             messages.error(request, 'Oh no! We were unable to verify that you confirmed to cancel. This is totally our fault. You can try again later, or contact us directly.', extra_tags='alert alert-warning')
             return HttpResponseRedirect(reverse('your-plan'))
     return render(request, 'cancel_plan_confirm.html')
+
+@login_required
+def change_plan_view(request):
+    """View function for choosing a plan"""
+    messages.error(request, 'We currently have no support for changing plans (as there is only one available plan). Check back later, or let us know that you are interested in a different plan by email or by clicking the link below the plan you are interested in!', extra_tags='alert alert-warning')
+    return HttpResponseRedirect(reverse('choose-plan'))
 
 @login_required
 def show_interest_in_unavailable_plan(request):
@@ -256,7 +262,7 @@ def show_interest_in_unavailable_plan(request):
             interesting_plan_name = form.cleaned_data['chosen_plan']
             request.user.subscriber.flagged_interest_in_plan = interesting_plan_name
             request.user.subscriber.save()
-            messages.success(request, 'Thanks. We have noted your interest!', extra_tags='alert alert-success')
+            messages.success(request, 'Thanks. Your interest is duely noted! We will contact you once the plan becomes available.', extra_tags='alert alert-success')
         else:
             messages.error(request, 'Oh no! That feature doesn\'t work right now, but please check back in later!', extra_tags='alert alert-warning')
     return HttpResponseRedirect(request.GET.get('next', reverse('choose-plan')))
@@ -276,14 +282,17 @@ def set_up_subscription(request):
         print("trying to look up: %s"%(form.cleaned_data['chosen_plan']))
         chosen_plan = Plan.objects.get(name=form.cleaned_data['chosen_plan'])
         chosen_plan_id = chosen_plan.stripe_plan_id
+
     else:
         messages.error(request, 'Oh no! We are unable to recognize the plan you chose in our back-end. This is totally our fault! We\'d really appreciate you dropping us an email letting us know this happened!', extra_tags='alert alert-warning')
         return HttpResponseRedirect(reverse('choose-plan'))
 
     #Make sure we have a Stripe Customer object to work with
+    s=Subscriber.objects.get(user__username=request.user.username)
+    s = s.sync_with_stripe_plan()
     if request.user.subscriber.stripe_id is not None:
         #This happens if users use the Update payment method or Restart buttons on plans.
-        #This has not been tested that it works as intended by me atm.
+        #This currently bills the customer and starts new subsc., regardless of the old.
         stripe_customer = stripe.Customer.retrieve(request.user.subscriber.stripe_id)
     else:
         #user does not have a stripe customer id, and we should make one
@@ -292,19 +301,16 @@ def set_up_subscription(request):
             email=request.user.email,
             #more fields here later
             )
-
-        s=Subscriber.objects.get(user__username=request.user.username)
         s.stripe_id=stripe_customer.id
         s.save()
-        s2=Subscriber.objects.get(user__username=request.user.username)
-
-
+        s = s.sync_with_stripe_plan()
+    #Make a session where customer object can create a subscription and payment method object on stripe webpage
     stripe_session = stripe.checkout.Session.create(
         customer=stripe_customer.id,
         payment_method_types=['card'],
         subscription_data={
             'items': [{
-            'plan': chosen_plan_id, #Since we only have one plan. in future, make choose-plan a forms and get it from cleaned_data
+            'plan': chosen_plan_id,
             }],
           },
           success_url=request.build_absolute_uri(reverse('set-up-subscription-success'))+'?stripe_session_id={CHECKOUT_SESSION_ID}', #'http:127.0.0.1:8000/set-up-subscription-success/?stripe_session_id={CHECKOUT_SESSION_ID}', #
