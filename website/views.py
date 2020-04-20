@@ -235,12 +235,16 @@ def cancel_plan_view(request):
     if request.method == 'POST':
         form = CancelPlanForm(request.POST)
         if form.is_valid():
-            cancelled_sub = stripe.Subscription.delete(request.user.subscriber.stripe_subscription_id)
+            try:
+                cancelled_sub = stripe.Subscription.delete(request.user.subscriber.stripe_subscription_id)
+            except:
+                messages.error(request, 'While canceling your subscription we encountered an error. Probably your subscription was already cancelled. If your subscription remains active, and the problem persists, please contact us.', extra_tags='alert alert-warning')
+            s=request.user.subscriber.sync_with_stripe_plan()
             if cancelled_sub.status == 'canceled':
                 messages.success(request, 'Your plan was cancelled!', extra_tags='alert alert-success')
             else:
                 messages.error(request, 'Oh no! We tried to cancel your subscription with our payment provider, but was unable to. Please try again later, or drop us an email to let us know this happened, and we will get right on fixing it!', extra_tags='alert alert-warning')
-            s = request.user.subscriber.sync_with_stripe_plan()
+            #s = request.user.subscriber.sync_with_stripe_plan()
             return HttpResponseRedirect(reverse('your-plan'))
         else:
             messages.error(request, 'Oh no! We were unable to verify that you confirmed to cancel. This is totally our fault. You can try again later, or contact us directly.', extra_tags='alert alert-warning')
