@@ -235,16 +235,19 @@ def cancel_plan_view(request):
     if request.method == 'POST':
         form = CancelPlanForm(request.POST)
         if form.is_valid():
+            canceled_sub=""
             try:
-                cancelled_sub = stripe.Subscription.delete(request.user.subscriber.stripe_subscription_id)
+                canceled_sub = stripe.Subscription.delete(request.user.subscriber.stripe_subscription_id)
             except:
                 messages.error(request, 'While canceling your subscription we encountered an error. Probably your subscription was already cancelled. If your subscription remains active, and the problem persists, please contact us.', extra_tags='alert alert-warning')
             s=request.user.subscriber.sync_with_stripe_plan()
-            if cancelled_sub.status == 'canceled':
-                messages.success(request, 'Your plan was cancelled!', extra_tags='alert alert-success')
-            else:
-                messages.error(request, 'Oh no! We tried to cancel your subscription with our payment provider, but was unable to. Please try again later, or drop us an email to let us know this happened, and we will get right on fixing it!', extra_tags='alert alert-warning')
-            #s = request.user.subscriber.sync_with_stripe_plan()
+            try:
+                if canceled_sub.status == 'canceled':
+                    messages.success(request, 'Your plan was cancelled!', extra_tags='alert alert-success')
+                else:
+                    messages.error(request, 'Oh no! We tried to cancel your subscription with our payment provider, but was unable to. Please try again later, or drop us an email to let us know this happened, and we will get right on fixing it!', extra_tags='alert alert-warning')
+            except:
+                    messages.error(request, 'Oh no! We tried to cancel your subscription with our payment provider, but was unable to. Please try to log out and in, and then try again.Drop us an email to let us know if this keeps happening.', extra_tags='alert alert-warning')
             return HttpResponseRedirect(reverse('your-plan'))
         else:
             messages.error(request, 'Oh no! We were unable to verify that you confirmed to cancel. This is totally our fault. You can try again later, or contact us directly.', extra_tags='alert alert-warning')
@@ -297,29 +300,41 @@ def set_up_subscription(request):
     if request.user.subscriber.stripe_id is not None:
         #This happens if users use the Update payment method or Restart buttons on plans.
         #This currently bills the customer and starts new subsc., regardless of the old.
-        stripe_customer = stripe.Customer.retrieve(request.user.subscriber.stripe_id)
+        try:
+            stripe_customer = stripe.Customer.retrieve(request.user.subscriber.stripe_id)
+        except:
+            messages.error(request, 'Oh no! We were unable to retrieve your customer data from our payment provider. If the problem persists, please contact us. ', extra_tags='alert alert-warning')
+            return HttpResponseRedirect(reverse('choose-plan'))
     else:
         #user does not have a stripe customer id, and we should make one
-        stripe_customer = stripe.Customer.create(
-            description="Test Customer from set_up_subscription_view",
-            email=request.user.email,
-            #more fields here later
-            )
-        s.stripe_id=stripe_customer.id
-        s.save()
-        s = s.sync_with_stripe_plan()
+        try:
+            stripe_customer = stripe.Customer.create(
+                description="Test Customer from set_up_subscription_view",
+                email=request.user.email,
+                #more fields here later
+                )
+            s.stripe_id=stripe_customer.id
+            s.save()
+            s = s.sync_with_stripe_plan()
+        except:
+            messages.error(request, 'Oh no! We were unable to connect with our payment provider. This usualy lasts very shortly. ', extra_tags='alert alert-warning')
+            return HttpResponseRedirect(reverse('choose-plan'))
     #Make a session where customer object can create a subscription and payment method object on stripe webpage
-    stripe_session = stripe.checkout.Session.create(
-        customer=stripe_customer.id,
-        payment_method_types=['card'],
-        subscription_data={
-            'items': [{
-            'plan': chosen_plan_id,
-            }],
-          },
-          success_url=request.build_absolute_uri(reverse('set-up-subscription-success'))+'?stripe_session_id={CHECKOUT_SESSION_ID}', #'http:127.0.0.1:8000/set-up-subscription-success/?stripe_session_id={CHECKOUT_SESSION_ID}', #
-          cancel_url=request.build_absolute_uri(reverse('set-up-subscription-cancel'))#reverse('set-up-subscription-cancel') #'http:127.0.0.1:8000/set-up-subscription-cancel/',
-        )
+    try:
+        stripe_session = stripe.checkout.Session.create(
+            customer=stripe_customer.id,
+            payment_method_types=['card'],
+            subscription_data={
+                'items': [{
+                'plan': chosen_plan_id,
+                }],
+              },
+              success_url=request.build_absolute_uri(reverse('set-up-subscription-success'))+'?stripe_session_id={CHECKOUT_SESSION_ID}', #'http:127.0.0.1:8000/set-up-subscription-success/?stripe_session_id={CHECKOUT_SESSION_ID}', #
+              cancel_url=request.build_absolute_uri(reverse('set-up-subscription-cancel'))#reverse('set-up-subscription-cancel') #'http:127.0.0.1:8000/set-up-subscription-cancel/',
+            )
+    except:
+            messages.error(request, 'Oh no! We were unable to connect with our payment provider. This usually doesn\'t last very long. However, if the problem persists, please contact us. ', extra_tags='alert alert-warning')
+            return HttpResponseRedirect(reverse('choose-plan'))
     illustration = 'images/small-business-plan.svg'
     zipped_plans = {(chosen_plan, illustration)}
 
@@ -341,8 +356,11 @@ def set_up_subscription_success(request):
     ''' a view for receiving success message from stripe '''
     # GET stripes session-id and retrieve the session,
     stripe_session_id = request.GET['stripe_session_id']
-    completed_stripe_session = stripe.checkout.Session.retrieve(stripe_session_id)
-
+    try:
+        completed_stripe_session = stripe.checkout.Session.retrieve(stripe_session_id)
+    except:
+        messages.error(request, 'Oh no! Your payment was successful, but then we were unable to connect to our payment provider to sync your settings on our side. We\'ll do it manually though, but it may take a while. Feel free to drop us an email letting us know about the problem.', extra_tags='alert alert-warning')
+        return HttpResponseRedirect(reverse('your-plan'))
     # Update the Subscriber object with the proper plan
     s=Subscriber.objects.get(user__username=request.user.username)
     s.stripe_subscription_id = completed_stripe_session.subscription

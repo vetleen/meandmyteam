@@ -6,10 +6,8 @@ users deciding to resignup before their last billing period expired, should not 
 
 #dev
 
-allow users to pick their own plan (use forms for csrf?)
 add illustrations as DB-field for plan, and use that to display them in the plan-displayer
 tests for new views and models
-cancel plan
 
 #Product #1
 add product model and related view logic
@@ -32,7 +30,7 @@ pick and connect domain
 set up basic email
 email-integration and password reset
 chat-box
-stripe-integration
+
 SEO?
 Google ads
 Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)

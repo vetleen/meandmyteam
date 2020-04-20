@@ -89,10 +89,15 @@ class Subscriber(models.Model):
     stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='Subscribers Subscription object ID in Stripe API')
 
     def sync_with_stripe_plan(self):
+        ''' Syncs the SUBSCRIPTION with stripe '''
         if self.stripe_subscription_id is None:
             #avoid errors caused by tryiong to retrieve a stripe-subscription that's not there.
             return self
-        stripe_subscription = stripe.Subscription.retrieve(self.stripe_subscription_id)
+        try:
+            stripe_subscription = stripe.Subscription.retrieve(self.stripe_subscription_id)
+        except:
+            print('There was an error at sync wityh stripe plan. Unable to retrieve Subscription with id %s, for user %s.'%(self.stripe_subscription_id, self.user) )
+            return self
 
         #Update the plan
         plan_to_set = Plan.objects.get(stripe_plan_id=stripe_subscription.plan.id)
