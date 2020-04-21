@@ -47,6 +47,7 @@ class Plan(models.Model):
 
     # Fields
     name = models.CharField(max_length=60, help_text='Name of the plan')
+    illustration_static_address = models.CharField(max_length=255, blank=True, null=True, help_text='The static address to to the ilustration in use. e.g."images/small-business-plan.svg"')
     description = models.CharField(max_length=255, help_text='A short description of the plan')
     monthly_price = models.DecimalField(max_digits=10, decimal_places=2, help_text='Montly price')
     yearly_price = models.DecimalField(max_digits=10, decimal_places=2, help_text='Yearly price')
@@ -70,7 +71,9 @@ class Plan(models.Model):
     sales_argument = models.ManyToManyField(SalesArgument, blank=True, help_text='Select sales arguments for this plan')
 
     ##Stripe integration
-    stripe_plan_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='This Plans Plan-object ID in Stripe API, format should be "plan_H7nTHThryy8L62".')
+    stripe_monthly_plan_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='This Plans monthly plan-object ID in Stripe API, format should be "plan_H7nTHThryy8L62".')
+    stripe_quarterly_plan_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='This Plans quarterly plan-object ID in Stripe API, format should be "plan_H7nTHThryy8L62".')
+    stripe_yearly_plan_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='This Plans yearly plan-object ID in Stripe API, format should be "plan_H7nTHThryy8L62".')
 
     def __str__(self):
         """String for representing the Plan object (in Admin site etc.)."""
@@ -96,11 +99,11 @@ class Subscriber(models.Model):
         try:
             stripe_subscription = stripe.Subscription.retrieve(self.stripe_subscription_id)
         except:
-            print('There was an error at sync wityh stripe plan. Unable to retrieve Subscription with id %s, for user %s.'%(self.stripe_subscription_id, self.user) )
+            print('There was an error when syncing Subscriber model with stripe Subscription. Unable to retrieve Subscription with id %s, for user %s.'%(self.stripe_subscription_id, self.user) )
             return self
 
         #Update the plan
-        plan_to_set = Plan.objects.get(stripe_plan_id=stripe_subscription.plan.id)
+        plan_to_set = Plan.objects.get(stripe_monthly_plan_id=stripe_subscription.plan.id)
         self.plan = plan_to_set
 
         #Update the plans expiery date

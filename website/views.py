@@ -203,11 +203,9 @@ def your_plan_view(request):
         messages.info(request, 'You haven\'t picked a plan yet.', extra_tags='alert alert-info')
         return HttpResponseRedirect(reverse('choose-plan'))
     else:
-        illustrations = ['images/small-business-plan.svg']
-        plans = [request.user.subscriber.plan]
-        zipped_plans = zip(plans, illustrations)
+
         context = {
-            'zipped_plans': zipped_plans,
+            'plans': [request.user.subscriber.plan],
             'show_sales_arguments': False,
             'show_footer': True,
         }
@@ -218,11 +216,9 @@ def choose_plan_view(request):
     """View function for choosing a plan"""
 
     #print('The three plans are; %s, %s and %s.'%(smb_plan, stdrd_plan, ent_plan))
-    illustrations = ['images/small-business-plan.svg', 'images/standard-plan.svg', 'images/enterprise-plan.svg']
     plans = Plan.objects.filter(can_be_viewed=True).order_by('monthly_price')[:3]
-    zipped_plans = zip(plans, illustrations)
     context = {
-        'zipped_plans': zipped_plans,
+        'plans': plans,
         'show_sales_arguments': True,
         'show_footer': True,
     }
@@ -286,9 +282,9 @@ def set_up_subscription(request):
     form = ChoosePlanForm(request.POST)
     if form.is_valid():
         print("ChoosePlanForm was valid")
-        print("trying to look up: %s"%(form.cleaned_data['chosen_plan']))
+        #print("trying to look up: %s"%(form.cleaned_data['chosen_plan']))
         chosen_plan = Plan.objects.get(name=form.cleaned_data['chosen_plan'])
-        chosen_plan_id = chosen_plan.stripe_plan_id
+        chosen_plan_id = chosen_plan.stripe_monthly_plan_id #only support monthly for now
 
     else:
         messages.error(request, 'Oh no! We are unable to recognize the plan you chose in our back-end. This is totally our fault! We\'d really appreciate you dropping us an email letting us know this happened!', extra_tags='alert alert-warning')
@@ -335,8 +331,6 @@ def set_up_subscription(request):
     except:
             messages.error(request, 'Oh no! We were unable to connect with our payment provider. This usually doesn\'t last very long. However, if the problem persists, please contact us. ', extra_tags='alert alert-warning')
             return HttpResponseRedirect(reverse('choose-plan'))
-    illustration = 'images/small-business-plan.svg'
-    zipped_plans = {(chosen_plan, illustration)}
 
     messages.info(request, 'You have chosen the %s plan, with monthly billing.'%(chosen_plan.name), extra_tags='alert alert-info')
     messages.info(request, 'Use this credit card in testing: 4242424242424242', extra_tags='alert alert-info')
@@ -344,7 +338,7 @@ def set_up_subscription(request):
     context = {
         'stripe_session': stripe_session,
         'stripe_pk': stripe_pk,
-        'zipped_plans': zipped_plans,
+        'plans': [chosen_plan],
         'show_sales_arguments': False,
         'show_footer': False,
     }
