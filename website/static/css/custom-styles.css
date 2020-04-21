@@ -25,7 +25,9 @@ code {
 }
 
 h1.main-page-headline{
-  color: #79d6f3;
+  /*color: #fff;
+  font-family: sans-serif;
+  color: #79d6f3;*/
   font-family: serif;
 }
 
@@ -34,4 +36,9 @@ div.social-proof{
   color: #8fadb6;
   font-weight: bold;
 
+}
+
+# motpanel logo
+.text-serif{
+  font-family: serif !important;
 }

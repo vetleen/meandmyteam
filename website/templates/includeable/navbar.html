@@ -1,0 +1,72 @@
+{% load static %}
+<!-- navbar begins -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light d-flex flex-column sticky-footer-wrapper">
+  <div class="container">
+      <!-- Logo -->
+        <a class="navbar-brand" href="{% url 'index' %}"><!--<img src={% static 'images/motpanel-logo.png' %} height="30"/>--><span class="text-info font-weight-bold" style="font-size:larger; font-family: serif;">motpanel</span></a>
+        <!-- collapse feature -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- main menu feature -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+          <ul class="navbar-nav">
+            {% if user.is_authenticated %}
+            <li class="nav-item {% if request.path == '/dashboard/' %}active{% endif %}">
+              <a class="nav-link" href="{% url 'dashboard' %}"> Dashboard {% if request.path == '/dashboard/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Account
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{% url 'change-password'%}">Change password</a>
+                <a class="dropdown-item" href="{% url 'edit-account'%}">Your profile</a>
+
+                {% if user.subscriber.status == 'active' or user.subscriber.status == 'trialing' or user.subscriber.status == 'expired' or user.subscriber.status == 'unable to charge' %}
+                <a class="dropdown-item" href="{% url 'your-plan'%}">Your plan
+                  {% if request.user.subscriber.status == 'active' %}
+                    <span class="badge badge-success">Active</span>
+                  {% elif request.user.subscriber.status == 'trialing' %}
+                    <span class="badge badge-success">Active</span>
+                  {% elif request.user.subscriber.status == 'expired' %}
+                    <span class="badge badge-warning">Expired</span>
+                  {% elif request.user.subscriber.status == 'canceled' %}
+                    <span class="badge badge-warning">Canceled</span>
+                  {% elif request.user.subscriber.status == 'unable to charge' %}
+                    <span class="badge badge-warning">Update payment method</span>
+                  {% else %}
+                    <span class="badge badge-secondary">No active plan</span>
+                  {% endif %}</a>
+                {% else %}
+                <a class="dropdown-item" href="{% url 'choose-plan'%}">Choose a plan</a>
+                {% endif %}
+
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">Log out</a>
+              </div>
+            </li>
+            {% else %}
+            <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+              <a class="nav-link" href="{% url 'index' %}">Home {% if request.path == '/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+            </li>
+            <li class="nav-item {% if request.path == '/accounts/login/' %}active{% endif %}">
+              <a class="nav-link" href="{% url 'loginc'%}">Login {% if request.path == '/login/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+            </li>
+            <li class="nav-item {% if request.path == '/sign-up' %}active{% endif %}">
+              <a class="nav-link" href="{% url 'sign-up'%}">Sign up{% if request.path == '/sign-up/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+            </li>
+            {% endif %}
+          </ul>
+          <span class="navbar-text">
+            {% if user.is_authenticated %}(currently logged in as: {{ user.get_username }}){% endif %}
+          </span>
+          <!--
+          <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn my-2 my-sm-0" type="submit">Search</button>
+          </form>
+        -->
+        </div><!-- navbar -->
+  </div><!-- container -->
+</nav>
