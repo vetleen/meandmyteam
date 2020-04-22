@@ -1,63 +1,9 @@
 
   <div class="container pt-3 pb-1">
-    <div class="row">
-      <div class="col-sm-4">
-        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">About this page</h6>
-        <p style="font-size: 14px;" class="text-muted">
-          <span class="text-info font-weight-bold" style="font-family: serif;">motpanel</span> is employee engagement software. Specifically, <span class="text-info font-weight-bold" style="font-family: serif;">motpanel</span> is a service that lets you easily and recurringly survey employee engagement.</p>
-
-
-      </div><!-- col -->
-      <div class="col-sm">
-        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">Points of interest</h6>
-        <ul class="list-unstyled">
-          <li>
-            <a href="{% url 'choose-plan' %}" style="font-size: 14px;" class="text-dark">Plans and prices</a>
-          </li>
-          <li>
-            <a href="#" style="font-size: 14px;" class="text-dark">About us</a>
-          </li>
-          <li>
-            {% if user.is_authenticated %}
-            <a href="{% url 'logout' %}" style="font-size: 14px;" class="text-dark">Log out</a>
-            {% else %}
-            <a href="{% url 'sign-up' %}" style="font-size: 14px;" class="text-dark">Sign up</a></li>
-            <li><a href="{% url 'loginc' %}" style="font-size: 14px;" class="text-dark">Login</a>
-            {% endif %}
-          </li>
-        </ul>
-      </div><!-- col -->
-      <div class="col-sm">
-        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">External links</h6>
-        <!--
-        <ul class="list-unstyled">
-          <li>
-            <a href="#!" style="font-size: 14px;" class="text-dark">Owners webpage</a>
-          </li>
-          <li>
-            <a href="#!" style="font-size: 14px;" class="text-dark">Press</a>
-          </li>
-          <li>
-            <a href="{% url 'index' %}" style="font-size: 14px;" class="text-dark">Something</a>
-          </li>
-        </ul>
-        -->
-      </div><!-- col -->
-      <div class="col-sm">
-        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">Contact</h6>
-        <p style="font-size: 14px;" class="text-muted">
-          <span class="text-info font-weight-bold" style="font-family: serif;">motpanel</span> is a brand of <br />
-          Engesbak Promotions<br />
-          co. Vetle Engesbak<br />
-          Elgestergate 58B <br />
-          NO-7030 Trondheim <br />
-          Norway
-        </p>
-      </div><!-- col -->
-    </div><!-- row -->
+    
       <div class="row">
       <div class="col-sm-12 text-center">
-        <span class="text-muted"><small>© 2020 <a href="{% url 'index' %}"> <span class="text-info font-weight-bold" style="font-family: serif;">motpanel</span></a></small></span><br />
+        <span class="text-muted"><small>© 2020 <span class="text-info font-weight-bold" style="font-family: serif;">motpanel</span>, a Engesbak Promotions brand.<br /><br />
       </div><!-- col -->
 
     </div><!-- row -->
