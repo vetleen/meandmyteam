@@ -84,7 +84,7 @@ DATABASES = {
 }
 
 #Email-config
-if os.environ.get('DJANGO_DEBUG') == False:
+if os.environ.get('DJANGO_DEBUG') == 'False':
     EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER', 'not_set')
     EMAIL_PORT = os.environ.get('MAILGUN_SMTP_PORT', '587')
     EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN', 'not_set')
