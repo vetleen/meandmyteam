@@ -82,7 +82,21 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+#Email-config
+if os.environ.get('DJANGO_DEBUG') == False:
+    EMAIL_HOST = os.environ.get('MAILGUN_SMTP_SERVER', 'not_set')
+    EMAIL_PORT = os.environ.get('MAILGUN_SMTP_PORT', '587')
+    EMAIL_HOST_USER = os.environ.get('MAILGUN_SMTP_LOGIN', 'not_set')
+    EMAIL_HOST_PASSWORD = os.environ.get('MAILGUN_SMTP_PASSWORD', 'not_set')
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
