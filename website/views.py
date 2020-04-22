@@ -107,8 +107,8 @@ def sign_up(request):
             subscriber.save()
             messages.success(request, 'Welcome aboard. Let\'s pick a plan.', extra_tags='alert alert-success')
             send_mail(
-                '[www] New user: %s!'%(request.user.username),
-                'User: %s has signed up!'%(request.user.username),
+                '[www] New user: %s!'%(user.username),
+                'User: %s has signed up!'%(user.username),
                 'sales@motpanel.com',
                 ['sales@motpanel.com'],
                 fail_silently=True,
