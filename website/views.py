@@ -302,13 +302,6 @@ def set_up_subscription(request):
 
     else:
         messages.error(request, 'Oh no! We are unable to recognize the plan you chose in our back-end. This is totally our fault! We\'d really appreciate you dropping us an email letting us know this happened!', extra_tags='alert alert-warning')
-        send_mail(
-            '[www-error] set_up_subscription view error',
-            'User: %s \n Plan: %s \n Error: form that should always be valid was not valid. Someone did not set the correct stripe ID in the DB.'%(request.user.username, cleaned_data['chosen_plan']),
-            'www-error@motpanel.com',
-            ['www-error@motpanel.com'],
-            fail_silently=True,
-        )
         return HttpResponseRedirect(reverse('choose-plan'))
 
     #Make sure we have a Stripe Customer object to work with
@@ -321,13 +314,6 @@ def set_up_subscription(request):
             stripe_customer = stripe.Customer.retrieve(request.user.subscriber.stripe_id)
         except:
             messages.error(request, 'Oh no! We were unable to retrieve your customer data from our payment provider. If the problem persists, please contact us. ', extra_tags='alert alert-warning')
-            send_mail(
-                '[www-error] set_up_subscription view error'
-                'User: %s \n Error: Couldn\'t get stripe id directly after setting it. Subscription setup was interrupted because of this error.'%(request.user.username),
-                'www-error@motpanel.com',
-                ['www-error@motpanel.com'],
-                fail_silently=True,
-            )
             return HttpResponseRedirect(reverse('choose-plan'))
 
     else:
@@ -359,13 +345,6 @@ def set_up_subscription(request):
             )
     except:
             messages.error(request, 'Oh no! We were unable to connect with our payment provider. This usually doesn\'t last very long. However, if the problem persists, please contact us. ', extra_tags='alert alert-warning')
-            send_mail(
-                '[www-error] set_up_subscription view error',
-                'User: %s \n Error: Unable to create a Session with stripe for stripe_id %s, and the plan %s.'%(request.user.username, stripe_customer.id, chosen_plan_id),
-                'www-error@motpanel.com',
-                ['www-error@motpanel.com'],
-                fail_silently=True,
-            )
             return HttpResponseRedirect(reverse('choose-plan'))
 
     messages.info(request, 'You have chosen the %s plan, with monthly billing.'%(chosen_plan.name), extra_tags='alert alert-info')
@@ -390,13 +369,6 @@ def set_up_subscription_success(request):
         completed_stripe_session = stripe.checkout.Session.retrieve(stripe_session_id)
     except:
         messages.error(request, 'Oh no! Your payment was successful, but then we were unable to connect to our payment provider to sync your settings on our side. Our people have been alerted, and will do it manually!', extra_tags='alert alert-warning')
-        send_mail(
-            '[www-error] set_up_subscription_success view error',
-            'User: %s \n Error: Unable to retrieve completed stripe session (%s) to confirm user had paid. Payment was not documented in our DB.'%(request.user.username, stripe_session_id),
-            'www-error@motpanel.com',
-            ['www-error@motpanel.com'],
-            fail_silently=True,
-        )
         return HttpResponseRedirect(reverse('your-plan'))
     # Update the Subscriber object with the proper plan
     s=Subscriber.objects.get(user__username=request.user.username)
@@ -412,13 +384,6 @@ def set_up_subscription_success(request):
         return HttpResponseRedirect(reverse('your-plan'))
     else:
         messages.error(request, 'Oh no. This rarely (never?) happens. Our payment provider sent you to this page because you completed subscription setup, but when we check your subscription status, the status-message, which we expected to be "active" or "trialing" is "%s" instead. We\'ve alerted ourselves though, and are working to fix the problem asap.'%(status), extra_tags='alert alert-warning')
-        send_mail(
-            '[www-error] set_up_subscription_success view error',
-            'User: %s \n Error: User was redirtected to success-page for payments, but Stripe was unable to confirm success. Should be done manually.'%(request.user.username),
-            'www-error@motpanel.com',
-            ['www-error@motpanel.com'],
-            fail_silently=True,
-        )
         return HttpResponseRedirect(reverse('your-plan'))
 
 @login_required
@@ -426,11 +391,4 @@ def set_up_subscription_cancel(request):
     ''' a view for receiving error message from stripe '''
 
     messages.error(request, 'The subscription setup process was cancelled. Try again?', extra_tags='alert alert-danger')
-    send_mail(
-        '[www] User %s tried to set up a subscription but failed'%(request.user.username),
-        'User: %s \n User cancelled set up on Stripe\'s pages.'%(request.user.username),
-        'sales@motpanel.com',
-        ['sales@motpanel.com'],
-        fail_silently=True,
-    )
     return HttpResponseRedirect(reverse('choose-plan'))

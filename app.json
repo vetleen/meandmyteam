@@ -3,8 +3,7 @@
   "environments": {
     "review": {
       "addons": [
-                "papertrail:choklad",
-                "mailgun:starter"
+                "papertrail:choklad"
               ]
     }
 }
