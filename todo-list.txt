@@ -1,12 +1,8 @@
 ##MeAndMyTeam
 
-prettier current user in nav
-more info in edit profile AND in sign up
-users deciding to resignup before their last billing period expired, should not be billed doubly.
 
-remove menu on 404 page and so on
 
-tests for stripe views and models, and Plan and Subscriber and everything
+
 
 #dev
 
@@ -18,8 +14,6 @@ add data visuallization on web
 add report-generator (I see there are heroku addons for html->pdf)
 
 #fun stuff
-
-design logo
 add screenshots to show of products on front page
 create "customers" for social-proof bar
 add impact stories to front page, and possibly own page
@@ -27,9 +21,8 @@ add about us explaining scientific background of test (if any...)
 about us page and link in footer
 contact us page and link in footer
 
-#external services
-pick and connect domain
 
+#external services
 set up basic email
 email-integration and password reset
 chat-box
@@ -39,6 +32,16 @@ Google ads
 Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)
 password validation for signup
 terms of use, and all that
+
+#Stripe-redo
+Add better flow -> create customer, -> create payment method, and attach -> create, change, cancel subscription -> control that U can only have one
+tests for stripe views and models, and Plan and Subscriber and everything
+users deciding to resignup before their last billing period expired, should not be billed doubly.
+
+#finishing touch
+more info in edit profile AND in sign up
+redesign 404 page and so on -  No menu, prettier message ...
+remake illustrations with the right color
 
 
 ## Name?

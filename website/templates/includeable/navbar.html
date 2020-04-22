@@ -59,7 +59,7 @@
             {% endif %}
           </ul>
           <span class="navbar-text">
-            {% if user.is_authenticated %}(currently logged in as: {{ user.get_username }}){% endif %}
+            {% if user.is_authenticated %}({{ user.get_username }}){% endif %}
           </span>
           <!--
           <form class="form-inline my-2 my-lg-0">

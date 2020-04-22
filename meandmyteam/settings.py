@@ -21,14 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = '2#q*c)!_g3tw2vj_p%7+rjyq+taizilidc*lvc0m$y)$7@^09!'
-
-
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '2#q*c)!_g3tw2vj_p%7+rjyq+taizilidc*lvc0m$y)$7@^09!')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'meandmyteam.herokuapp.com'] #should probs specify when a sub-domain is created in heroku
 
@@ -89,7 +82,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

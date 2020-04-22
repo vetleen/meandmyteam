@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash, login, authenticate
 from django.contrib import auth
 from django.contrib import messages
-
+from django.core.mail import send_mail
 
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -106,6 +106,13 @@ def sign_up(request):
             subscriber = Subscriber(user=user)
             subscriber.save()
             messages.success(request, 'Welcome aboard. Let\'s pick a plan.', extra_tags='alert alert-success')
+            send_mail(
+                '[www] New user: %s!'%(request.user.username),
+                'User: %s has signed up!'%(request.user.username),
+                'sales@motpanel.com',
+                ['sales@motpanel.com'],
+                fail_silently=True,
+            )
             if user is not None:
                 auth.login(request, user)
             # redirect to a new URL:
@@ -266,6 +273,13 @@ def show_interest_in_unavailable_plan(request):
             request.user.subscriber.flagged_interest_in_plan = interesting_plan_name
             request.user.subscriber.save()
             messages.success(request, 'Thanks. Your interest is duely noted! We will contact you once the plan becomes available.', extra_tags='alert alert-success')
+            send_mail(
+                '[www] Interest in unavailable plan from: %s'%(request.user.username),
+                '%s has indicated that they are interested in an unavialble plan: %s.'%(request.user.username, interesting_plan_name),
+                'sales@motpanel.com',
+                ['sales@motpanel.com'],
+                fail_silently=True,
+            )
         else:
             messages.error(request, 'Oh no! That feature doesn\'t work right now, but please check back in later!', extra_tags='alert alert-warning')
     return HttpResponseRedirect(request.GET.get('next', reverse('choose-plan')))
@@ -281,13 +295,20 @@ def set_up_subscription(request):
     #logic to pick the plan
     form = ChoosePlanForm(request.POST)
     if form.is_valid():
-        print("ChoosePlanForm was valid")
+        #print("ChoosePlanForm was valid")
         #print("trying to look up: %s"%(form.cleaned_data['chosen_plan']))
         chosen_plan = Plan.objects.get(name=form.cleaned_data['chosen_plan'])
         chosen_plan_id = chosen_plan.stripe_monthly_plan_id #only support monthly for now
 
     else:
         messages.error(request, 'Oh no! We are unable to recognize the plan you chose in our back-end. This is totally our fault! We\'d really appreciate you dropping us an email letting us know this happened!', extra_tags='alert alert-warning')
+        send_mail(
+            '[www-error] set_up_subscription view error',
+            'User: %s \n Plan: %s \n Error: form that should always be valid was not valid. Someone did not set the correct stripe ID in the DB.'%(request.user.username, cleaned_data['chosen_plan']),
+            'www-error@motpanel.com',
+            ['www-error@motpanel.com'],
+            fail_silently=True,
+        )
         return HttpResponseRedirect(reverse('choose-plan'))
 
     #Make sure we have a Stripe Customer object to work with
@@ -300,7 +321,15 @@ def set_up_subscription(request):
             stripe_customer = stripe.Customer.retrieve(request.user.subscriber.stripe_id)
         except:
             messages.error(request, 'Oh no! We were unable to retrieve your customer data from our payment provider. If the problem persists, please contact us. ', extra_tags='alert alert-warning')
+            send_mail(
+                '[www-error] set_up_subscription view error'
+                'User: %s \n Error: Couldn\'t get stripe id directly after setting it. Subscription setup was interrupted because of this error.'%(request.user.username),
+                'www-error@motpanel.com',
+                ['www-error@motpanel.com'],
+                fail_silently=True,
+            )
             return HttpResponseRedirect(reverse('choose-plan'))
+
     else:
         #user does not have a stripe customer id, and we should make one
         try:
@@ -330,6 +359,13 @@ def set_up_subscription(request):
             )
     except:
             messages.error(request, 'Oh no! We were unable to connect with our payment provider. This usually doesn\'t last very long. However, if the problem persists, please contact us. ', extra_tags='alert alert-warning')
+            send_mail(
+                '[www-error] set_up_subscription view error',
+                'User: %s \n Error: Unable to create a Session with stripe for stripe_id %s, and the plan %s.'%(request.user.username, stripe_customer.id, chosen_plan_id),
+                'www-error@motpanel.com',
+                ['www-error@motpanel.com'],
+                fail_silently=True,
+            )
             return HttpResponseRedirect(reverse('choose-plan'))
 
     messages.info(request, 'You have chosen the %s plan, with monthly billing.'%(chosen_plan.name), extra_tags='alert alert-info')
@@ -353,7 +389,14 @@ def set_up_subscription_success(request):
     try:
         completed_stripe_session = stripe.checkout.Session.retrieve(stripe_session_id)
     except:
-        messages.error(request, 'Oh no! Your payment was successful, but then we were unable to connect to our payment provider to sync your settings on our side. We\'ll do it manually though, but it may take a while. Feel free to drop us an email letting us know about the problem.', extra_tags='alert alert-warning')
+        messages.error(request, 'Oh no! Your payment was successful, but then we were unable to connect to our payment provider to sync your settings on our side. Our people have been alerted, and will do it manually!', extra_tags='alert alert-warning')
+        send_mail(
+            '[www-error] set_up_subscription_success view error',
+            'User: %s \n Error: Unable to retrieve completed stripe session (%s) to confirm user had paid. Payment was not documented in our DB.'%(request.user.username, stripe_session_id),
+            'www-error@motpanel.com',
+            ['www-error@motpanel.com'],
+            fail_silently=True,
+        )
         return HttpResponseRedirect(reverse('your-plan'))
     # Update the Subscriber object with the proper plan
     s=Subscriber.objects.get(user__username=request.user.username)
@@ -368,7 +411,14 @@ def set_up_subscription_success(request):
         messages.success(request, 'You have succesfully set up a plan! Now, go check out your dashboard!', extra_tags='alert alert-success')
         return HttpResponseRedirect(reverse('your-plan'))
     else:
-        messages.error(request, 'Oh no. This rarely (never?) happens. Our payment provider sent you to this page because you completed subscription setup, but when we check your subscription status, the status-message, which we expected to be "active" or "trialing" is "%s" instead.'%(status), extra_tags='alert alert-warning')
+        messages.error(request, 'Oh no. This rarely (never?) happens. Our payment provider sent you to this page because you completed subscription setup, but when we check your subscription status, the status-message, which we expected to be "active" or "trialing" is "%s" instead. We\'ve alerted ourselves though, and are working to fix the problem asap.'%(status), extra_tags='alert alert-warning')
+        send_mail(
+            '[www-error] set_up_subscription_success view error',
+            'User: %s \n Error: User was redirtected to success-page for payments, but Stripe was unable to confirm success. Should be done manually.'%(request.user.username),
+            'www-error@motpanel.com',
+            ['www-error@motpanel.com'],
+            fail_silently=True,
+        )
         return HttpResponseRedirect(reverse('your-plan'))
 
 @login_required
@@ -376,4 +426,11 @@ def set_up_subscription_cancel(request):
     ''' a view for receiving error message from stripe '''
 
     messages.error(request, 'The subscription setup process was cancelled. Try again?', extra_tags='alert alert-danger')
+    send_mail(
+        '[www] User %s tried to set up a subscription but failed'%(request.user.username),
+        'User: %s \n User cancelled set up on Stripe\'s pages.'%(request.user.username),
+        'sales@motpanel.com',
+        ['sales@motpanel.com'],
+        fail_silently=True,
+    )
     return HttpResponseRedirect(reverse('choose-plan'))
