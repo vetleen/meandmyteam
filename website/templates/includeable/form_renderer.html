@@ -1,6 +1,6 @@
 
 {% load widget_tweaks %}
-
+  {% if form %}
       <form method="post">
         {% csrf_token %}
         {% for hidden_field in form.hidden_fields %}
@@ -31,3 +31,4 @@
         {% endfor %}
         <button type="submit" class="btn btn-primary">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button>
       </form>
+      {% endif %}

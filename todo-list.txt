@@ -1,9 +1,5 @@
 ##MeAndMyTeam
 
-
-
-
-
 #dev
 
 
@@ -42,7 +38,7 @@ users deciding to resignup before their last billing period expired, should not 
 more info in edit profile AND in sign up
 redesign 404 page and so on -  No menu, prettier message ...
 remake illustrations with the right color
-
+Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#customize-pages
 
 ## Name?
 * meandmy.team

@@ -1,8 +1,14 @@
 from django.conf import settings
 
-from website.forms import ChangePasswordForm, SignUpForm, LoginForm, EditAccountForm, ChoosePlanForm, CancelPlanForm
+from website.forms import ChangePasswordForm, SignUpForm, LoginForm, EditAccountForm, ChoosePlanForm, CancelPlanForm, ResetPasswordForm
 from website.models import Subscriber, Plan
 from django.views.generic.edit import CreateView, UpdateView, DeleteView #dont think this is needed anymore
+
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
 
 from django.views import generic
 from django.shortcuts import render
@@ -17,6 +23,11 @@ from django.contrib.auth import update_session_auth_hash, login, authenticate
 from django.contrib import auth
 from django.contrib import messages
 from django.core.mail import send_mail
+
+#class-based password reset views
+from django.contrib.auth import views as auth_views
+from django.contrib.messages.views import SuccessMessageMixin
+
 
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -80,6 +91,85 @@ def change_password(request):
 
     return render(request, 'change_password_form.html', context)
 
+class PasswordResetRequestView(auth_views.PasswordResetView):
+    email_template_name = 'account/reset_password_email.html'
+    subject_template_name = 'account/password_reset_subject.txt'
+    success_url = reverse_lazy('password-reset-request-received')
+    template_name = 'account/password_reset_request_form.html'
+    from_email = 'support@motpanel.com'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in variables
+        context['submit_button_text'] = 'Send password reset link'
+        return context
+
+class PasswordResetRequestReceivedView(auth_views.PasswordResetDoneView):
+    template_name = 'account/password_reset_request_received.html'
+
+
+class PasswordResetView(SuccessMessageMixin, auth_views.PasswordResetConfirmView):
+    success_url = reverse_lazy('password-reset-complete')
+    template_name = 'account/password_reset_form.html'
+
+class PasswordResetCompleteView(auth_views.PasswordChangeDoneView):
+    template_name = ''
+def password_reset_complete_view(request):
+    #messages.success(request, 'Your password was changed. You can now use the new password to log in.', extra_tags='alert alert-success')
+    return render(request, 'account/password_reset_complete.html')
+
+'''
+def reset_password_view(request):
+    """View function for resetting ones password."""
+
+    form = ResetPasswordForm()
+    context = {
+        'form': form,
+        'submit_button_text': 'Send reset link',
+    }
+    # If this is a POST request then process the Form data
+    if request.method == 'POST':
+        # Create a form instance and populate it with data from the request (binding):
+        form = ResetPasswordForm(request.POST)
+        context.update({'form': form})
+        # Check if the form is valid:
+        if form.is_valid():
+            u = User.objects.get(username=form.cleaned_data['username'])
+            #https://simpleisbetterthancomplex.com/tutorial/2016/08/24/how-to-create-one-time-link.html
+            token_generator = PasswordResetTokenGenerator()
+            token = token_generator.make_token(u)
+            user_id =urlsafe_base64_encode(force_bytes(u.pk)),
+            #print('We now have auser id %s, of type %s'%(user_id, type(user_id)))
+            reset_link = request.build_absolute_uri(reverse('reset-password-confirm', kwargs={'uidb64':user_id[0], 'token': token}))
+            #print(u.id)
+            send_mail(
+                subject='Password reset link from motpanel.com',
+                message='Hi! \n Someone requested a password reset for your account: %s. \n Hopefully that was you! \n Anyway, just paste this link into your brower, and follow the instructions from there: \n \n %s \n \n Best regards,\n motpanel.com '%(u.username, reset_link),
+                from_email='support@motpanel.com',
+                recipient_list=[u.username],
+                fail_silently=True,
+            )
+            token_check = token_generator.check_token(u, token)
+            print('and checked it: %s.'%(token_check))
+    return render(request, 'reset_password_confirm.html', context)
+
+def reset_password_confirm_view(request, **kwargs):
+    """View function for resetting ones password."""
+    assert 'uidb64' in kwargs and 'token' in kwargs
+    validlink = False
+    uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
+    token = kwargs.get('token', None)
+    u=User.objects.get(pk=uid)
+    token_generator = PasswordResetTokenGenerator()
+    if token_generator.check_token(u, token):
+        validlink = True
+        #render form
+        #return page
+    else:
+        messages.error(request, 'We were unable to to confirm this address. Did you copy it correctly? You can try the link agin (make sure you copy the entire link) or you can create a new link below:', extra_tags='alert alert-warning')
+        return HttpResponseRedirect(reverse('reset-password'))
+'''
 def sign_up(request):
     """View function for signing up."""
     #logged in users are redirected

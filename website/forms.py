@@ -66,6 +66,21 @@ class ChangePasswordForm(forms.Form):
                     )
         return self.cleaned_data['confirm_new_password']
 
+class ResetPasswordForm(forms.Form):
+    username = forms.EmailField(max_length = 150, label="Email address", widget=forms.TextInput(attrs={'type':'input'}))
+
+    def clean_username(self):
+        if not User.objects.filter(username=self.cleaned_data['username']).exists():
+            raise forms.ValidationError(
+                "There is no user with that email (%(attempted)s).", #I think the benefit in user-friendlyness of this error message outweights the potential security risk
+                code='invalid',
+                params={'attempted': self.cleaned_data['username']}
+            )
+        return self.cleaned_data['username']
+
+    def clean(self):
+        return self.cleaned_data
+
 class LoginForm(forms.Form):
     username = forms.EmailField(max_length = 150, label="Email address", widget=forms.TextInput(attrs={'type':'input'}))
     password = forms.CharField(max_length = 20, label="Password", widget=forms.PasswordInput(attrs={'type':'password'}))
@@ -93,8 +108,6 @@ class LoginForm(forms.Form):
                 code='invalid',
                 params={}
             )
-
-        #logic here once I figure out how to access User object here. Suspect it has something to do with ___init__ of the form...
         return self.cleaned_data['password']
 
     def clean(self):
@@ -123,7 +136,7 @@ class EditAccountForm(forms.Form):
             )
         return self.cleaned_data['username']
 
-        
+
 class ChoosePlanForm(forms.Form):
     chosen_plan = forms.CharField(max_length = 50)
 
