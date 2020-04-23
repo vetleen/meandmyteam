@@ -1,5 +1,5 @@
 {
-  "addons": ["papertrail:choklad"],
+  "addons": ["papertrail:choklad"]
   "environments": {
     "review": {
       "addons": [
