@@ -38,8 +38,6 @@ class Employee(models.Model):
     receives_surveys = models.BooleanField(default=True, help_text='This Employee should receive surveys from the Organization')
 
     def uidb64(self):
-        print('we\'re getting there...')
-        print(self.pk)
         return urlsafe_base64_encode(force_bytes(self.pk))
 
     def __str__(self):

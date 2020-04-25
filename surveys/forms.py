@@ -17,11 +17,13 @@ class CreateOrganizationForm(forms.Form):
 
     def clean_name(self):
         if Organization.objects.filter(name=self.cleaned_data['name']).exists():
-            raise forms.ValidationError(
-                "An organization with that name already exists (%(taken_name)s).",
-                code='invalid',
-                params={'taken_name': self.cleaned_data['name']}
-            )
+            if not Organization.objects.get(name=self.cleaned_data['name']).owner == self.user:
+                print ('Compared %s with %s'%(Organization.objects.get(name=self.cleaned_data['name']).owner, self.user))
+                raise forms.ValidationError(
+                    "An organization with that name already exists (%(taken_name)s).",
+                    code='invalid',
+                    params={'taken_name': self.cleaned_data['name']}
+                )
         return self.cleaned_data['name']
 
 class AddEmployeeForm(forms.Form):
@@ -37,4 +39,13 @@ class AddEmployeeForm(forms.Form):
                 code='invalid',
                 params={'taken_email': self.cleaned_data['email']}
             )
+        return self.cleaned_data['email']
+        
+class EditEmployeeForm(forms.Form):
+    email = forms.EmailField(max_length = 150, label="Email address", widget=forms.TextInput(attrs={'placeholder': 'Required'}))
+    first_name = forms.CharField(max_length = 255, label="First name", required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
+    last_name = forms.CharField(max_length = 255, label="Last name", required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
+    #receives_surveys = forms.BooleanField(label="Send surveys to this employee", required=False, widget=forms.CheckboxInput(attrs={'default': 'true'}))
+
+    def clean_email(self):
         return self.cleaned_data['email']

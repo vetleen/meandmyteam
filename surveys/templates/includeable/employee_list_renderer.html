@@ -1,0 +1,13 @@
+<ul class="list-group-flush">
+{% for employee in employee_list %}
+  <li class="list-group-item">
+    <div class="d-flex justify-content-between">
+      <div>{{ employee.email|truncatechars:20 }}</div>
+      <div>
+      <a href="{% url 'surveys-delete-coworker' employee.uidb64 %}" class="badge badge-danger align-self-end">Delete</a>
+      <a href="{% url 'edit-individual-coworker' employee.uidb64 %}" class="badge badge-success align-self-end">Edit</a>
+      </div>
+    </div>
+  </li>
+{% endfor %}
+</ul>

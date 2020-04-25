@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.models import User
 from surveys.models import Product, Organization, Employee
-from surveys.forms import CreateOrganizationForm, AddEmployeeForm
+from surveys.forms import CreateOrganizationForm, AddEmployeeForm, EditEmployeeForm
 
 from datetime import date
 from django.utils.encoding import force_text
@@ -23,10 +23,12 @@ from django.utils.http import urlsafe_base64_decode
 def dashboard_view(request):
     """View function for the dashboard"""
     try:
-        employee_count = Employee.objects.filter(organization__pk=request.user.organization.pk).count()
+        employee_list = request.user.organization.employee_set.all()
+        employee_count = employee_list.count()
         print(employee_count)
     except Organization.DoesNotExist:
-        employee_count=0
+        employee_list = []
+        employee_count = 0
 
     try:
         active_products = request.user.organization.active_products.all()
@@ -44,6 +46,7 @@ def dashboard_view(request):
         'todays_date': date.today(),
         'employee_count': employee_count,
         'active_products_count': active_products_count,
+        'employee_list': employee_list,
 
     }
     return render(request, 'dashboard.html', context)
@@ -54,14 +57,34 @@ def dashboard_view(request):
 # set up how often surveys are sent, and the date for the first one
 
 @login_required
-def create_organization_view(request):
+def edit_organization_view(request):
     """View function for creating organizations."""
     #logged in users are redirected
-    form = CreateOrganizationForm
-    context = {
-        'form': form,
-        'submit_button_text': 'Save organization details',
-    }
+    try:
+        existing_organization=Organization.objects.get(owner=request.user)
+    except Organization.DoesNotExist:
+        existing_organization=None
+
+    if existing_organization is not None:
+        data={
+            'name':  request.user.organization.name,
+            'address_line_1': request.user.organization.address_line_1,
+            'address_line_2': request.user.organization.address_line_2,
+            'zip_code': request.user.organization.zip_code,
+            'city': request.user.organization.city,
+            'country': request.user.organization.country,
+        }
+        form = CreateOrganizationForm(initial=data)
+        context = {
+            'form': form,
+            'submit_button_text': 'Edit organization details',
+        }
+    else:
+        form = CreateOrganizationForm
+        context = {
+            'form': form,
+            'submit_button_text': 'Save organization details',
+        }
     # If this is a POST request then process the Form data
     if request.method == 'POST':
 
@@ -70,18 +93,27 @@ def create_organization_view(request):
         context.update({'form': form})
         # Check if the form is valid:
         if form.is_valid():
-            o = Organization(
-                owner = request.user,
-                name = form.cleaned_data['name'],
-                address_line_1 = form.cleaned_data['address_line_1'],
-                address_line_2 = form.cleaned_data['address_line_2'],
-                zip_code = form.cleaned_data['zip_code'],
-                city = form.cleaned_data['city'],
-                country = form.cleaned_data['country'],
-                )
-            o.save()
-            messages.success(request, 'You have set up your organization and billing address.', extra_tags='alert alert-success')
-
+            if existing_organization is not None:
+                existing_organization.name = form.cleaned_data['name']
+                existing_organization.address_line_1 = form.cleaned_data['address_line_1']
+                existing_organization.address_line_2 = form.cleaned_data['address_line_2']
+                existing_organization.zip_code = form.cleaned_data['zip_code']
+                existing_organization.city = form.cleaned_data['city']
+                existing_organization.country = form.cleaned_data['country']
+                existing_organization.save()
+                messages.success(request, 'Your organization profile was updated!', extra_tags='alert alert-success')
+            else:
+                o = Organization(
+                    owner = request.user,
+                    name = form.cleaned_data['name'],
+                    address_line_1 = form.cleaned_data['address_line_1'],
+                    address_line_2 = form.cleaned_data['address_line_2'],
+                    zip_code = form.cleaned_data['zip_code'],
+                    city = form.cleaned_data['city'],
+                    country = form.cleaned_data['country'],
+                    )
+                o.save()
+                messages.success(request, 'You have set up your organization profile.', extra_tags='alert alert-success')
             return HttpResponseRedirect(reverse('surveys-dashboard'))
     return render(request, 'create_organization.html', context)
 ### edit_organization view, or maybe in edit account?
@@ -121,6 +153,37 @@ def edit_coworker_view(request):
             form = AddEmployeeForm
             context.update({'form': form})
     return render(request, 'edit_coworkers.html', context)
+
+@login_required
+def edit_individual_coworker_view(request, **kwargs):
+    uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
+    employee = get_object_or_404(Employee, pk=uid)
+    if not request.user == employee.organization.owner:
+        return HttpResponseForbidden()
+    data ={
+        'email': employee.email,
+        'first_name': employee.first_name,
+        'last_name': employee.last_name
+    }
+    form = EditEmployeeForm(initial=data)
+    context = {
+        'form': form,
+        'submit_button_text': 'Update',
+        }
+    if request.method == 'POST':
+        # Create a form instance and populate it with data from the request (binding):
+        form = EditEmployeeForm(request.POST)
+        context.update({'form': form})
+        # Check if the form is valid:
+        if form.is_valid():
+            employee.email = form.cleaned_data['email']
+            employee.first_name = form.cleaned_data['first_name']
+            employee.last_name = form.cleaned_data['last_name']
+            employee.save()
+            messages.success(request, 'Co-worker was updated.', extra_tags='alert alert-success')
+            return HttpResponseRedirect(request.GET.get('next', reverse('surveys-edit-coworker')))
+    return render(request, 'edit_individual_coworker.html', context)
+
 
 @login_required
 def delete_coworker_view(request, **kwargs):
