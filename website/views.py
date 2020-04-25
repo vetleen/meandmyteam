@@ -39,7 +39,7 @@ stripe_sk = settings.STRIPE_SECRET_KEY
 def index(request):
     """View function for home page of site."""
     if request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('dashboard'))
+        return HttpResponseRedirect(reverse('surveys-dashboard'))
     context = {
         'foo': 'bar',
     }
@@ -47,16 +47,7 @@ def index(request):
     # Render the HTML template index.html with the data in the context variable
     return render(request, 'index.html', context=context)
 
-@login_required
-def dashboard_view(request):
-    """View function for the dashboard"""
-    messages.info(request, 'You have reached the dashboard.', extra_tags='alert alert-info')
-    messages.success(request, 'Success!.', extra_tags='alert alert-success')
-    messages.warning(request, 'the dashboard is under construction', extra_tags='alert alert-warning')
-    context = {
-        'foo': 'bar',
-    }
-    return render(request, 'dashboard.html', context)
+
 
 @login_required
 def change_password(request):
@@ -216,7 +207,7 @@ def login_view(request):
     #is user already logged in?
     if request.user.is_authenticated:
         messages.error(request, 'You are already logged in.', extra_tags='alert alert-warning')
-        return HttpResponseRedirect(request.GET.get('next', reverse('dashboard')))
+        return HttpResponseRedirect(request.GET.get('next', reverse('surveys-dashboard')))
 
     #If we receive POST data
     if request.method == 'POST':
@@ -470,8 +461,8 @@ def set_up_subscription_success(request):
     status = request.user.subscriber.status
     #print('in the view we call status and get: %s'%(status))
     if (status == 'active') or (status == 'trialing'): #Possible values are incomplete, trialing, active, expired, 'unable to charge'
-        messages.success(request, 'You have succesfully set up a plan! Now, go check out your dashboard!', extra_tags='alert alert-success')
-        return HttpResponseRedirect(reverse('your-plan'))
+        messages.success(request, 'You have succesfully set up a plan! The next step to get started is shown belown!', extra_tags='alert alert-success')
+        return HttpResponseRedirect(reverse('surveys-dashboard'))
     else:
         messages.error(request, 'Oh no. This rarely (never?) happens. Our payment provider sent you to this page because you completed subscription setup, but when we check your subscription status, the status-message, which we expected to be "active" or "trialing" is "%s" instead. We\'ve alerted ourselves though, and are working to fix the problem asap.'%(status), extra_tags='alert alert-warning')
         return HttpResponseRedirect(reverse('your-plan'))

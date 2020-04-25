@@ -1,0 +1,108 @@
+{% extends "base_generic.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+  <div class="row pt-4">
+    <div class="col-sm-12">
+      <h3> Dashboard </h3>
+    </div>
+  </div> <!-- row -->
+  <div class="row justify-content-center pt-2">
+  {% include "includeable/message_displayer.html" %}
+  </div><!-- row -->
+  <div class="row">
+    <div class="col-12">
+
+      {% if not request.user.subscriber.date_current_plan_expires or request.user.subscriber.date_current_plan_expires < todays_date %}
+      <div class="card">
+        <div class="card-header">
+          Your next step to get started
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Choose a plan</h5>
+          <p class="card-text">To get started with our employee engagement software, you first need to pick a plan. Don't worry though, the first month is free for most plans, so you can try it out before deciding that you would like to continue with the paid plan.</p>
+          <a href="{% url 'choose-plan' %}" class="btn btn-info">Choose a plan</a>
+        </div>
+      </div>
+      {% elif not request.user.organization %}
+      <div class="card">
+        <div class="card-header">
+          Your next step to get started
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Enter your organization details</h5>
+          <p class="card-text">We don't know who you are yet. Help us out by giving us a little more info on your organization.</p>
+          <a href="{% url 'surveys-create-organization' %}" class="btn btn-info">Set up organization</a>
+        </div>
+      </div>
+      {% elif employee_count == 0 %}
+      <div class="card">
+        <div class="card-header">
+          Your next step to get started
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Add some coworkers to track</h5>
+          <p class="card-text">Where are we going to send surveys? You can add coworkers manually, or email us a list (e.g. an excel sheet), and we'll add them for you!</p>
+          <a href="{% url 'surveys-edit-coworker' %}" class="btn btn-info">Add coworkers</a>
+        </div>
+      </div>
+      {% elif active_product_count == 0 %}
+      <div class="card">
+        <div class="card-header">
+          Your next step to get started
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Activate surveys</h5>
+          <p class="card-text">Now we just need to know how often to send out surveys, and when to start. We want to wait to send out the first one until you have had time to add all the employees who should be surveyed (or email us a list and we'll add them for you). Don't worry though, you can always add more respondents and we'll ask you if we should send open surveys.</p>
+          <a href="#" class="btn btn-info">Activate surveys</a>
+        </div>
+      </div>
+      {% else %}
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="card text-center">
+            <div class="card-header">
+              Your next step to get started
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">You are ready!</h5>
+
+              <p class="card-text">Don't worry, you can always add more coworkers to track later.</p>
+              <a href="#" class="btn btn-success">Start surveys!</a>
+            </div>
+            <div class="card-footer text-muted">
+              <p class="card-text"><small class="text-muted">Surveys are not currently active</small></p>
+            </div>
+          </div>
+        </div><!-- col -->
+        <div class="col-sm-6">
+          <div class="card">
+            <div class="card-header text-center">
+              Organization
+            </div>
+            <center><h3 class="card-title mt-2">{{ request.user.organization.name }}</h3></center>
+            <!--<img class="card-img-top mt-2" src="{% static request.user.subscriber.plan.illustration_static_address %}" style="height: 10rem;" alt="Card image cap">-->
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item"><div class="d-flex justify-content-between"><span>Number of co-workers: </span> <span>{{ employee_count }}</span></div></li>
+                  <li class="list-group-item"><div class="d-flex justify-content-between"><span>Coworker satisfaction tracking: </span> <span>Off</span></div></li>
+
+                </ul>
+            <div class="card-body">
+              <center><a href="#" class="btn btn-info">Edit organization details</a></center>
+
+            </div><!-- card-body -->
+            <div class="card-footer text-muted text-center">
+              <p class="card-text"><small class="text-muted">&nbsp;</small></p>
+            </div>
+          </div> <!-- card -->
+        </div><!-- col -->
+      </div><!-- row -->
+
+      {% endif %}
+    </div><!-- col -->
+
+  </div> <!-- row -->
+</div><!-- container -->
+
+{% endblock %}

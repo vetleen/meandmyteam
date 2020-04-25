@@ -82,7 +82,7 @@ class Plan(models.Model):
 class Subscriber(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, blank=True, null=True)
-    date_current_plan_expires = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='The date the current strupe subscription ends')
+    date_current_plan_expires = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='The date the current stripe subscription ends')
     status = models.CharField(max_length=35, blank=True, null=True, default=None, help_text='The subscrition status of the Subscriber')
     date_last_synced_with_stripe = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='The date this object was synced with Stripe')
     flagged_interest_in_plan = models.CharField(max_length=60, blank=True, null=True, help_text='Subscriber is interested in this plan')

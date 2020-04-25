@@ -13,7 +13,7 @@
           <ul class="navbar-nav">
             {% if user.is_authenticated %}
             <li class="nav-item {% if request.path == '/dashboard/' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'dashboard' %}"> Dashboard {% if request.path == '/dashboard/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+              <a class="nav-link" href="{% url 'surveys-dashboard' %}"> Start here {% if request.path == '/dashboard/' %}<span class="sr-only">(current)</span>{% endif %}</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

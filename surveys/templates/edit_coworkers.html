@@ -1,0 +1,114 @@
+{% extends "base_generic.html" %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container">
+  <div class="row pt-4">
+    <div class="col-sm-12">
+
+    </div>
+  </div> <!-- row -->
+
+
+
+  <div class="row justify-content-center pt-2">
+  {% include "includeable/message_displayer.html" %}
+  </div><!-- row -->
+
+
+
+  <div class="row">
+    <div class="col-sm-6">
+      <h4>Register new coworkers</h4>
+      <form method="post">
+        {% csrf_token %}
+        {% for hidden_field in form.hidden_fields %}
+          {{ hidden_field }}
+        {% endfor %}
+
+        <div class="form-row">
+        <div class="form-group col-sm-6">
+          {{ form.first_name.label_tag }}
+          {% if form.is_bound %}
+            {% if form.first_name.errors %}
+              {% render_field form.first_name class="form-control is-invalid" %}
+              {% for error in form.first_name.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.first_name class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.first_name class="form-control" %}
+          {% endif %}
+          {% if first_name.help_text %}
+            <small class="form-text text-muted">{{ form.first_name.help_text }}</small>
+          {% endif %}
+        </div>
+
+
+        <div class="form-group col-sm-6">
+          {{ form.last_name.label_tag }}
+          {% if form.is_bound %}
+            {% if form.last_name.errors %}
+              {% render_field form.last_name class="form-control is-invalid" %}
+              {% for error in form.last_name.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.last_name class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.last_name class="form-control" %}
+          {% endif %}
+          {% if last_name.help_text %}
+            <small class="form-text text-muted">{{ form.last_name.help_text }}</small>
+          {% endif %}
+        </div>
+        </div> <!-- form row -->
+
+        <div class="form-group">
+          {{ form.email.label_tag }}
+          {% if form.is_bound %}
+            {% if form.email.errors %}
+              {% render_field form.email class="form-control is-invalid" %}
+              {% for error in form.email.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.email class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.email class="form-control" %}
+          {% endif %}
+          {% if email.help_text %}
+            <small class="form-text text-muted">{{ form.email.help_text }}</small>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button>
+      </form>
+      <div class="w-100"></div>
+      <a href="{% url 'surveys-dashboard' %}">I'm done adding coworkers</a>
+    </div><!-- col -->
+    <div class="col-sm-6">
+      {% if employee_list %}
+        <h4>Registered coworkers</h4>
+      <ul class="list-group-flush">
+      {% for employee in employee_list %}
+        <li class="list-group-item"> <div class="d-flex justify-content-between">{{ employee.email|truncatechars:20 }}<a href="{% url 'surveys-delete-coworker' employee.uidb64 %}" class="badge badge-danger align-self-end">delete</a></div></li>
+      {% endfor %}
+      <ul class="list-group">
+      {% else %}
+
+      {% endif %}
+    </div> <!-- col -->
+  </div> <!-- row -->
+</div><!-- container -->
+
+{% endblock %}
