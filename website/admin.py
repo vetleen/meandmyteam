@@ -22,7 +22,7 @@ class SalesArgumentAdmin(admin.ModelAdmin):
 class SubscriberInline(admin.StackedInline): #for use in UserAdmin
     model = Subscriber
     can_delete = False
-    verbose_name_plural = 'subscribers'
+    #verbose_name_plural = 'subscribers'
 
 class UserAdmin(BaseUserAdmin):
     inlines = (SubscriberInline,)

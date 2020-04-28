@@ -69,10 +69,10 @@
               <h5 class="card-title">You are ready!</h5>
 
               <p class="card-text">Don't worry, you can always add more coworkers to track later.</p>
-              <a href="#" class="btn btn-success">Start surveys!</a>
+              <a href="#" class="btn btn-lg btn-success">Start tracking!</a>
             </div>
             <div class="card-footer text-muted">
-              <p class="card-text"><small class="text-muted">Surveys are not currently active</small></p>
+              <p class="card-text"><small class="text-muted">Employee Satisfaction Tracking is currently <b>not activated</b></small></p>
             </div>
           </div>
         </div><!-- col -->
@@ -101,13 +101,14 @@
             <div class="card-header text-center">
               Employees
             </div>
-            <center><h3 class="card-title mt-2">Co-workers at {{ request.user.organization.name }}</h3></center>
+            <div class="card-body">
+              <center><h3 class="card-title">Co-workers at {{ request.user.organization.name }}</h3></center>
+            </div><!-- card-body -->
 
                 {% include "includeable/employee_list_renderer.html" %}
 
             <div class="card-body">
               <center><a href="{% url 'surveys-edit-coworker' %}" class="btn btn-info">Add co-workers</a></center>
-
             </div><!-- card-body -->
             <div class="card-footer text-muted text-center">
               <p class="card-text"><small class="text-muted">&nbsp;</small></p>
