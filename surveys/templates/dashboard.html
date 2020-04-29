@@ -66,13 +66,28 @@
               Your next step to get started
             </div>
             <div class="card-body">
-              <h5 class="card-title">You are ready!</h5>
+            {% if est_active == True %}
+            <h5 class="card-title">You are all set!</h5>
+            <p class="card-text">
+              Sit back and relax, once data is in we will let you know, and we will display it here. <br />
 
-              <p class="card-text">Don't worry, you can always add more coworkers to track later.</p>
-              <a href="#" class="btn btn-lg btn-success">Start tracking!</a>
+            </p>
+            <a href="{% url 'surveys-set-up-employee-satisfaction-tracking' %}" class="btn btn-lg btn-info">Update settings</a>
+            {% else %}
+            <h5 class="card-title">You are ready!</h5>
+            <p class="card-text">Don't worry, you can always add more coworkers to track later.</p>
+            <a href="{% url 'surveys-set-up-employee-satisfaction-tracking' %}" class="btn btn-lg btn-success">Start tracking!</a>
+
+            {% endif %}
             </div>
             <div class="card-footer text-muted">
-              <p class="card-text"><small class="text-muted">Employee Satisfaction Tracking is currently <b>not activated</b></small></p>
+              <p class="card-text">
+                {% if est_active == True %}
+                <small class="text-muted">Co-worker Satisfaction Tracking is currently <b>active</b></small>
+                {% else %}
+                <small class="text-muted">CO-worker Satisfaction Tracking is currently <b>not activated</b></small>
+                {% endif %}
+              </p>
             </div>
           </div>
         </div><!-- col -->

@@ -1,0 +1,20 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="row pt-4">
+    <div class="col-sm-12">
+      <h3> Settings for the Co-worker Satisfaction Tracking </h3>
+    </div>
+  </div> <!-- row -->
+  <div class="row justify-content-center pt-2">
+  {% include "includeable/message_displayer.html" %}
+  </div><!-- row -->
+  <div class="row">
+    <div class="col-lg-6">
+{% include "includeable/form_renderer.html" %}
+    </div><!-- col -->
+  </div> <!-- row -->
+</div><!-- container -->
+
+{% endblock %}

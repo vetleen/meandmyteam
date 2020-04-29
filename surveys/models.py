@@ -24,7 +24,7 @@ class Organization(models.Model):
     zip_code =  models.CharField(max_length=255, blank=True, null=True, help_text='Zip code of the Organization')
     city =  models.CharField(max_length=255, blank=True, null=True, help_text='City where the Organization is located')
     country =  models.CharField(max_length=255, blank=True, null=True, help_text='Country where the Organization is located')
-    surveys_remain_open_days = models.SmallIntegerField(default = 21, help_text='How many days should surveys be open for this organization', validators=[MinValueValidator(0), MaxValueValidator(365)])
+    
 
     ##Todo
     #Add support for other Users than owner to be allowed to change organization
@@ -39,6 +39,7 @@ class ProductSetting(models.Model):
     survey_interval = models.SmallIntegerField(default=90, help_text='How many days between each survey', validators=[MinValueValidator(0), MaxValueValidator(730)])
     last_survey_open = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last opening date of survey with this product/prganization combo')
     last_survey_close = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last closing date of survey with this product/prganization combo')
+    surveys_remain_open_days = models.SmallIntegerField(default = 21, help_text='How many days should surveys be open for this organization', validators=[MinValueValidator(0), MaxValueValidator(365)])
 
 class Employee(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT, help_text='Organization where this Employee is employed')

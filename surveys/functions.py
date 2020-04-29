@@ -4,23 +4,28 @@ from django.core.mail import send_mail
 
 def configure_product(organization, product, **kwargs):
     #make sure we have a ProductSetting object to work with or exit
+    if not isinstance(organization, Organization):
+        raise TypeError('configure_product() takes an argument organization that must be an instance of models.Organziation, was %s'%(type(organization)))
+    if not isinstance(product, Product):
+        raise TypeError('configure_product() takes an argument product that must be an instance of models.Product, was %s'%(type(product)))
+
     ps = ProductSetting.objects.filter(organization=organization, product=product)
-    if ps.count() == 1:
-        ps=ps[0]
-    elif ps.count() == 0:
+    if ps.count() == 0:
         ps = ProductSetting(organization=organization, product=product)
         ps.save()
     else:
-        return
+        ps=ps[0]
     #look for kwargs and update accordingly
-    if 'is_active' in kwargs:
-        ps.is_active = kwargs.get('is_active', None)
+    #if 'is_active' in kwargs:
+    #    ps.is_active = kwargs.get('is_active', None)
     if 'survey_interval' in kwargs:
         ps.survey_interval = kwargs.get('survey_interval', None)
     if 'last_survey_open' in kwargs:
         ps.last_survey_open = kwargs.get('last_survey_open', None)
     if 'last_survey_close' in kwargs:
         ps.last_survey_close = kwargs.get('last_survey_close', None)
+    if 'surveys_remain_open_days' in kwargs:
+        ps.surveys_remain_open_days = kwargs.get('surveys_remain_open_days', None)
     #save all changes
     ps.save()
     return ps
@@ -43,7 +48,8 @@ def open_existing_survey(survey, days_open):
     ps = configure_product(organization, product, last_survey_open=date_open, last_survey_close=date_close)
 '''
 def create_survey(organization, product, date_open=date.today()):
-    date_close = date_open + timedelta(days=organization.surveys_remain_open_days)
+    ps=configure_product(organization, product)
+    date_close = date_open + timedelta(days=ps.surveys_remain_open_days)
     s = Survey(
         product = product,
         owner = organization,

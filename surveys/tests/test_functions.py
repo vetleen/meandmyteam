@@ -16,7 +16,7 @@ class MinorFunctionsTest(TestCase):
     ''' TESTS FUNCTIONS IN FUNCTIONS.PY '''
     def setUp(self):
         u = User(username="testuser", password="insecure123")
-        o = Organization(owner=u, name="TestOrga1", surveys_remain_open_days = 21)
+        o = Organization(owner=u, name="TestOrga1")
         p=Product(name="Product Name")
         p.save()
         u.save()
@@ -37,20 +37,21 @@ class MinorFunctionsTest(TestCase):
 
         #test that default values are set:
         ps = configure_product(o, p)
-        self.assertEqual(ps.is_active, True)
+        
         self.assertEqual(ps.survey_interval, 90)
         self.assertEqual(ps.last_survey_open, None)
         self.assertEqual(ps.last_survey_close, None)
 
         #test if we can change the default values
-        ps = configure_product(organization=o, product=p, is_active=False)
-        self.assertEqual(ps.is_active, False)
+
         ps = configure_product(organization=o, product=p, survey_interval=75)
         self.assertEqual(ps.survey_interval, 75)
         ps = configure_product(organization=o, product=p, last_survey_open=date.today())
         self.assertEqual(ps.last_survey_open, date.today())
         ps = configure_product(organization=o, product=p, last_survey_close=date.today()+timedelta(days=-14))
         self.assertEqual(ps.last_survey_close, date.today()+timedelta(days=-14))
+        ps = configure_product(organization=o, product=p, surveys_remain_open_days=5)
+        self.assertEqual(ps.surveys_remain_open_days, 5)
 
     def test_function_create_survey(self):
         o=Organization.objects.get(pk=1)
@@ -59,19 +60,20 @@ class MinorFunctionsTest(TestCase):
         self.assertEqual(Survey.objects.all().count(), 0)
         #chech that we can make one
         create_survey(o, p)
+        ps = configure_product(o, p)
         self.assertEqual(Survey.objects.all().count(), 1)
         #chech default values
         s=Survey.objects.get(pk=1)
         self.assertEqual(s.product, p)
         self.assertEqual(s.owner, o)
         self.assertEqual(s.date_open, date.today())
-        self.assertEqual(s.date_close, s.date_open + timedelta(days=o.surveys_remain_open_days))
+        self.assertEqual(s.date_close, s.date_open + timedelta(days=ps.surveys_remain_open_days))
 
 class TestFunction_make_surveys_for_active_products_base(TestCase):
     '''  '''
     def setUp(self):
         u = User(username="testuser", password="insecure123")
-        o = Organization(owner=u, name="TestOrga1", surveys_remain_open_days = 21)
+        o = Organization(owner=u, name="TestOrga1")
         u.save()
         o.save()
         p=Product(name="Product One")
@@ -116,7 +118,7 @@ class TestFunction_make_surveys_for_active_products_base(TestCase):
         self.assertEqual(s.date_open, ps.last_survey_open)
         self.assertEqual(s.date_close, ps.last_survey_close)
         self.assertEqual(s.date_open, date.today())
-        self.assertEqual(s.date_close, s.date_open + timedelta(days=s.owner.surveys_remain_open_days))
+        self.assertEqual(s.date_close, s.date_open + timedelta(days=ps.surveys_remain_open_days))
         #check that the rest of the survey was made right
         self.assertEqual(s.owner, o)
         self.assertEqual(s.product, p)
@@ -147,7 +149,7 @@ class TestFunctionmake_survey_instances_for_active_surveys(TestCase):
     def setUp(self):
         #org with surveys that are active and inactive, employees to add
         u = User(username="testuser", password="insecure123")
-        o = Organization(owner=u, name="TestOrga1", surveys_remain_open_days = 21)
+        o = Organization(owner=u, name="TestOrga1")
         p=Product(name="Product Name")
         u.save()
         o.save()
@@ -216,7 +218,7 @@ class TestFunctionmake_send_out_survey_instance_emails(TestCase):
     def setUp(self):
         #org with surveys that are active and inactive, employees to add
         u = User(username="testuser", password="insecure123")
-        o = Organization(owner=u, name="TestOrga1", surveys_remain_open_days = 21)
+        o = Organization(owner=u, name="TestOrga1")
         p=Product(name="Product Name")
         u.save()
         o.save()

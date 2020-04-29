@@ -40,7 +40,7 @@ class AddEmployeeForm(forms.Form):
                 params={'taken_email': self.cleaned_data['email']}
             )
         return self.cleaned_data['email']
-        
+
 class EditEmployeeForm(forms.Form):
     email = forms.EmailField(max_length = 150, label="Email address", widget=forms.TextInput(attrs={'placeholder': 'Required'}))
     first_name = forms.CharField(max_length = 255, label="First name", required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
@@ -49,3 +49,14 @@ class EditEmployeeForm(forms.Form):
 
     def clean_email(self):
         return self.cleaned_data['email']
+
+class ConfigureEmployeeSatisfactionTrackingForm(forms.Form):
+    is_active = forms.BooleanField(label="Co-worker satisfaction tracking on/off", required=False, widget=forms.CheckboxInput(attrs={'default': 'true'}))
+    INTERVAL_CHOICES = (
+        (90, 'Every 3 months'),
+        (180, 'Every 6 months'),
+        (365, 'Every year'),
+
+            )
+    survey_interval = forms.ChoiceField(label="How often should co-workers in your organization be surveyed?", required=True, choices=INTERVAL_CHOICES)
+    #surveys_remain_open_days =

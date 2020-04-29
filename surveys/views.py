@@ -11,12 +11,14 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.models import User
-from surveys.models import Product, Organization, Employee
-from surveys.forms import CreateOrganizationForm, AddEmployeeForm, EditEmployeeForm
+from surveys.models import Product, Organization, Employee, ProductSetting
+from surveys.forms import CreateOrganizationForm, AddEmployeeForm, EditEmployeeForm, ConfigureEmployeeSatisfactionTrackingForm
 
 from datetime import date
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
+
+from surveys.functions import configure_product
 # Create your views here.
 
 @login_required
@@ -40,13 +42,17 @@ def dashboard_view(request):
     #see your organization(name, number of employees and so on)
     #See what products are activated, easily get started on them
     #If a product is activated show mini-dashboard with, when was the last survey, when is the next, how many have replied, and how many are waiting to reply
-
-
+    est_active = False
+    p = Product.objects.get(name='Employee Satisfaction Tracking')
+    if p in request.user.organization.active_products.all():
+        est_active = True
+    print('est is active: %s.'%(est_active))
     context = {
         'todays_date': date.today(),
         'employee_count': employee_count,
         'active_products_count': active_products_count,
         'employee_list': employee_list,
+        'est_active': est_active
 
     }
     return render(request, 'dashboard.html', context)
@@ -196,3 +202,66 @@ def delete_coworker_view(request, **kwargs):
     else:
         return HttpResponseForbidden()
 ###logic that actually makes surveys and sends out emails
+
+@login_required
+def set_up_employee_satisfaction_tracking(request, **kwargs):
+    est = Product.objects.get(name="Employee Satisfaction Tracking")
+    apset = request.user.organization.active_products.all()
+
+    #check if the product is currently active
+    est_is_active=False
+    if est in apset:
+        est_is_active=True
+
+    #set default: assume it's not activated yet
+    form=ConfigureEmployeeSatisfactionTrackingForm
+    context = {
+        'form': form,
+        'submit_button_text': 'Start Employee Satisfaction Tracking',
+        'est_is_active': est_is_active,
+    }
+    #we check if product was ever activated, by looking for an existing config
+    ps = ProductSetting.objects.filter(organization=request.user.organization, product=est)
+    if ps.count() != 0:
+        submit_button_text = 'Update settings'
+        ps = configure_product(request.user.organization, est)
+
+
+        data={
+            'is_active':  est_is_active,
+            'survey_interval': ps.survey_interval,
+
+        }
+
+        form = ConfigureEmployeeSatisfactionTrackingForm(initial=data)
+        context.update({
+            'form': form,
+            'submit_button_text': submit_button_text
+        })
+
+
+    if request.method == 'POST':
+        form=ConfigureEmployeeSatisfactionTrackingForm(request.POST)
+        context.update({'form': form})
+        if form.is_valid():
+            if form.cleaned_data['is_active']==True and est not in apset:
+                request.user.organization.active_products.add(est)
+            if form.cleaned_data['is_active']==False and est in apset:
+                #print("before: %s."%(request.user.organization.active_products.all().count()))
+                request.user.organization.active_products.remove(est)
+                #print("before: %s."%(request.user.organization.active_products.all().count()))
+            ps=configure_product(
+
+                organization = request.user.organization,
+                product = est,
+                survey_interval = form.cleaned_data['survey_interval'],
+                surveys_remain_open_days = 21
+            )
+
+            apset = request.user.organization.active_products.all()
+            if est in apset:
+                messages.success(request, 'Your settings were updated: Employee satisfaction tracking is ACTIVE with the settings you submitted.', extra_tags='alert alert-success')
+            else:
+                messages.success(request, 'Your settings were updated: Employee satisfaction tracking is INACTIVE.', extra_tags='alert alert-success')
+            return HttpResponseRedirect(reverse('surveys-dashboard'))
+    return render(request, 'set_up_product.html', context)
