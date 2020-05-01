@@ -1,18 +1,87 @@
 {% extends "base_generic.html" %}
-
+{% load widget_tweaks %}
 {% block content %}
 <div class="container">
   <div class="row pt-4">
     <div class="col-sm-12">
-      <h3> Settings for the Co-worker Satisfaction Tracking </h3>
+      <h3> Settings </h3>
     </div>
   </div> <!-- row -->
   <div class="row justify-content-center pt-2">
   {% include "includeable/message_displayer.html" %}
   </div><!-- row -->
   <div class="row">
-    <div class="col-lg-6">
-{% include "includeable/form_renderer.html" %}
+    <div class="col-sm-12">
+
+      <form method="post">
+        {% csrf_token %}
+        {% for hidden_field in form.hidden_fields %}
+          {{ hidden_field }}
+        {% endfor %}
+
+
+
+        <div class="form-group row">
+        <div class="col-sm-2">
+        {% if form.is_bound %}
+          {% if form.survey_interval.errors %}
+            {% render_field form.survey_interval class="form-control is-invalid" %}
+            {% for error in form.survey_interval.errors %}
+              <div class="invalid-feedback">
+                {{ error }}
+              </div>
+            {% endfor %}
+          {% else %}
+            {% render_field form.survey_interval class="form-control is-valid" %}
+          {% endif %}
+        {% else %}
+          {% render_field form.survey_interval class="form-control" %}
+        {% endif %}
+        {% if survey_interval.help_text %}
+          <small class="form-text text-muted">{{ form.survey_interval.help_text }}</small>
+        {% endif %}
+        </div><!-- col -->
+        <div class="col-sm-6">
+          {{ form.survey_interval.label_tag }}
+        </div>
+
+      </div><!-- form group row -->
+
+
+
+
+          <div class="form-group row">
+          <div class="col-sm-2" >
+          {% if form.is_bound %}
+            {% if form.is_active.errors %}
+              {% render_field form.is_active class="form-control is-invalid" %}
+              {% for error in form.is_active.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.is_active class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.is_active class="form-control" %}
+          {% endif %}
+          {% if is_active.help_text %}
+            <small class="form-text text-muted">{{ form.is_active.help_text }}</small>
+          {% endif %}
+          </div> <!-- col -->
+          <div class="col-sm-6">
+            {{ form.is_active.label_tag }}
+          </div>
+
+        </div><!-- form group row -->
+
+
+
+        <button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button>
+      </form>
+
+
     </div><!-- col -->
   </div> <!-- row -->
 </div><!-- container -->

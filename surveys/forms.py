@@ -51,7 +51,7 @@ class EditEmployeeForm(forms.Form):
         return self.cleaned_data['email']
 
 class ConfigureEmployeeSatisfactionTrackingForm(forms.Form):
-    is_active = forms.BooleanField(label="Co-worker satisfaction tracking on/off", required=False, widget=forms.CheckboxInput(attrs={'default': 'true'}))
+    is_active = forms.BooleanField(label="Co-worker satisfaction tracking ON?", required=False, widget=forms.CheckboxInput(attrs={'default': 'true'}))
     INTERVAL_CHOICES = (
         (90, 'Every 3 months'),
         (180, 'Every 6 months'),

@@ -110,57 +110,7 @@ def password_reset_complete_view(request):
     #messages.success(request, 'Your password was changed. You can now use the new password to log in.', extra_tags='alert alert-success')
     return render(request, 'account/password_reset_complete.html')
 
-'''
-def reset_password_view(request):
-    """View function for resetting ones password."""
 
-    form = ResetPasswordForm()
-    context = {
-        'form': form,
-        'submit_button_text': 'Send reset link',
-    }
-    # If this is a POST request then process the Form data
-    if request.method == 'POST':
-        # Create a form instance and populate it with data from the request (binding):
-        form = ResetPasswordForm(request.POST)
-        context.update({'form': form})
-        # Check if the form is valid:
-        if form.is_valid():
-            u = User.objects.get(username=form.cleaned_data['username'])
-            #https://simpleisbetterthancomplex.com/tutorial/2016/08/24/how-to-create-one-time-link.html
-            token_generator = PasswordResetTokenGenerator()
-            token = token_generator.make_token(u)
-            user_id =urlsafe_base64_encode(force_bytes(u.pk)),
-            #print('We now have auser id %s, of type %s'%(user_id, type(user_id)))
-            reset_link = request.build_absolute_uri(reverse('reset-password-confirm', kwargs={'uidb64':user_id[0], 'token': token}))
-            #print(u.id)
-            send_mail(
-                subject='Password reset link from motpanel.com',
-                message='Hi! \n Someone requested a password reset for your account: %s. \n Hopefully that was you! \n Anyway, just paste this link into your brower, and follow the instructions from there: \n \n %s \n \n Best regards,\n motpanel.com '%(u.username, reset_link),
-                from_email='support@motpanel.com',
-                recipient_list=[u.username],
-                fail_silently=True,
-            )
-            token_check = token_generator.check_token(u, token)
-            print('and checked it: %s.'%(token_check))
-    return render(request, 'reset_password_confirm.html', context)
-
-def reset_password_confirm_view(request, **kwargs):
-    """View function for resetting ones password."""
-    assert 'uidb64' in kwargs and 'token' in kwargs
-    validlink = False
-    uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
-    token = kwargs.get('token', None)
-    u=User.objects.get(pk=uid)
-    token_generator = PasswordResetTokenGenerator()
-    if token_generator.check_token(u, token):
-        validlink = True
-        #render form
-        #return page
-    else:
-        messages.error(request, 'We were unable to to confirm this address. Did you copy it correctly? You can try the link agin (make sure you copy the entire link) or you can create a new link below:', extra_tags='alert alert-warning')
-        return HttpResponseRedirect(reverse('reset-password'))
-'''
 def sign_up(request):
     """View function for signing up."""
     #logged in users are redirected

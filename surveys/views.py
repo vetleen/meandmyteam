@@ -15,6 +15,10 @@ from surveys.models import Product, Organization, Employee, ProductSetting
 from surveys.forms import CreateOrganizationForm, AddEmployeeForm, EditEmployeeForm, ConfigureEmployeeSatisfactionTrackingForm
 
 from datetime import date
+
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 
@@ -32,25 +36,28 @@ def dashboard_view(request):
         employee_list = []
         employee_count = 0
 
-    try:
-        active_products = request.user.organization.active_products.all()
-        active_products_count =  active_products.count()
-
-    except Organization.DoesNotExist:
-        active_products_count = 0
+    #try:
+    #    active_products = request.user.organization.active_products.all()
+    #    active_products_count =  active_products.count()
+    #
+    #except Organization.DoesNotExist:
+    #    active_products_count = 0
 
     #see your organization(name, number of employees and so on)
     #See what products are activated, easily get started on them
     #If a product is activated show mini-dashboard with, when was the last survey, when is the next, how many have replied, and how many are waiting to reply
     est_active = False
     p = Product.objects.get(name='Employee Satisfaction Tracking')
-    if p in request.user.organization.active_products.all():
-        est_active = True
-    print('est is active: %s.'%(est_active))
+    try:
+        if p in request.user.organization.active_products.all():
+            est_active = True
+    except Organization.DoesNotExist:
+        pass
+    #print('est is active: %s.'%(est_active))
     context = {
         'todays_date': date.today(),
         'employee_count': employee_count,
-        'active_products_count': active_products_count,
+        #'active_products_count': active_products_count,
         'employee_list': employee_list,
         'est_active': est_active
 
@@ -214,7 +221,7 @@ def set_up_employee_satisfaction_tracking(request, **kwargs):
         est_is_active=True
 
     #set default: assume it's not activated yet
-    form=ConfigureEmployeeSatisfactionTrackingForm
+    form=ConfigureEmployeeSatisfactionTrackingForm(label_suffix='')
     context = {
         'form': form,
         'submit_button_text': 'Start Employee Satisfaction Tracking',
@@ -233,7 +240,7 @@ def set_up_employee_satisfaction_tracking(request, **kwargs):
 
         }
 
-        form = ConfigureEmployeeSatisfactionTrackingForm(initial=data)
+        form = ConfigureEmployeeSatisfactionTrackingForm(initial=data, label_suffix='.')
         context.update({
             'form': form,
             'submit_button_text': submit_button_text
@@ -241,7 +248,7 @@ def set_up_employee_satisfaction_tracking(request, **kwargs):
 
 
     if request.method == 'POST':
-        form=ConfigureEmployeeSatisfactionTrackingForm(request.POST)
+        form=ConfigureEmployeeSatisfactionTrackingForm(request.POST, label_suffix='')
         context.update({'form': form})
         if form.is_valid():
             if form.cleaned_data['is_active']==True and est not in apset:
@@ -260,8 +267,20 @@ def set_up_employee_satisfaction_tracking(request, **kwargs):
 
             apset = request.user.organization.active_products.all()
             if est in apset:
-                messages.success(request, 'Your settings were updated: Employee satisfaction tracking is ACTIVE with the settings you submitted.', extra_tags='alert alert-success')
+                messages.success(request, 'Your settings were updated: Employee satisfaction tracking is ON.', extra_tags='alert alert-success')
             else:
-                messages.success(request, 'Your settings were updated: Employee satisfaction tracking is INACTIVE.', extra_tags='alert alert-success')
+                messages.success(request, 'Your settings were updated: Employee satisfaction tracking is OFF.', extra_tags='alert alert-warning')
             return HttpResponseRedirect(reverse('surveys-dashboard'))
+
+    if est not in apset:
+        messages.info(request, 'Make sure you tick the box below to activate satisfaction tracking!', extra_tags='alert alert-warning')
+
     return render(request, 'set_up_product.html', context)
+
+def answer_survey_view(request, **kwargs):
+    sid = int(force_text(urlsafe_base64_decode(kwargs.get('si_idb64', None))))-89322028
+    #si = get_object_or_404(SurveyInstance, pk=sid)
+    context = {
+        'sid': sid,
+            }
+    return render(request, 'answer_survey.html', context)

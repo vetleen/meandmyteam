@@ -2,10 +2,12 @@ from django.test import TestCase, SimpleTestCase
 
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib import auth
-from surveys.functions import make_surveys_for_active_products, make_survey_instances_for_active_surveys, send_out_survey_instance_emails, configure_product, create_survey
+from surveys.functions import make_surveys_for_active_products, make_survey_instances_for_active_surveys, send_out_survey_instance_emails, configure_product, create_survey, send_email_about_survey_instance
 from surveys.models import Organization, Employee, Survey, SurveyInstance, IntAnswer, TextAnswer, Question, Product, ProductSetting
 
 from datetime import date, timedelta
+
+from django.core import mail
 
 def yellow(message):
     ''' A custom function that sets strings meant for the consoll to yellow so that they stand out'''
@@ -16,11 +18,20 @@ class MinorFunctionsTest(TestCase):
     ''' TESTS FUNCTIONS IN FUNCTIONS.PY '''
     def setUp(self):
         u = User(username="testuser", password="insecure123")
+        u.save()
+
         o = Organization(owner=u, name="TestOrga1")
+        o.save()
+
         p=Product(name="Product Name")
         p.save()
-        u.save()
-        o.save()
+
+        e=Employee(
+            organization = o,
+            email = 'e1@aa.aa',
+            receives_surveys = True
+        )
+        e.save()
 
     def test_function_configure_product(self):
         o=Organization.objects.get(pk=1)
@@ -37,7 +48,7 @@ class MinorFunctionsTest(TestCase):
 
         #test that default values are set:
         ps = configure_product(o, p)
-        
+
         self.assertEqual(ps.survey_interval, 90)
         self.assertEqual(ps.last_survey_open, None)
         self.assertEqual(ps.last_survey_close, None)
@@ -68,6 +79,38 @@ class MinorFunctionsTest(TestCase):
         self.assertEqual(s.owner, o)
         self.assertEqual(s.date_open, date.today())
         self.assertEqual(s.date_close, s.date_open + timedelta(days=ps.surveys_remain_open_days))
+
+    def test_send_email_about_survey_instance(self):
+        #setup for days
+        o=Organization.objects.get(pk=1)
+        p=Product.objects.get(pk=1)
+        e=Employee.objects.get(pk=1)
+        o.active_products.add(p)
+        o.save()
+        make_surveys_for_active_products(o)
+        make_survey_instances_for_active_surveys(o)
+        si=SurveyInstance.objects.get(pk=1)
+        #send an email
+        send_email_about_survey_instance(
+            si,
+            email_txt_template='emails/new_survey_instance_email_txt.html',
+            email_html_template='emails/new_survey_instance_email_html.html',
+            subject_template='emails/new_survey_subject.txt'
+        )
+        #see if it was sent
+        self.assertEqual(len(mail.outbox), 1)
+
+        #check that organization name was found in subject
+        self.assertTrue(o.name in mail.outbox[0].subject)
+        #self.assertTrue(o.name in mail.outbox[0].message)
+        self.assertTrue(o.name in mail.outbox[0].body)
+        self.assertTrue('hey would appreciate it if you took' in mail.outbox[0].body)
+        self.assertTrue(o.owner.email in mail.outbox[0].body)
+        self.assertTrue(e.email in mail.outbox[0].to)
+
+        #check that the body contains elemts of expected content
+        #print(dir(mail.outbox[0]))
+
 
 class TestFunction_make_surveys_for_active_products_base(TestCase):
     '''  '''
@@ -217,11 +260,13 @@ class TestFunctionmake_survey_instances_for_active_surveys(TestCase):
 class TestFunctionmake_send_out_survey_instance_emails(TestCase):
     def setUp(self):
         #org with surveys that are active and inactive, employees to add
-        u = User(username="testuser", password="insecure123")
-        o = Organization(owner=u, name="TestOrga1")
-        p=Product(name="Product Name")
+        u = User(username="testuser@tt.tt", email="testuser@tt.tt", password="insecure123")
         u.save()
+        o = Organization(owner=u, name="TestOrga1")
         o.save()
+        p=Product(name="Product Name")
+
+
         p.save()
         s1 = Survey(
             product = p,
@@ -281,3 +326,6 @@ class TestFunctionmake_send_out_survey_instance_emails(TestCase):
         send_out_survey_instance_emails(o)
         si = SurveyInstance.objects.get(pk=1)
         self.assertEqual(si.last_reminder, date.today())
+
+        #test that we are sending emails:
+        self.assertEqual(len(mail.outbox), 3)

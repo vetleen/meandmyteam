@@ -12,4 +12,5 @@ urlpatterns = [
         path('delete-coworker/<uidb64>/', views.delete_coworker_view, name='surveys-delete-coworker'),
         path('edit-coworker/<uidb64>/', views.edit_individual_coworker_view, name='edit-individual-coworker'),
         path('set-up-employee-satisfaction-tracking/', views.set_up_employee_satisfaction_tracking, name='surveys-set-up-employee-satisfaction-tracking'),
+        #path('answer-survey/<si_idb64>/', views.answer_survey_view, name='surveys-answer-survey'),
 ]

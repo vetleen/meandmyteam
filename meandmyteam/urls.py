@@ -18,7 +18,7 @@ from django.urls import path
 from django.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from surveys import views as survey_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,7 +26,7 @@ urlpatterns = [
     path('products/', include('surveys.urls')),
     path('dashboard/', include('surveys.urls')),
     path('', include('website.urls')),
-
+    path('answer-survey/<si_idb64>/', survey_views.answer_survey_view, name='surveys-answer-survey'),
 
 ]
 

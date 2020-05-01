@@ -47,49 +47,48 @@
           <a href="{% url 'surveys-edit-coworker' %}" class="btn btn-info">Add coworkers</a>
         </div>
       </div>
-      {% elif active_product_count == 0 %}
-      <div class="card">
-        <div class="card-header">
-          Your next step to get started
-        </div>
-        <div class="card-body">
-          <h5 class="card-title">Activate surveys</h5>
-          <p class="card-text">Now we just need to know how often to send out surveys, and when to start. We want to wait to send out the first one until you have had time to add all the employees who should be surveyed (or email us a list and we'll add them for you). Don't worry though, you can always add more respondents and we'll ask you if we should send open surveys.</p>
-          <a href="#" class="btn btn-info">Activate surveys</a>
-        </div>
-      </div>
+
       {% else %}
       <div class="row">
         <div class="col-sm-6">
+          {% if est_active == True %}
+          <div class="card text-center">
+            <div class="card-header">
+
+              Employee Satisfaction Tracking
+
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">You are all set!</h5>
+              <p class="card-text">
+                Sit back and relax, once data is in we will let you know, and we will display it here. <br />
+              </p>
+              <a href="{% url 'surveys-set-up-employee-satisfaction-tracking' %}" class="btn btn-info">Update settings</a>
+            </div>
+            <div class="card-footer text-muted">
+              <p class="card-text">
+                <small class="text-muted">Co-worker Satisfaction Tracking is currently <b>active</b></small>
+              </p>
+            </div>
+          </div>
+          {% else %}
           <div class="card text-center">
             <div class="card-header">
               Your next step to get started
             </div>
             <div class="card-body">
-            {% if est_active == True %}
-            <h5 class="card-title">You are all set!</h5>
-            <p class="card-text">
-              Sit back and relax, once data is in we will let you know, and we will display it here. <br />
 
-            </p>
-            <a href="{% url 'surveys-set-up-employee-satisfaction-tracking' %}" class="btn btn-lg btn-info">Update settings</a>
-            {% else %}
             <h5 class="card-title">You are ready!</h5>
             <p class="card-text">Don't worry, you can always add more coworkers to track later.</p>
             <a href="{% url 'surveys-set-up-employee-satisfaction-tracking' %}" class="btn btn-lg btn-success">Start tracking!</a>
-
-            {% endif %}
             </div>
             <div class="card-footer text-muted">
               <p class="card-text">
-                {% if est_active == True %}
-                <small class="text-muted">Co-worker Satisfaction Tracking is currently <b>active</b></small>
-                {% else %}
                 <small class="text-muted">CO-worker Satisfaction Tracking is currently <b>not activated</b></small>
-                {% endif %}
               </p>
             </div>
           </div>
+        {% endif %}
         </div><!-- col -->
         <div class="col-sm-6">
           <div class="card">
@@ -100,8 +99,19 @@
             <!--<img class="card-img-top mt-2" src="{% static request.user.subscriber.plan.illustration_static_address %}" style="height: 10rem;" alt="Card image cap">-->
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item"><div class="d-flex justify-content-between"><span>Number of co-workers: </span> <span>{{ employee_count }}</span></div></li>
-                  <li class="list-group-item"><div class="d-flex justify-content-between"><span>Coworker satisfaction tracking: </span> <span>Off</span></div></li>
 
+                  <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                      <div>Coworker satisfaction tracking:</div>
+                      <div>
+                      {% if est_active == True %}
+                      <a href="{% url 'surveys-set-up-employee-satisfaction-tracking' %}" class="badge badge-success align-self-end">ON</a>
+                      {% else %}
+                      <a href="{% url 'surveys-set-up-employee-satisfaction-tracking' %}" class="badge badge-warning align-self-end">OFF</a>
+                      {% endif %}
+                      </div>
+                    </div>
+                  </li>
                 </ul>
             <div class="card-body">
               <center><a href="{% url 'surveys-edit-organization' %}" class="btn btn-info">Edit organization details</a></center>

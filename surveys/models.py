@@ -24,7 +24,7 @@ class Organization(models.Model):
     zip_code =  models.CharField(max_length=255, blank=True, null=True, help_text='Zip code of the Organization')
     city =  models.CharField(max_length=255, blank=True, null=True, help_text='City where the Organization is located')
     country =  models.CharField(max_length=255, blank=True, null=True, help_text='Country where the Organization is located')
-    
+
 
     ##Todo
     #Add support for other Users than owner to be allowed to change organization
@@ -69,7 +69,9 @@ class SurveyInstance(models.Model):
     respondent = models.ForeignKey(Employee, on_delete=models.SET_NULL, blank=True, null=True, help_text='Employee who answered this SurveyInstance')
     sent_initial = models.BooleanField(default=False, help_text='This SI has been sent once, the initial time')
     last_reminder = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last reminder was sent')
-
+    #uniqe_link_token? Use ID like we already do? with survey.pk and respondent.pk to salt, dont need db?
+    def si_idb64(self):
+        return urlsafe_base64_encode(force_bytes(self.pk+89322028))
 
     def __str__(self):
         """String for representing the SurveyInstance object (in Admin site etc.)."""
