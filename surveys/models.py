@@ -5,27 +5,26 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 import datetime
 from django.contrib.auth.models import User
-
-from surveys.products import complete_products_list
 # Create your models here.
 
+class Product(models.Model):
+    name = models.CharField(max_length=255, help_text='Name of the Product')
+    short_description = models.CharField(max_length=255, blank=True, null=True, help_text='Short description of Product')
 
+    def __str__(self):
+        """String for representing the Product object (in Admin site etc.)."""
+        return self.name
 
 class Organization(models.Model):
     owner = models.OneToOneField(User, blank=True, null=True, on_delete=models.PROTECT, help_text='User who owns this Organization')
     name = models.CharField(max_length=255, blank=True, null=True, help_text='Name of the Organization')
+    active_products = models.ManyToManyField(Product, blank=True, help_text='Products this organization is currently using')
     address_line_1 = models.CharField(max_length=255, blank=True, null=True, help_text='Adress of the Organization')
     address_line_2 = models.CharField(max_length=255, blank=True, null=True, help_text='Address contd.')
     zip_code =  models.CharField(max_length=255, blank=True, null=True, help_text='Zip code of the Organization')
     city =  models.CharField(max_length=255, blank=True, null=True, help_text='City where the Organization is located')
     country =  models.CharField(max_length=255, blank=True, null=True, help_text='Country where the Organization is located')
-    active_product_1 = models.BooleanField(default=False, help_text='Employee Satisfaction Tracking is active for this organization')
 
-    def active_products():
-        ap_list=[]
-        if active_product_1 = True:
-            ap_list.append
-        return ap_list
 
     ##Todo
     #Add support for other Users than owner to be allowed to change organization
@@ -78,6 +77,34 @@ class SurveyInstance(models.Model):
         """String for representing the SurveyInstance object (in Admin site etc.)."""
         return 'SurveyInstance of Product: %s for Organization: %s.'%(self.survey.product.name, self.survey.owner.name)
 
+class Question(models.Model):
+    ''' Base model of a question '''
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, help_text='Product that asks this question')
+    active = models.BooleanField(default=True, help_text='Question is included in new Surveys')
+    question_string = models.TextField(help_text='The question as it appears to the respondent')
+    dimension = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True,
+        default=None,
+        help_text='The dimension or category for this Question',
+    )
+
+    def answer(value):
+        print('Received and answer to a question')
+        print('The answer if of type %s'%(type(value)))
+        if type(value) == int:
+            a=IntAnswer(value)
+            a.save()
+        elif type(value) == str:
+            a=TextAnswer(value)
+            a.save()
+        else:
+            raise TypeError('Answers must be strings or integers at this point')
+
+    def __str__(self):
+        """String for representing the Question object (in Admin site etc.)."""
+        return self.question_string
 
 class Answer(models.Model):
     survey_instance = models.ForeignKey(SurveyInstance, on_delete=models.PROTECT, help_text='The SurveyInstance where this answer given')
