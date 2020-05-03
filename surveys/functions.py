@@ -1,4 +1,4 @@
-from surveys.models import Organization, Employee, Survey, SurveyInstance, IntAnswer, TextAnswer, Question, Product, ProductSetting
+from surveys.models import Organization, Employee, Survey, SurveyInstance, IntAnswer, TextAnswer, ProductSetting
 from datetime import date, timedelta
 from django.core.mail import EmailMultiAlternatives
 
