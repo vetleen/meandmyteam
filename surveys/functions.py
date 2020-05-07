@@ -115,7 +115,8 @@ def send_email_about_survey_instance(si, email_txt_template, email_html_template
 
     token = si.get_url_token
     contact_person = si.survey.owner.owner.email
-    if si.survey.owner.owner.first_name is not None and si.survey.owner.owner.last_name is not None:
+    if si.survey.owner.owner.first_name !='' and si.survey.owner.owner.last_name !='':
+        print (si.survey.owner.owner.first_name, si.survey.owner.owner.last_name)
         contact_person = '%s %s'%(si.survey.owner.owner.first_name, si.survey.owner.owner.last_name)
 
 

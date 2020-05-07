@@ -8,6 +8,7 @@
 
 
 
+
 #Product #1
 add data visuallization on web
 add report-generator (I see there are heroku addons for html->pdf)
@@ -42,60 +43,4 @@ redesign 404 page and so on -  No menu, prettier message ...
 remake illustrations with the right color
 Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#customize-pages
 use standard sign-up and change-password views?
-
-
-## Name?
-* meandmy.team
-nestpanel.com
-vibekeys.com
-myteamandme.com
-myteammetrics.com
-* motpanel.com
-retainhero.com
-
-team
-flow
-hero
-teamwork
-7
-feather
-teambird
-engine
-power
-tail/tale
-color
-*meter
-pattern
-cadence
-twin
-space
-create
-happy
-creatures
-create belonging, a sense of
-senseofbelonging
-joy
-staff
-care
-nurture
-nurse
-squad
-shape
-development
-panel
-metrics
-survey
-people
-stay/keep/retain/sustain/
-nest
-vibe/pulse
-soft
-motion
-ahead
-together
-better
-our
-voice
-key
-huddle
-keep, minder, gardener, grower,
+- When visiting add employees for the first time, it would be neat if user was already added
