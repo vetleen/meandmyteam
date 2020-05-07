@@ -1,8 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.http import HttpResponseForbidden
-
+from django.http import HttpResponseForbidden, Http404, HttpResponseRedirect
 
 
 from django.contrib import messages
@@ -11,8 +9,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.models import User
-from surveys.models import Product, Organization, Employee, ProductSetting
-from surveys.forms import CreateOrganizationForm, AddEmployeeForm, EditEmployeeForm, ConfigureEmployeeSatisfactionTrackingForm
+from surveys.models import Product, Organization, Employee, ProductSetting, SurveyInstance, Survey, Question, Answer, IntAnswer, TextAnswer
+from surveys.forms import CreateOrganizationForm, AddEmployeeForm, EditEmployeeForm, ConfigureEmployeeSatisfactionTrackingForm, AnswerQuestionsForm
 
 from datetime import date
 
@@ -278,9 +276,105 @@ def set_up_employee_satisfaction_tracking(request, **kwargs):
     return render(request, 'set_up_product.html', context)
 
 def answer_survey_view(request, **kwargs):
-    sid = int(force_text(urlsafe_base64_decode(kwargs.get('si_idb64', None))))-89322028
-    #si = get_object_or_404(SurveyInstance, pk=sid)
+    #instantiate the context right away
     context = {
-        'sid': sid,
-            }
+        'submit_button_text': 'Continue',
+    }
+
+    #The URL should be telling us which survey instance user is trying to answer, let's use that to get the survey instance 'si' right away
+    #The URL should also have a token, so let's use that to ensure the user actually has the valid link that lets him answer this survey
+    try:
+        #get the si-id and token from the url, and check that it's format is correct
+        token = kwargs.get('token', None)
+        token_args = token.split("-")
+        assert len(token_args) == 2, "Faulty link (wrong link format)"
+        #get the assosciated SI
+        si_id = int(force_text(urlsafe_base64_decode(token_args[0])))
+        si = get_object_or_404(SurveyInstance, pk=si_id)
+        #ensure the token matches the si
+        assert si.get_hash_string() == token_args[1], "Faulty link (invalid hash)"
+        #ensure the survey that the si belonmgs to is still open
+        assert si.survey.date_close >= date.today()
+        context.update({'si': si})
+    except:
+        raise Http404("The survey you asked for does not exist. If you pasted a link, make sure you got the entire link.")
+
+    #this view also takes a page argument that we use for pagination of questions
+    page=kwargs.get('page', None)
+    context.update({'page': page})
+    #print('page (%s) is of type %s'%(page, type(page)))
+    #if it's not paginated, we present the user with the "start survey" help text and button
+
+    if page is None:
+        pass
+
+    #else, it is a paginated page, and we should probably present some questions
+    else:
+        #get the questions in the survey, we are going to use them anyway
+        questions = Question.objects.filter(product=si.survey.product).order_by('pk')
+
+        #make a list 'qlist' containing exactly the questions the user should be asked
+        page_size = 5 #questions per page
+        qlist = []
+        last_q_id = int(page)*page_size
+        for i, q in enumerate(questions):
+            if i < last_q_id and i >= (last_q_id-page_size):
+                qlist.append(q)
+        #initialize the dict that will contain pre-existing data from the db to fill in the initial values in the form
+        data={}
+        #get previous answers for the questions in qlist and add them to the dict
+        for q in qlist:
+            #print(q)
+            alist = IntAnswer.objects.filter(question=q, survey_instance=si)
+            if alist is not None:
+                try:
+                    #print(alist[0])
+                    data.update({'question_%s'%(q.pk): alist[0].value})
+                except IndexError:
+                    pass
+        print (data)
+
+        #make a form, with pre-existing data if any
+        form=AnswerQuestionsForm(questions=qlist, initial=data)
+        #make form available to context
+        context.update({'form': form})
+
+        #did the user POST something?
+        if request.method == 'POST':
+            print('received form')
+            #make a fresh form insatnce, and bind it with the posted value
+            form=AnswerQuestionsForm(request.POST, questions=qlist)
+            context.update({'form': form})
+
+            #deal with data if it's valid
+            if form.is_valid():
+                print('form is valid')
+                for item in form.cleaned_data:
+                    # identify the question that has been answered
+                    q_id= int(item.replace('question_', ''))
+                    q = Question.objects.get(pk=q_id)
+
+                    # find the value that has been provided as the answer
+                    value=int(form.cleaned_data[item])
+
+                    # use the answer method of the question to create answer objects for this si
+                    q.answer(value=value, survey_instance=si)
+                    #print('calling q.answer for question %s, with answer %s, and si %s.'%(q.pk, value, si.pk))
+
+                #if there are more questions, send them to the next page
+                print('comparing questions-length, %s, to page x page_size, %s...'%(len(questions), int(page)*page_size))
+                if len(questions) > int(page)*page_size:
+                    print('redirecting to page number %s.'%(page))
+                    return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(token, int(page)+1)))
+                #else, we are done answering, and redirect to thank you message
+                else:
+                    print('survey complete')
+                    si.completed=True
+                    si.save()
+                    print(token)
+                    return HttpResponseRedirect(reverse('surveys-answer-survey', args=(token, )))
+
+    #In case a valid form was not submitted, we present the current form
+    print('default choice')
+    print(context)
     return render(request, 'answer_survey.html', context)

@@ -1,14 +1,14 @@
 ##MeAndMyTeam
 
 #dev
-Add product:
-- 
+- email not sent to completed SI
+- Own navbar for survey responding and 404++
+- tests for survey respons view
+- fix html emails
 
 
 
 #Product #1
-add product model and related view logic
-add support for manually adding employees
 add data visuallization on web
 add report-generator (I see there are heroku addons for html->pdf)
 

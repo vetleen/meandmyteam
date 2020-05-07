@@ -329,3 +329,6 @@ class TestFunctionmake_send_out_survey_instance_emails(TestCase):
 
         #test that we are sending emails:
         self.assertEqual(len(mail.outbox), 3)
+        for m in mail.outbox:
+            #print(dir(m.body))
+            print(m.body)

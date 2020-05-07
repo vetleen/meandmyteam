@@ -60,3 +60,27 @@ class ConfigureEmployeeSatisfactionTrackingForm(forms.Form):
             )
     survey_interval = forms.ChoiceField(label="How often should co-workers in your organization be surveyed?", required=True, choices=INTERVAL_CHOICES)
     #surveys_remain_open_days =
+
+class AnswerQuestionsForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        #self.user = kwargs.pop('user',None)
+        self.questions = kwargs.pop('questions',None)
+        super(AnswerQuestionsForm, self).__init__(*args, **kwargs)
+
+        CHOICES = [
+            (1, '1'),
+            (2, '2'),
+            (3, '3'),
+            (4, '4'),
+            (5, '5')]
+
+        for q in self.questions:
+            field_name= 'question_%s'%(q.pk)
+            self.fields[field_name] = forms.ChoiceField(
+                label=q.question_string,
+                choices=CHOICES,
+                help_text=q.instruction_string,
+                widget=forms.RadioSelect(attrs={
+                    'class': 'form-check-input'
+                })
+            )

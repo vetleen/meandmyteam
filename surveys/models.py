@@ -5,6 +5,9 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 import datetime
 from django.contrib.auth.models import User
+
+from django.conf import settings
+from django.utils.crypto import salted_hmac
 # Create your models here.
 
 class Product(models.Model):
@@ -69,9 +72,22 @@ class SurveyInstance(models.Model):
     respondent = models.ForeignKey(Employee, on_delete=models.SET_NULL, blank=True, null=True, help_text='Employee who answered this SurveyInstance')
     sent_initial = models.BooleanField(default=False, help_text='This SI has been sent once, the initial time')
     last_reminder = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last reminder was sent')
+    completed = models.BooleanField(default=False, help_text='This SI has been completed')
+
     #uniqe_link_token? Use ID like we already do? with survey.pk and respondent.pk to salt, dont need db?
-    def si_idb64(self):
-        return urlsafe_base64_encode(force_bytes(self.pk+89322028))
+    def get_hash_string(self):
+        hash_string = salted_hmac(
+            "django.contrib.auth.tokens.PasswordResetTokenGenerator",
+            urlsafe_base64_encode(force_bytes(10*self.respondent.email+str(self.pk+self.survey.pk+self.survey.product.pk)+self.respondent.email)),
+            settings.SECRET_KEY,
+        ).hexdigest()[::2]
+        return hash_string
+
+    def get_url_token(self):
+        si = urlsafe_base64_encode(force_bytes(self.pk))
+        s = urlsafe_base64_encode(force_bytes(self.pk))
+        hash_string = self.get_hash_string()
+        return "%s-%s"%(si, hash_string)
 
     def __str__(self):
         """String for representing the SurveyInstance object (in Admin site etc.)."""
@@ -82,6 +98,7 @@ class Question(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, help_text='Product that asks this question')
     active = models.BooleanField(default=True, help_text='Question is included in new Surveys')
     question_string = models.TextField(help_text='The question as it appears to the respondent')
+    instruction_string = models.CharField(max_length=255, blank=True, null=True, default=None, help_text="Short text instructing how to answer the question")
     dimension = models.CharField(
         max_length=250,
         blank=True,
@@ -90,14 +107,39 @@ class Question(models.Model):
         help_text='The dimension or category for this Question',
     )
 
-    def answer(value):
-        print('Received and answer to a question')
-        print('The answer if of type %s'%(type(value)))
+    def answer(self, value, survey_instance):
+
+        #print('Received an answer to a question')
+        #print('The answer if of type %s'%(type(value)))
+        #print('can i print self? %s'%(self))
+        #print('can i print value, %s? and si, %s?'%(value, survey_instance))
+        #check if an answer already exists for this Q for this SI, if so update that, else make new answer
+        int_answer_list = IntAnswer.objects.filter(survey_instance=survey_instance, question=self)
+        #print('found %s previous answers'%(int_answer_list.count()))
+        if int_answer_list.count() > 0:
+            #print("there was already an intanswer for this question: %s."%(int_answer_list[0]))
+            a = int_answer_list[0]
+            a.value=value
+            a.save()
+            #print("now it's %s."%(a))
+            return
+
+        txt_answer_list = TextAnswer.objects.filter(survey_instance=survey_instance, question=self)
+        if txt_answer_list.count() > 0:
+            #print("there was already a txtanswer for this question")
+            a = txt_answer_list[0]
+            a.value=value
+            a.save()
+            return
+
+        #print("there was no answer for this q, let's make one")
         if type(value) == int:
-            a=IntAnswer(value)
+            a=IntAnswer(value=value, survey_instance=survey_instance, question=self)
+            #print(a)
             a.save()
         elif type(value) == str:
-            a=TextAnswer(value)
+            a=TextAnswer(value=value, survey_instance=survey_instance, question=self)
+            #print(a)
             a.save()
         else:
             raise TypeError('Answers must be strings or integers at this point')
@@ -115,7 +157,7 @@ class Answer(models.Model):
 
     def __str__(self):
         """String for representing the Answer object (in Admin site etc.)."""
-        return self.value
+        return 'AnswerObject: with value %s, to question %s'%(str(self.value), self.question)
 
 class IntAnswer(Answer):
     ''' Answer is an int'''

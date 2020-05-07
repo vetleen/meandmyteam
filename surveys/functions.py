@@ -113,14 +113,14 @@ def send_email_about_survey_instance(si, email_txt_template, email_html_template
 
     #from django.shortcuts import render
 
-    si_idb64 = si.si_idb64
+    token = si.get_url_token
     contact_person = si.survey.owner.owner.email
     if si.survey.owner.owner.first_name is not None and si.survey.owner.owner.last_name is not None:
         contact_person = '%s %s'%(si.survey.owner.owner.first_name, si.survey.owner.owner.last_name)
 
 
     context={
-            'si_idb64':si_idb64,
+            'token':token,
             'organization': si.survey.owner.name,
             'contact_person': contact_person
             }

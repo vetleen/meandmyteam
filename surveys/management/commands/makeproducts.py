@@ -20,6 +20,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'It is clear to me what is expected of me at work',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "role"
             )
             q1.save()
@@ -29,6 +30,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I can decide when to take a break',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "control"
             )
             q2.save()
@@ -38,6 +40,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'Different groups at work demand different things from me that are hard to combine',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "demands"
             )
             q3.save()
@@ -47,6 +50,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I know how to go about getting my job done',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "role"
             )
             q4.save()
@@ -56,6 +60,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I am subject to personal harassment in the form of unkind words or behaviour',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "relationships"
             )
             q5.save()
@@ -65,6 +70,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I have unachievable deadlines',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "demands"
             )
             q6.save()
@@ -75,6 +81,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'If work gets difficult, my colleagues will help me',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "peer support"
             )
             q7.save()
@@ -84,6 +91,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I am given supportive feedback on the work I do',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "manager support"
             )
             q8.save()
@@ -93,6 +101,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I have to work very intensively',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "demands"
             )
             q9.save()
@@ -102,6 +111,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I have a say in my own work speed',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "control"
             )
             q10.save()
@@ -111,6 +121,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'It is clear to me what my duties and responsibilities are',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "role"
             )
             q11.save()
@@ -120,6 +131,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I have to neglect some tasks because I have too much to do',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "demands"
             )
             q12.save()
@@ -129,6 +141,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'The goals and objectives for my department are clear to me',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "role"
             )
             q13.save()
@@ -138,6 +151,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'There is friction or anger between colleagues',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "relationships"
             )
             q14.save()
@@ -147,6 +161,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I have a choice in deciding how I do my work',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "control"
             )
             q15.save()
@@ -156,6 +171,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I am unable to take sufficient breaks',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "demands"
             )
             q16.save()
@@ -166,6 +182,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I understand how my work fits into the overall aim of the organisation',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "role"
             )
             q17.save()
@@ -175,6 +192,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I am pressured to work long hours',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "demands"
             )
             q18.save()
@@ -184,6 +202,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I have a choice in deciding what I do at work',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "control"
             )
             q19.save()
@@ -193,6 +212,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I have to work very fast',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "demands"
             )
             q20.save()
@@ -202,6 +222,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I am subject to bullying at work',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "relationships"
             )
             q21.save()
@@ -211,6 +232,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I have unrealistic time pressures',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "demands"
             )
             q22.save()
@@ -220,6 +242,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I can rely on my manager to help me out with a work problem',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "manager support"
             )
             q23.save()
@@ -229,6 +252,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I get help and support I need from colleagues',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "peer support"
             )
             q24.save()
@@ -238,6 +262,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I have some say over the way I work',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "control"
             )
             q25.save()
@@ -247,6 +272,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I have sufficient opportunities to question managers about change at work',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "change"
             )
             q26.save()
@@ -256,6 +282,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I receive the respect at work I deserve from my colleagues',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "peer support"
             )
             q27.save()
@@ -265,6 +292,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'Staff are always consulted about change at work',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "change"
             )
             q28.save()
@@ -274,6 +302,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I can talk to my manager about something that has upset or annoyed me about work',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "manager support"
             )
             q29.save()
@@ -283,6 +312,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'My working time can be flexible',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "control"
             )
             q30.save()
@@ -292,6 +322,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'My colleagues are willing to listen to my work-related problems',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "peer support"
             )
             q31.save()
@@ -301,6 +332,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'When changes are made at work, it is clear to me how they will work out in practice',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "change"
             )
             q32.save()
@@ -310,6 +342,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'I am supported through emotionally demanding work',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "manager support"
             )
             q33.save()
@@ -319,6 +352,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'Relationships at work are strained',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "relationships"
             )
             q34.save()
@@ -328,6 +362,7 @@ class Command(BaseCommand):
                 product = p,
                 active = True,
                 question_string = 'My manager encourages me at work',
+                instruction_string ='How strongly do you agree with this statement?  1 means you don\'t  agree at all, and 5 means you agree completely.',
                 dimension = "manager support"
             )
             q35.save()

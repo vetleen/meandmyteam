@@ -2,7 +2,7 @@ from django.contrib import admin
 
 #from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import Product, Organization, Employee, Survey, Question
+from .models import Product, Organization, Employee, Survey, Question, SurveyInstance
 from website.admin import UserAdmin as BaseUserAdmin, SubscriberInline
 
 
@@ -40,6 +40,12 @@ class SurveyInline(admin.TabularInline): #for use in UserAdmin
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner', 'address_line_1', 'address_line_2', 'zip_code', 'city', 'country')
     inlines = (EmployeeInline, SurveyInline)
+
+@admin.register(SurveyInstance)
+class SurveyInstanceAdmin(admin.ModelAdmin):
+        list_display = ('respondent', 'survey', 'sent_initial', 'last_reminder')
+
+
 
 #reregister
 admin.site.unregister(User)
