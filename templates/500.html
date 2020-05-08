@@ -2,17 +2,22 @@
 {% block navbar %}
   {% include "includeable/empty_navbar.html" %}
 {% endblock %}
+{% load static %}
 {% block content %}
 <div class="container">
   <div class="row justify-content-center pt-4">
-    <div  class="alert alert-danger col-lg-6 alert-dismissible fade show" role="alert">
+    <div  class="alert alert-warning col-sm-6 alert-dismissible fade show" role="alert">
       <h4 class="alert-heading"> Server error </h4>
       <hr>
-      <p> Oh no! There was a server error. This is totally our fault, and we are working hard to fix it!</p>
+      <p> Oh no! Our server encountered an error.</p>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
+    <div class="w-100"></div>
+    <div class col-sm-6>
+      <img src="{% static 'images/generic-error.svg' %}" class="img-fluid" width="400" alt="404: Not found." />
+    </div><!-- col -->
   </div> <!-- row -->
 </div><!-- container -->
 
