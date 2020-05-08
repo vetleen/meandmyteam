@@ -1,12 +1,13 @@
 ##MeAndMyTeam
 
 #dev
-- Own navbar for survey responding
+
 - tests for survey respons view
 - fix html emails
 
 
 #Product #1
+add automatic worker
 add data visuallization on web
 add report-generator (I see there are heroku addons for html->pdf)
 
