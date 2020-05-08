@@ -1,9 +1,7 @@
 ##MeAndMyTeam
 
 #dev
-
 - tests for survey respons view
-- fix html emails
 
 
 #Product #1
