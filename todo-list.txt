@@ -2,11 +2,9 @@
 
 #dev
 - email not sent to completed SI
-- Own navbar for survey responding and 404++
+- Own navbar for survey responding
 - tests for survey respons view
 - fix html emails
-
-
 
 
 #Product #1
@@ -39,7 +37,7 @@ users deciding to resignup before their last billing period expired, should not 
 
 #finishing touch
 more info in edit profile AND in sign up
-redesign 404 page and so on -  No menu, prettier message ...
+redesign 404 page and so on -  custom navbar, prettier message (illustration) ...
 remake illustrations with the right color
 Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#customize-pages
 use standard sign-up and change-password views?

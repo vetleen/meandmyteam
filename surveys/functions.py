@@ -146,22 +146,20 @@ def send_out_survey_instance_emails(organization):
     sis = SurveyInstance.objects.filter(survey__owner=organization, survey__date_close__gt=date.today())
     for si in sis:
 
-        if not si.sent_initial:
+        if not si.sent_initial and not si.completed:
             send_email_about_survey_instance(
                 si,
                 email_txt_template='emails/new_survey_instance_email_txt.html',
                 email_html_template='emails/new_survey_instance_email_html.html',
                 subject_template='emails/new_survey_subject.txt'
             )
-        elif si.last_reminder < (date.today() + timedelta(days=-7)):
+        elif (si.last_reminder < (date.today() + timedelta(days=-7))) and not si.completed:
             send_email_about_survey_instance(
                 si,
                 email_txt_template='emails/remind_survey_instance_email_txt.html',
                 email_html_template='emails/remind_survey_instance_email_html.html',
                 subject_template='emails/remind_survey_subject.txt'
             )
-        else:
-            pass
 
 def daily_survey_maintenance():
     #get all organiaztions, and for eacH:

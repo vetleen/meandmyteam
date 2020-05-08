@@ -332,3 +332,19 @@ class TestFunctionmake_send_out_survey_instance_emails(TestCase):
         for m in mail.outbox:
             #print(dir(m.body))
             print(m.body)
+        #test that mails are not sent about completed SIs
+        self.assertFalse(si.completed)
+        si.completed = True
+        si.last_reminder = date.today() + timedelta(days=-9)
+        si.save()
+        self.assertTrue(si.completed)
+        self.assertEqual(si.last_reminder, date.today() + timedelta(days=-9))
+        send_out_survey_instance_emails(o)
+        self.assertTrue(si.completed)
+        self.assertEqual(len(mail.outbox), 3)
+        self.assertEqual(si.sent_initial, True)
+        si.sent_initial = False
+        si.save()
+        send_out_survey_instance_emails(o)
+        self.assertEqual(si.sent_initial, False)
+        self.assertEqual(len(mail.outbox), 3)
