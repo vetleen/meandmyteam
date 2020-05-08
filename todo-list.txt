@@ -1,7 +1,6 @@
 ##MeAndMyTeam
 
 #dev
-- email not sent to completed SI
 - Own navbar for survey responding
 - tests for survey respons view
 - fix html emails

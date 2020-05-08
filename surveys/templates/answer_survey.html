@@ -1,6 +1,10 @@
 {% extends "base_generic.html" %}
 {% load widget_tweaks %}
 
+{% block navbar %}
+  {% include "includeable/empty_navbar.html" %}
+{% endblock %}
+
 {% block content %}
 <div class="container">
   <div class="row justify-content-center pt-2">
@@ -23,7 +27,12 @@
         </div>
         <div class="card-body">
           <h5 class="card-title">Thank you for taking the time to answer this survey</h5>
-          <p class="card-text">The survey has been successfully completed. You can update your answers until {{ si.survey.date_close }}. </p>
+          <p class="card-text">
+            The survey has been successfully completed, and your answers saved. You can update your answers until {{ si.survey.date_close }} by using the button below, and the link we emailed you before will get you back here if you need it.
+          </p>
+          <p class="card-text">
+            You may close this window now.
+          </p>
           <a href="{% url 'surveys-answer-survey-pages' si.get_url_token 1 %}" class="btn btn-info">Review answers</a>
         </div>
       </div>
