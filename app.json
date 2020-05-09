@@ -1,5 +1,5 @@
 {
-	"addons": ["papertrail:choklad"],
+	"addons": ["papertrail:choklad", "scheduler:standard"],
 	"scripts": {
 		"postdeploy": "python manage.py makeplans && python manage.py makeproducts"
 	}
