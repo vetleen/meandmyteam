@@ -302,9 +302,8 @@ def answer_survey_view(request, **kwargs):
     #this view also takes a page argument that we use for pagination of questions
     page=kwargs.get('page', None)
     context.update({'page': page})
-    #print('page (%s) is of type %s'%(page, type(page)))
-    #if it's not paginated, we present the user with the "start survey" help text and button
 
+    #if it's not paginated, we present the user with the "start survey" help text and button
     if page is None:
         pass
 
@@ -320,15 +319,14 @@ def answer_survey_view(request, **kwargs):
         for i, q in enumerate(questions):
             if i < last_q_id and i >= (last_q_id-page_size):
                 qlist.append(q)
+
         #initialize the dict that will contain pre-existing data from the db to fill in the initial values in the form
         data={}
         #get previous answers for the questions in qlist and add them to the dict
         for q in qlist:
-            #print(q)
             alist = IntAnswer.objects.filter(question=q, survey_instance=si)
             if alist is not None:
                 try:
-                    #print(alist[0])
                     data.update({'question_%s'%(q.pk): alist[0].value})
                 except IndexError:
                     pass
@@ -359,22 +357,16 @@ def answer_survey_view(request, **kwargs):
 
                     # use the answer method of the question to create answer objects for this si
                     q.answer(value=value, survey_instance=si)
-                    #print('calling q.answer for question %s, with answer %s, and si %s.'%(q.pk, value, si.pk))
 
                 #if there are more questions, send them to the next page
-                print('comparing questions-length, %s, to page x page_size, %s...'%(len(questions), int(page)*page_size))
                 if len(questions) > int(page)*page_size:
-                    print('redirecting to page number %s.'%(page))
                     return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(token, int(page)+1)))
                 #else, we are done answering, and redirect to thank you message
                 else:
                     print('survey complete')
                     si.completed=True
                     si.save()
-                    print(token)
                     return HttpResponseRedirect(reverse('surveys-answer-survey', args=(token, )))
 
     #In case a valid form was not submitted, we present the current form
-    print('default choice')
-    print(context)
     return render(request, 'answer_survey.html', context)
