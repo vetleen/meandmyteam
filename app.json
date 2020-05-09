@@ -1,6 +1,6 @@
 {
 	"addons": ["papertrail:choklad"],
 	"scripts": {
-		"postdeploy": "python manage.py makeplans"
+		"postdeploy": "python manage.py makeplans && python manage.py makeproducts"
 	}
 }

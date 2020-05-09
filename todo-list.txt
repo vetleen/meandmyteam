@@ -3,9 +3,8 @@
 #dev
 
 
-
 #Product #1
-add automatic worker
+
 add data visuallization on web
 add report-generator (I see there are heroku addons for html->pdf)
 
