@@ -43,12 +43,28 @@
     <div class="col-sm-8">
       <div class="card text-center">
         <div class="card-header">
-          {{ si.survey.product.name }}
+          Workplace satisfaction survey
         </div>
         <div class="card-body">
           <h5 class="card-title">Thank you for taking the time to answer this survey</h5>
-          <p class="card-text">{{ si.survey.product.short_description }}</p>
-          <a href="{% url 'surveys-answer-survey-pages' si.get_url_token 1 %}" class="btn btn-info">Start survey</a>
+          <p class="card-text">
+The personal data we collect in this survey will primarily be used to provide your
+organization with a picture of its strong and weak points regarding co-worker
+happiness and satisfaction. We attempt to maintain your anonymity in the
+following manner:<br />
+            </p>
+            <p class="card-text">
+We do not directly tell your organization (or anyone else) WHO has answered WHAT
+to these questions. Yet, in some case, it may be possible to to guess. For
+example if the organization is very small and/or everyone answers very
+similarily.
+          </p>
+          <p class="card-text">
+Read our full <a href="{% url 'privacy-policy' %}" target="_blank">privacy policy&#11016;</a>.
+          </p>
+
+
+          <a href="{% url 'surveys-answer-survey-pages' si.get_url_token 1 %}" class="btn btn-info">Consent to use of personal data and start survey</a>
         </div>
       </div>
     </div>

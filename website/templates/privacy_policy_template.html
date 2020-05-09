@@ -1,0 +1,15 @@
+{% extends "base_generic.html" %}
+{% block navbar %}
+  {% include "includeable/empty_navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center pt-4">
+    <div class="col-sm-8 text-dark">
+{% include "includeable/privacy_policy_text.html" %}
+    </div><!-- col -->
+  </div> <!-- row -->
+</div><!-- container -->
+
+{% endblock %}

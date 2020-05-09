@@ -47,6 +47,9 @@ def index(request):
     # Render the HTML template index.html with the data in the context variable
     return render(request, 'index.html', context=context)
 
+def privacy_policy_view(request):
+    ''' displays the sites privacy policy'''
+    return render(request, 'privacy_policy_template.html')
 
 
 @login_required
