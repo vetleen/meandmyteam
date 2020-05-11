@@ -1,0 +1,142 @@
+{% extends "base_generic.html" %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container">
+  <div class="row pt-4">
+    <div class="col-sm-12 text-center">
+      <h4>Co-worker satisfaction tracking data</h4>
+    </div>
+  </div> <!-- row -->
+
+  <div class="row justify-content-center pt-2">
+  {% include "includeable/message_displayer.html" %}
+  </div><!-- row -->
+
+
+
+  <div class="row justify-content-center">
+    <div class="col-md-6 mt-4">
+      <h3>Summary</h3>
+      <h5>Summary of scores for latest survey</h5>
+      <p class="text-muted">
+        Completion date: May 10th 2020<br />
+        Respondents: {{ number_of_respondents }}
+
+      </p>
+      <p class="text-body">
+We score your organization on six dimensions. Your organization's scores are
+summarized below.
+{% if number_of_respondents > 4 %}
+You can click each dimension to see a further breakdown, and
+see which concrete questions cause a certain score.
+
+{% else %}
+Since this survey had fewer than five respondents, we don't provide a more
+detailed view of the data. This is because we promised your co-workers that we
+would anonymize the data, and with less than five responents it starts to become
+possible to guesstimate individual answers.
+
+{% endif %}
+      </p>
+      {% for result in survey_results %}
+      <div class="row">
+        <div class="col-sm-4">
+
+          {{ result.name }}
+        </div><!-- col -->
+        <div class="col-sm-8">
+          <div class="progress"  style="height: 20px;">
+            <div class="progress-bar{% if result.score < 2 %} bg-danger{% elif result.score >= 4 %} bg-success{% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ result.progress }}%" aria-valuenow="{{ result.role.progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.score }}</div>
+          </div>
+        </div><!-- col -->
+      </div><!-- row -->
+      {% endfor %}
+    </div><!-- col -->
+    <div class="w-100"></div>
+    <div class="col-md-6 mt-4">
+      <h5>Change from previous survey</h5>
+      <p class="text-muted">
+        Completion date: November 10th 2019<br />
+        Respondents: {{ number_of_respondents_previous }}
+
+      </p>
+      {% for result in survey_results %}
+      <div class="row">
+        <div class="col-sm-4">
+
+          {{ result.name }}
+
+        </div><!-- col -->
+        <div class="col-sm-8">
+
+          <div class="progress"  style="height: 20px;">
+            <div class="progress-bar bg-transparent" role="progressbar" style="width: {{ result.blue_bar }}%" aria-valuenow="{{ result.blue_bar }}" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ result.red_bar }}%" aria-valuenow="{{ result.red_bar }}" aria-valuemin="0" aria-valuemax="100"> {{result.delta}} </div>
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ result.green_bar }}%" aria-valuenow="{{ result.green_bar }}" aria-valuemin="0" aria-valuemax="100"> +{{result.delta}} </div>
+          </div>
+        </div><!-- col -->
+      </div><!-- row -->
+      {% endfor %}
+    </div> <!-- col -->
+
+    <div class="w-100"></div>
+    {% for result in survey_results %}
+
+    <div class="col-md-6 mt-4">
+      <h3>{{ result.name}}</h3>
+      <div class="row">
+        <div class="col-sm-4">
+          Previous score:
+        </div><!-- col -->
+        <div class="col-sm-8">
+          <div class="progress"  style="height: 20px;">
+            <div class="progress-bar{% if result.previous_score < 2 %} bg-secondary{% elif result.previous_score >= 4 %} bg-secondary{% else %} bg-secondary{% endif %}" role="progressbar" style="width: {{ result.previous_progress }}%" aria-valuenow="{{ result.role.previous_progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.previous_score }}</div>
+          </div>
+        </div><!-- col -->
+      </div><!-- row -->
+      <div class="row">
+        <div class="col-sm-4">
+          Change:
+        </div><!-- col -->
+        <div class="col-sm-8">
+          <div class="progress"  style="height: 20px;">
+            <div class="progress-bar bg-transparent" role="progressbar" style="width: {{ result.blue_bar }}%" aria-valuenow="{{ result.blue_bar }}" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ result.red_bar }}%" aria-valuenow="{{ result.red_bar }}" aria-valuemin="0" aria-valuemax="100"> {{result.delta}} </div>
+            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ result.green_bar }}%" aria-valuenow="{{ result.green_bar }}" aria-valuemin="0" aria-valuemax="100"> +{{result.delta}} </div>
+          </div>
+        </div><!-- col -->
+      </div><!-- row -->
+      <div class="row">
+        <div class="col-sm-4">
+          Current score:
+        </div><!-- col -->
+        <div class="col-sm-8">
+          <div class="progress"  style="height: 20px;">
+            <div class="progress-bar{% if result.score < 2 %} bg-danger{% elif result.score >= 4 %} bg-success{% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ result.progress }}%" aria-valuenow="{{ result.role.progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.score }}</div>
+          </div>
+        </div><!-- col -->
+      </div><!-- row -->
+      <p class="mt-2">
+        {{ result.description }}
+      </p>
+      To arrive at this score, we asked respondents to what extent they agree with the following statements:
+      <ul>
+      {% for q in questions %}
+        {% if q.dimension == result.dimension %}
+          <li>{{q}} </li>
+        {% endif %}
+
+      {% endfor %}
+      </ul>
+
+
+
+
+    </div> <!-- col -->
+    <div class="w-100"></div>
+    {% endfor %}
+
+  </div> <!-- row -->
+</div><!-- container -->
+
+{% endblock %}

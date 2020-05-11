@@ -34,16 +34,6 @@ def dashboard_view(request):
         employee_list = []
         employee_count = 0
 
-    #try:
-    #    active_products = request.user.organization.active_products.all()
-    #    active_products_count =  active_products.count()
-    #
-    #except Organization.DoesNotExist:
-    #    active_products_count = 0
-
-    #see your organization(name, number of employees and so on)
-    #See what products are activated, easily get started on them
-    #If a product is activated show mini-dashboard with, when was the last survey, when is the next, how many have replied, and how many are waiting to reply
     est_active = False
     p = Product.objects.get(name='Employee Satisfaction Tracking')
     try:
@@ -61,11 +51,6 @@ def dashboard_view(request):
 
     }
     return render(request, 'dashboard.html', context)
-
-###get started wizard for product number one (setup-product-name)
-# add or confirm your organization
-# add employees manually, or email us the list
-# set up how often surveys are sent, and the date for the first one
 
 @login_required
 def edit_organization_view(request):
@@ -370,3 +355,45 @@ def answer_survey_view(request, **kwargs):
 
     #In case a valid form was not submitted, we present the current form
     return render(request, 'answer_survey.html', context)
+
+@login_required
+def co_worker_satisfaction_data_view(request):
+    #get the result from the latest completed survey
+    questions = Question.objects.filter(product__name='Employee Satisfaction Tracking')
+    '''
+    latest_survey_results = (
+        {'name': 'Role clarity', 'score': 4, 'progress': (4/5*100)},
+        {'name': 'Controlling', 'score': 3, 'progress': (3/5*100)},
+        {'name': 'Demanding', 'score': 2, 'progress': (2/5*100)},
+        {'name': 'Work relationships', 'score': 1, 'progress': (1/5*100)},
+        {'name': 'Peer support', 'score': 2, 'progress': (2/5*100)},
+        {'name': 'Manager support', 'score': 5, 'progress': (5/5*100)},
+    )
+    previous_survey_results = (
+        {'name': 'Role clarity', 'score': 1, 'delta': 3, 'blue_bar': (1/5*100), 'red_bar': (0/5*100), 'green_bar': (3/5*100)},
+        {'name': 'Controlling', 'score': 3, 'delta': 0, 'blue_bar': (3/5*100), 'red_bar': (0/5*100), 'green_bar': (0/5*100)},
+        {'name': 'Demanding', 'score': 4, 'delta': -2, 'blue_bar': (2/5*100), 'red_bar': (2/5*100), 'green_bar': (0/5*100)},
+        {'name': 'Work relationships', 'score': 2, 'delta': -1, 'blue_bar': (1/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
+        {'name': 'Peer support', 'score': 3, 'delta': -1, 'blue_bar': (2/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
+        {'name': 'Manager support', 'score': 4, 'delta': 1, 'blue_bar': (4/5*100), 'red_bar': (0/5*100), 'green_bar': (1/5*100)},
+    )
+    '''
+    survey_results = (
+        {'dimension': 'role', 'name': 'Role clarity', 'description': 'Role clarity refers to how clearly ones role is defined. Unclear roles is a common, yet often overlooked, underlaying cause of dissatisfaction. When people feel it\'s unclear what their role is, and what is expected of them, it can lead to anxious feelings, and doubt as to whether or not one is living up to expectations.', 'score': 4, 'progress': (4/5*100), 'previous_score': 1, 'previous_progress': (1/5*100), 'delta': 3, 'blue_bar': (1/5*100), 'red_bar': (0/5*100), 'green_bar': (3/5*100)},
+        {'dimension': 'control', 'name': 'Controlling', 'description': 'Describe this dimension', 'score': 3, 'progress': (3/5*100), 'previous_score': 3, 'previous_progress': (3/5*100), 'delta': 0, 'blue_bar': (3/5*100), 'red_bar': (0/5*100), 'green_bar': (0/5*100)},
+        {'dimension': 'demands', 'name': 'Demanding', 'description': 'Describe this dimension', 'score': 2, 'progress': (2/5*100), 'previous_score': 4, 'previous_progress': (4/5*100), 'delta': -2, 'blue_bar': (2/5*100), 'red_bar': (2/5*100), 'green_bar': (0/5*100)},
+        {'dimension': 'relationships', 'name': 'Work relationships', 'description': 'Describe this dimension', 'score': 1, 'progress': (1/5*100), 'previous_score': 2, 'previous_progress': (2/5*100), 'delta': -1, 'blue_bar': (1/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
+        {'dimension': 'peer support', 'name': 'Peer support', 'description': 'Describe this dimension', 'score': 2, 'progress': (2/5*100), 'previous_score': 3, 'previous_progress': (3/5*100), 'delta': -1, 'blue_bar': (2/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
+        {'dimension': 'manager support', 'name': 'Manager support', 'description': 'Describe this dimension', 'score': 5, 'progress': (5/5*100), 'previous_score': 4, 'previous_progress': (4/5*100), 'delta': 1, 'blue_bar': (4/5*100), 'red_bar': (0/5*100), 'green_bar': (1/5*100)},
+    )
+    #get the number of respondents
+    number_of_respondents = 4
+    number_of_respondents_previous = 6
+
+    context={
+        'survey_results': survey_results,
+        'number_of_respondents': number_of_respondents,
+        'number_of_respondents_previous': number_of_respondents_previous,
+        'questions': questions,
+    }
+    return render(request, 'co_worker_satisfaction_data.html', context)

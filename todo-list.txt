@@ -39,3 +39,4 @@ Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#cus
 use standard sign-up and change-password views?
 - When visiting add employees for the first time, it would be neat if user was already added
 - more tests (survey response view, )
+- add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages, and make option to revoke consent.
