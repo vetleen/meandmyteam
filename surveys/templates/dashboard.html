@@ -100,18 +100,18 @@
               <center>
               <a href="{% url 'surveys-co-worker-satisfaction-data' surveys.0.date_close %}" class="btn btn-info">View details</a>
               </center>
-              
-              <h5 class="card-title text-left">Co-worker satisfaction tracking settings</h5>
+
+              <h5 class="card-title text-left mt-4">Co-worker satisfaction tracking settings</h5>
               {% endif %}
               <center>
               <a href="{% url 'surveys-set-up-employee-satisfaction-tracking' %}" class="btn btn-info">Review settings</a>
               </center>
               <p class="card-text">
               {% if surveys %}
-              <h5 class="card-title text-left">Revisit earlier surveys</h5>
+              <h5 class="card-title text-left mt-4">Your organizations surveys</h5>
               <ul>
                 {% for survey in surveys %}
-                  <li><a href="{% url 'surveys-co-worker-satisfaction-data' survey.date_close %}">{{ survey.date_close }}</a></li>
+                  <li><a href="{% url 'surveys-co-worker-satisfaction-data' survey.date_close %}">{{ survey.date_close }}</a>{% if forloop.counter == 1 %} (latest){% endif %}</li>
                 {% endfor %}
               </ul>
               {% endif %}

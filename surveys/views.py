@@ -264,7 +264,6 @@ def edit_individual_coworker_view(request, **kwargs):
             return HttpResponseRedirect(request.GET.get('next', reverse('surveys-edit-coworker')))
     return render(request, 'edit_individual_coworker.html', context)
 
-
 @login_required
 def delete_coworker_view(request, **kwargs):
     uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
@@ -294,25 +293,23 @@ def set_up_employee_satisfaction_tracking(request, **kwargs):
         'submit_button_text': 'Start Employee Satisfaction Tracking',
         'est_is_active': est_is_active,
     }
+
     #we check if product was ever activated, by looking for an existing config
     ps = ProductSetting.objects.filter(organization=request.user.organization, product=est)
     if ps.count() != 0:
         submit_button_text = 'Update settings'
         ps = configure_product(request.user.organization, est)
 
-
         data={
             'is_active':  est_is_active,
             'survey_interval': ps.survey_interval,
 
         }
-
         form = ConfigureEmployeeSatisfactionTrackingForm(initial=data, label_suffix='.')
         context.update({
             'form': form,
             'submit_button_text': submit_button_text
         })
-
 
     if request.method == 'POST':
         form=ConfigureEmployeeSatisfactionTrackingForm(request.POST, label_suffix='')
@@ -551,6 +548,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
         survey_results = (
             {
                 'dimension': 'role',
+                'description': 'Role clarity is the degree to which co-workers\' in your organization feels that it is clearly understood what is expected of them, and what their job entails.',
                 'name': 'Role clarity',
                 'score': role_clarity_avg,
                 'progress': (role_clarity_avg/5*100),
@@ -589,14 +587,13 @@ def co_worker_satisfaction_data_view(request, **kwargs):
 
         #if there was a previous survey, let's grab that data and add to our context as well:
         if previous_survey is not None:
-            answers = IntAnswer.objects.filter(survey_instance__survey=previous_survey) #for now, all answers are IntAnswers
+            panswers = IntAnswer.objects.filter(survey_instance__survey=previous_survey) #for now, all answers are IntAnswers
 
             #get and average out role clarity:
             #also decide the size of the bars to display
             prole_clarity_avg = 0
             try:
-
-                role_clarity_answers = [a for a in answers if a.question.dimension == 'role']
+                role_clarity_answers = [a for a in panswers if a.question.dimension == 'role']
                 role_clarity_total = 0
                 for a in role_clarity_answers:
                     role_clarity_total += a.value
@@ -638,8 +635,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             #get and average out control:
             pcontrol_avg = 0
             try:
-
-                control_answers = [a for a in answers if a.question.dimension == 'control']
+                control_answers = [a for a in panswers if a.question.dimension == 'control']
                 control_total = 0
                 for a in control_answers:
                     control_total += a.value
@@ -657,7 +653,6 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                 green_bar = (0/5*100)
                 if control_avg > pcontrol_avg:
                     green_bar = ((control_avg-pcontrol_avg)/5*100)
-
 
             except ZeroDivisionError:
                 print('Got a divide by Zero error, because there are no answers in this category ')
@@ -679,8 +674,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             #get and average out demands:
             pdemands_avg = 0
             try:
-
-                demands_answers = [a for a in answers if a.question.dimension == 'demands']
+                demands_answers = [a for a in panswers if a.question.dimension == 'demands']
                 demands_total = 0
                 for a in demands_answers:
                     demands_total += a.value
@@ -698,7 +692,6 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                 green_bar = (0/5*100)
                 if demands_avg > pdemands_avg:
                     green_bar = ((demands_avg-pdemands_avg)/5*100)
-
 
             except ZeroDivisionError:
                 print('Got a divide by Zero error, because there are no answers in this category ')
@@ -720,8 +713,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             #get and average out relationships:
             prelationships_avg = 0
             try:
-                
-                relationships_answers = [a for a in answers if a.question.dimension == 'relationships']
+                relationships_answers = [a for a in panswers if a.question.dimension == 'relationships']
                 relationships_total = 0
                 for a in relationships_answers:
                     relationships_total += a.value
@@ -739,7 +731,6 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                 green_bar = (0/5*100)
                 if relationships_avg > prelationships_avg:
                     green_bar = ((relationships_avg-prelationships_avg)/5*100)
-
 
             except ZeroDivisionError:
                 print('Got a divide by Zero error, because there are no answers in this category ')
@@ -761,8 +752,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             #get and average out peer_support:
             ppeer_support_avg = 0
             try:
-
-                peer_support_answers = [a for a in answers if a.question.dimension == 'peer support']
+                peer_support_answers = [a for a in panswers if a.question.dimension == 'peer support']
                 peer_support_total = 0
                 for a in peer_support_answers:
                     peer_support_total += a.value
@@ -780,7 +770,6 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                 green_bar = (0/5*100)
                 if peer_support_avg > ppeer_support_avg:
                     green_bar = ((peer_support_avg-ppeer_support_avg)/5*100)
-
 
             except ZeroDivisionError:
                 print('Got a divide by Zero error, because there are no answers in this category ')
@@ -802,7 +791,6 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             #get and average out manager_support:
             pmanager_support_avg = 0
             try:
-
                 manager_support_answers = [a for a in answers if a.question.dimension == 'manager support']
                 manager_support_total = 0
                 for a in manager_support_answers:
@@ -822,7 +810,6 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                 if manager_support_avg > pmanager_support_avg:
                     green_bar = ((manager_support_avg-pmanager_support_avg)/5*100)
 
-
             except ZeroDivisionError:
                 print('Got a divide by Zero error, because there are no answers in this category ')
                 blue_bar = 0
@@ -840,30 +827,22 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                         'green_bar': green_bar,
                    })
 
-            #prepare a filled list to pass to context
-            #survey_results = (
-            #    {
-            #        'dimension': 'role',
-            #        'name': 'Role clarity',
-            #        'score': role_clarity_avg,
-            #        'progress': (role_clarity_avg/5*100),
-            #        'previous_score': prole_clarity_avg,
-            #        'previous_progress': (prole_clarity_avg/5*100),
-            #        'delta':  (role_clarity_avg-prole_clarity_avg),
-            #        'blue_bar': (1/5*100),
-            #        'red_bar': (0/5*100),
-            #        'green_bar': (3/5*100),
-            #    },
-                #{'dimension': 'control', 'name': 'Controlling', 'score': control_avg, 'progress': (control_avg/5*100), 'previous_score': 3, 'previous_progress': (3/5*100), 'delta': 0, 'blue_bar': (3/5*100), 'red_bar': (0/5*100), 'green_bar': (0/5*100)},
-                #{'dimension': 'demands', 'name': 'Demanding', 'score': demands_avg, 'progress': (demands_avg/5*100), 'previous_score': 4, 'previous_progress': (4/5*100), 'delta': -2, 'blue_bar': (2/5*100), 'red_bar': (2/5*100), 'green_bar': (0/5*100)},
-                #{'dimension': 'relationships', 'name': 'Work relationships', 'score': relationships_avg, 'progress': (relationships_avg/5*100), 'previous_score': 2, 'previous_progress': (2/5*100), 'delta': -1, 'blue_bar': (1/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
-                #{'dimension': 'peer support', 'name': 'Peer support', 'score': peer_support_avg, 'progress': (peer_support_avg/5*100), 'previous_score': 3, 'previous_progress': (3/5*100), 'delta': -1, 'blue_bar': (2/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
-                #{'dimension': 'manager support', 'name': 'Manager support', 'score': manager_support_avg, 'progress': (manager_support_avg/5*100), 'previous_score': 4, 'previous_progress': (4/5*100), 'delta': 1, 'blue_bar': (4/5*100), 'red_bar': (0/5*100), 'green_bar': (1/5*100)},
-            #)
-
-    #get questions for the product
+    #get questions for the product to display under each category
     questions = Question.objects.filter(product__name='Employee Satisfaction Tracking')
 
+    #get all answers for this survey, so we can show scores with the questions
+    #find the average score for each, and also calculate the progress bar length to display - pass both into a list questions
+    if answers:
+        answers_avgs = []
+        for q in questions:
+            relevant_answers = [a for a in answers if a.question == q]
+            relevant_answers_total = 0
+            for a in relevant_answers:
+                relevant_answers_total += a.value
+            relevant_answers_avg = relevant_answers_total / len(relevant_answers)
+            answers_avgs.append((relevant_answers_avg, ((relevant_answers_avg/5)*100)))
+        print(answers_avgs)
+        questions = list(zip(questions, answers_avgs))
 
     context={
         'survey_results': survey_results,

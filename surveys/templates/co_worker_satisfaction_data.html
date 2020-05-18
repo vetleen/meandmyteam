@@ -16,7 +16,7 @@
 
   <div class="row justify-content-center">
     <div class="col-md-6 mt-4">
-      <h3>Summary</h3>
+      <h3>1. Summary</h3>
       <h5>Summary of scores for latest survey</h5>
       <p class="text-muted">
         Completion date: {{ this_survey.date_close }}<br />
@@ -57,7 +57,7 @@ possible to guesstimate individual answers.
 
     {% if previous_survey %}
     <div class="col-md-6 mt-4">
-      <h5>Change from previous survey</h5>
+      <h5>Change from previous survey </h5>
       <p class="text-muted">
         Completion date: {{ previous_survey.date_close }}<br />
         Respondents: {{ number_of_respondents_previous }}
@@ -77,6 +77,9 @@ possible to guesstimate individual answers.
         </div><!-- col -->
       </div><!-- row -->
       {% endfor %}
+      <p class="mt-2 text-center">
+      <a href="{% url 'surveys-co-worker-satisfaction-data' previous_survey.date_close %}">View previous survey</a>
+      </p>
     </div> <!-- col -->
     {% endif %}
 
@@ -84,8 +87,9 @@ possible to guesstimate individual answers.
     <div class="w-100"></div>
     {% for result in survey_results %}
 
-    <div class="col-md-6 mt-4">
-      <h3>{{ result.name}}</h3>
+    <div class="col-md-6 mt-4 py-3">
+      <h3>{{ forloop.counter|add:'1' }}. {{ result.name}}</h3>
+      {% if previous_survey %}
       <div class="row">
         <div class="col-sm-4">
           Previous score:
@@ -108,13 +112,19 @@ possible to guesstimate individual answers.
           </div>
         </div><!-- col -->
       </div><!-- row -->
+
+      {% endif %}
       <div class="row">
         <div class="col-sm-4">
+          {% if previous_survey %}
           Current score:
+          {% else %}
+          Score:
+          {% endif %}
         </div><!-- col -->
         <div class="col-sm-8">
           <div class="progress"  style="height: 20px;">
-            <div class="progress-bar{% if result.score < 2 %} bg-danger{% elif result.score >= 4 %} bg-success{% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ result.progress }}%" aria-valuenow="{{ result.role.progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.score }}</div>
+            <div class="progress-bar{% if result.score < 2 %} bg-danger{% elif result.score >= 4 %} bg-success{% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ result.progress }}%" aria-valuenow="{{ result.role.progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.score|floatformat }}</div>
           </div>
         </div><!-- col -->
       </div><!-- row -->
@@ -124,10 +134,24 @@ possible to guesstimate individual answers.
       </p>
       <h5 class="mt-2">How we arrived at that score:</h5>
       To arrive at this score, we asked respondents to what extent they agree with the following statements:
-      <ul>
+      <ul class="list-group mt-4">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <h4>Statements</h4>
+        </li>
       {% for q in questions %}
-        {% if q.dimension == result.dimension %}
-          <li>{{q}} </li>
+        {% if q.0.dimension == result.dimension %}
+          <li class="list-group-item">
+            <div class="row">
+              <div class="col-sm-12">
+                {{ q.0 }}
+              </div><!-- col -->
+              <div class="col-sm-12">
+                <div class="progress"  style="height: 20px;">
+                  <div class="progress-bar{% if q.1.0 < 2 %} bg-danger{% elif q.1.0 >= 4 %} bg-success{% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ q.1.1 }}%" aria-valuenow="{{ q.1.1 }}" aria-valuemin="0" aria-valuemax="100">{{ q.1.0|floatformat }}</div>
+                </div>
+              </div><!-- col -->
+            </div><!-- row -->
+          </li>
         {% endif %}
 
       {% endfor %}
