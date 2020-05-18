@@ -19,7 +19,7 @@
       <h3>Summary</h3>
       <h5>Summary of scores for latest survey</h5>
       <p class="text-muted">
-        Completion date: May 10th 2020<br />
+        Completion date: {{ this_survey.date_close }}<br />
         Respondents: {{ number_of_respondents }}
 
       </p>
@@ -46,38 +46,40 @@ possible to guesstimate individual answers.
         </div><!-- col -->
         <div class="col-sm-8">
           <div class="progress"  style="height: 20px;">
-            <div class="progress-bar{% if result.score < 2 %} bg-danger{% elif result.score >= 4 %} bg-success{% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ result.progress }}%" aria-valuenow="{{ result.role.progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.score }}</div>
+            <div class="progress-bar{% if result.score < 2 %} bg-danger{% elif result.score >= 4 %} bg-success{% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ result.progress }}%" aria-valuenow="{{ result.role.progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.score|floatformat }}</div>
           </div>
         </div><!-- col -->
       </div><!-- row -->
       {% endfor %}
     </div><!-- col -->
     <div class="w-100"></div>
+
+
+    {% if previous_survey %}
     <div class="col-md-6 mt-4">
       <h5>Change from previous survey</h5>
       <p class="text-muted">
-        Completion date: November 10th 2019<br />
+        Completion date: {{ previous_survey.date_close }}<br />
         Respondents: {{ number_of_respondents_previous }}
 
       </p>
       {% for result in survey_results %}
       <div class="row">
         <div class="col-sm-4">
-
           {{ result.name }}
-
         </div><!-- col -->
         <div class="col-sm-8">
-
           <div class="progress"  style="height: 20px;">
             <div class="progress-bar bg-transparent" role="progressbar" style="width: {{ result.blue_bar }}%" aria-valuenow="{{ result.blue_bar }}" aria-valuemin="0" aria-valuemax="100"></div>
-            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ result.red_bar }}%" aria-valuenow="{{ result.red_bar }}" aria-valuemin="0" aria-valuemax="100"> {{result.delta}} </div>
-            <div class="progress-bar bg-success" role="progressbar" style="width: {{ result.green_bar }}%" aria-valuenow="{{ result.green_bar }}" aria-valuemin="0" aria-valuemax="100"> +{{result.delta}} </div>
+            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ result.red_bar }}%" aria-valuenow="{{ result.red_bar }}" aria-valuemin="0" aria-valuemax="100"> {{result.delta|floatformat}} </div>
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ result.green_bar }}%" aria-valuenow="{{ result.green_bar }}" aria-valuemin="0" aria-valuemax="100"> +{{result.delta|floatformat}} </div>
           </div>
         </div><!-- col -->
       </div><!-- row -->
       {% endfor %}
     </div> <!-- col -->
+    {% endif %}
+
 
     <div class="w-100"></div>
     {% for result in survey_results %}
@@ -90,7 +92,7 @@ possible to guesstimate individual answers.
         </div><!-- col -->
         <div class="col-sm-8">
           <div class="progress"  style="height: 20px;">
-            <div class="progress-bar{% if result.previous_score < 2 %} bg-secondary{% elif result.previous_score >= 4 %} bg-secondary{% else %} bg-secondary{% endif %}" role="progressbar" style="width: {{ result.previous_progress }}%" aria-valuenow="{{ result.role.previous_progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.previous_score }}</div>
+            <div class="progress-bar{% if result.previous_score < 2 %} bg-secondary{% elif result.previous_score >= 4 %} bg-secondary{% else %} bg-secondary{% endif %}" role="progressbar" style="width: {{ result.previous_progress }}%" aria-valuenow="{{ result.role.previous_progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.previous_score|floatformat }}</div>
           </div>
         </div><!-- col -->
       </div><!-- row -->
@@ -101,8 +103,8 @@ possible to guesstimate individual answers.
         <div class="col-sm-8">
           <div class="progress"  style="height: 20px;">
             <div class="progress-bar bg-transparent" role="progressbar" style="width: {{ result.blue_bar }}%" aria-valuenow="{{ result.blue_bar }}" aria-valuemin="0" aria-valuemax="100"></div>
-            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ result.red_bar }}%" aria-valuenow="{{ result.red_bar }}" aria-valuemin="0" aria-valuemax="100"> {{result.delta}} </div>
-            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ result.green_bar }}%" aria-valuenow="{{ result.green_bar }}" aria-valuemin="0" aria-valuemax="100"> +{{result.delta}} </div>
+            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ result.red_bar }}%" aria-valuenow="{{ result.red_bar }}" aria-valuemin="0" aria-valuemax="100"> {{result.delta|floatformat}} </div>
+            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ result.green_bar }}%" aria-valuenow="{{ result.green_bar }}" aria-valuemin="0" aria-valuemax="100"> +{{result.delta|floatformat}} </div>
           </div>
         </div><!-- col -->
       </div><!-- row -->
@@ -116,9 +118,11 @@ possible to guesstimate individual answers.
           </div>
         </div><!-- col -->
       </div><!-- row -->
-      <p class="mt-2">
+      <p>
+        <h5 class="mt-2">What this means:</h5>
         {{ result.description }}
       </p>
+      <h5 class="mt-2">How we arrived at that score:</h5>
       To arrive at this score, we asked respondents to what extent they agree with the following statements:
       <ul>
       {% for q in questions %}

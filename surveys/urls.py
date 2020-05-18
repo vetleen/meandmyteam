@@ -12,6 +12,6 @@ urlpatterns = [
         path('delete-coworker/<uidb64>/', views.delete_coworker_view, name='surveys-delete-coworker'),
         path('edit-coworker/<uidb64>/', views.edit_individual_coworker_view, name='edit-individual-coworker'),
         path('set-up-employee-satisfaction-tracking/', views.set_up_employee_satisfaction_tracking, name='surveys-set-up-employee-satisfaction-tracking'),
-        path('co-worker-satisfaction/', views.co_worker_satisfaction_data_view, name='surveys-co-worker-satisfaction-data'),
+        path('co-worker-satisfaction/<date_close>/', views.co_worker_satisfaction_data_view, name='surveys-co-worker-satisfaction-data'),
 
 ]

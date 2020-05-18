@@ -52,6 +52,7 @@ def open_existing_survey(survey, days_open):
     ps = configure_product(organization, product, last_survey_open=date_open, last_survey_close=date_close)
 '''
 def create_survey(organization, product, date_open=date.today()):
+    print('create_survey was called....')
     ps=configure_product(organization, product)
     if ps.last_survey_open is not None and ps.last_survey_open > date_open:
         raise NotImplementedError('The create_survey() function does not yet support creating a new survey when the passed date_open (%s) is before the pre-existing ProductSetting.last_survey_open (%s).'%(date_open, ps.last_survey_open))
@@ -71,7 +72,7 @@ def make_surveys_for_active_products(organization):
 
     active_products = organization.active_products.all()
 
-    #If no active products, go do something else
+    #If no active products, go dthere were EXISTING surveys...o something else
     if active_products.count() == 0:
         return
 
@@ -79,20 +80,27 @@ def make_surveys_for_active_products(organization):
     for product in active_products:
         #make sure it's configured and we have the config available
         ps = configure_product(organization=organization, product=product)
+        print('Making surveyInstances for %s'%(organization))
+        print('ps.last_survey_close is %s.'%(ps.last_survey_close))
 
         #get existing surveys
         surveys = Survey.objects.filter(owner=organization, product=product)
         if surveys.count() == 0:
+            print('there were ZERO surveys, so we make one...')
             create_survey(organization, product) #this also sets the last open and close dates in ProductSettings
         else:
+            print('there were EXISTING surveys...')
             time_for_next_survey = ps.last_survey_open + timedelta(days=ps.survey_interval)
+            print('time_for_next_survey date was: %s...'%(time_for_next_survey))
             if time_for_next_survey < date.today():
+                print('making a new survey')
                 create_survey(organization, product) #this also sets the last open and close dates in ProductSettings
 
 
 def make_survey_instances_for_active_surveys(organization):
     #Filter surveys that are supposed to be active
     surveys = Survey.objects.filter(owner=organization, date_open__lte=date.today(), date_close__gt=date.today()) #will return surveys for all products!
+    print('found %s surveys in function: make_survey_instances_for_active_surveys(organization).'%(len(surveys)))
 
     #find list of employees for organization
     employees = Employee.objects.filter(organization=organization, receives_surveys=True)
@@ -112,13 +120,11 @@ def make_survey_instances_for_active_surveys(organization):
 def send_email_about_survey_instance(si, email_txt_template, email_html_template, subject_template):
 
     #from django.shortcuts import render
-
     token = si.get_url_token
     contact_person = si.survey.owner.owner.email
     if si.survey.owner.owner.first_name !='' and si.survey.owner.owner.last_name !='':
         print (si.survey.owner.owner.first_name, si.survey.owner.owner.last_name)
         contact_person = '%s %s'%(si.survey.owner.owner.first_name, si.survey.owner.owner.last_name)
-
 
     context={
             'token':token,
@@ -162,9 +168,11 @@ def send_out_survey_instance_emails(organization):
             )
 
 def daily_survey_maintenance():
+    print('doing daily_survey_maint for...')
     #get all organiaztions, and for eacH:
     organizations = Organization.objects.all()
     for org in organizations:
+        print('... %s.'%(org))
         make_surveys_for_active_products(org)
         make_survey_instances_for_active_surveys(org)
         send_out_survey_instance_emails(org)

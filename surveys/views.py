@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from surveys.models import Product, Organization, Employee, ProductSetting, SurveyInstance, Survey, Question, Answer, IntAnswer, TextAnswer
 from surveys.forms import CreateOrganizationForm, AddEmployeeForm, EditEmployeeForm, ConfigureEmployeeSatisfactionTrackingForm, AnswerQuestionsForm
 
-from datetime import date
+from datetime import date, datetime
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode
@@ -29,25 +29,109 @@ def dashboard_view(request):
     try:
         employee_list = request.user.organization.employee_set.all()
         employee_count = employee_list.count()
-        print(employee_count)
+        #print(employee_count)
     except Organization.DoesNotExist:
         employee_list = []
         employee_count = 0
 
+    #get the organization's surveys, sorted by closing date
+    surveys_raw = Survey.objects.filter(product__name='Employee Satisfaction Tracking', owner=request.user.organization).order_by('-date_close') #the first item is the latest survey
+
+    #if any are not closed yet, remove it from the list, and add a note to show the user the closing date
+    surveys = [s for s in surveys_raw if s.date_close < date.today()]
+    next_survey_close=None
+    if len(surveys_raw) > len(surveys):
+        surplus_survey=surveys_raw[0]
+        next_survey_close=surplus_survey.date_close
+
+    #get the latest completed survey results
+    survey_results = () #empty list to be passed top context if 0 surveys
+    if len(surveys) > 0: #if, however, there are more than 0 surveys, we want to grab the latest and get the results to display
+        latest_survey = surveys[0]
+
+        ##get score per category
+        #get all answers in latest survey
+        answers = IntAnswer.objects.filter(survey_instance__survey=latest_survey) #for now, all answers are IntAnswers
+
+        #get and average out role clarity:
+        role_clarity_answers = [a for a in answers if a.question.dimension == 'role']
+        role_clarity_total = 0
+        for a in role_clarity_answers:
+            role_clarity_total += a.value
+        role_clarity_avg = role_clarity_total / len(role_clarity_answers)
+
+
+        #get and average out control:
+        control_answers = [a for a in answers if a.question.dimension == 'control']
+        control_total = 0
+        for a in control_answers:
+            control_total += a.value
+        control_avg = control_total / len(control_answers)
+
+
+        #get and average out demands:
+        demands_answers = [a for a in answers if a.question.dimension == 'demands']
+        demands_total = 0
+        for a in demands_answers:
+            demands_total += a.value
+        demands_avg = demands_total / len(demands_answers)
+
+
+        #get and average out relationships:
+        relationships_answers = [a for a in answers if a.question.dimension == 'relationships']
+        relationships_total = 0
+        for a in relationships_answers:
+            relationships_total += a.value
+        relationships_avg = relationships_total / len(relationships_answers)
+
+
+        #get and average out peer_support:
+        peer_support_answers = [a for a in answers if a.question.dimension == 'peer support']
+        peer_support_total = 0
+        for a in peer_support_answers:
+            peer_support_total += a.value
+        peer_support_avg = peer_support_total / len(peer_support_answers)
+
+
+        #get and average out manager_support:
+        manager_support_answers = [a for a in answers if a.question.dimension == 'manager support']
+        manager_support_total = 0
+        for a in manager_support_answers:
+            manager_support_total += a.value
+        manager_support_avg = manager_support_total / len(manager_support_answers)
+
+
+        #prepare a filled list to pass to context
+        survey_results = (
+            {'name': 'Role clarity', 'score': role_clarity_avg, 'progress': (role_clarity_avg/5*100)},
+            {'name': 'Controlling', 'score': control_avg, 'progress': (control_avg/5*100)},
+            {'name': 'Demanding', 'score': demands_avg, 'progress': (demands_avg/5*100)},
+            {'name': 'Work relationships', 'score': relationships_avg, 'progress': (relationships_avg/5*100)},
+            {'name': 'Peer support', 'score': peer_support_avg, 'progress': (peer_support_avg/5*100)},
+            {'name': 'Manager support', 'score': manager_support_avg, 'progress': (manager_support_avg/5*100)},
+        )
+
+    #make the est_active variable and correctly set it
     est_active = False
     p = Product.objects.get(name='Employee Satisfaction Tracking')
+
     try:
         if p in request.user.organization.active_products.all():
             est_active = True
     except Organization.DoesNotExist:
         pass
-    #print('est is active: %s.'%(est_active))
+
+    #collect all the info that the dashboard needs (and maybe then some?)
     context = {
         'todays_date': date.today(),
         'employee_count': employee_count,
         #'active_products_count': active_products_count,
         'employee_list': employee_list,
-        'est_active': est_active
+        'est_active': est_active,
+        'surveys': surveys,
+        'next_survey_close': next_survey_close,
+        'survey_results': survey_results,
+
 
     }
     return render(request, 'dashboard.html', context)
@@ -357,43 +441,436 @@ def answer_survey_view(request, **kwargs):
     return render(request, 'answer_survey.html', context)
 
 @login_required
-def co_worker_satisfaction_data_view(request):
-    #get the result from the latest completed survey
+def co_worker_satisfaction_data_view(request, **kwargs):
+    #get the survey with the specified date provided by the url
+    date_close=kwargs.get('date_close', None)
+    #print(date_close)
+    date_close = datetime.strptime(date_close, "%Y-%m-%d").date()
+
+    #get the organization's surveys, sorted by closing date, and only the ones up until the date specified in the url
+    surveys = Survey.objects.filter(
+        product__name='Employee Satisfaction Tracking',
+        owner=request.user.organization,
+        date_close__lte=date_close
+    ).order_by('date_close') #the last item is the requested survey (with the should_be_impossible_exception that more surveys end this date)
+    #print (len(surveys))
+
+    #turn queryset into list, and remove any surveys that are not closed yet
+    surveys = [s for s in surveys if s.date_close < date.today()]
+
+    #get the last closed survey and bind to variable, if any
+    if len(surveys) > 0:
+        this_survey = surveys.pop()
+    else:
+        this_survey = None
+
+    #get the second last survey and bind to variable, if any
+    if len(surveys) > 0:
+        previous_survey = surveys.pop()
+    else:
+        previous_survey = None
+
+    ##get score per category
+    #get all answers in latest survey
+    survey_results = () #empty list if there is no latest survey
+    #set the number of respondents-variables in case they are not set later
+    number_of_respondents = 0
+    number_of_respondents_previous = 0
+
+    if this_survey is not None:
+        answers = IntAnswer.objects.filter(survey_instance__survey=this_survey) #for now, all answers are IntAnswers
+
+        #get and average out role clarity:
+        role_clarity_avg = 0
+        try:
+            role_clarity_answers = [a for a in answers if a.question.dimension == 'role']
+            role_clarity_total = 0
+            for a in role_clarity_answers:
+                role_clarity_total += a.value
+            role_clarity_avg = role_clarity_total / len(role_clarity_answers)
+            number_of_respondents = int((len(role_clarity_answers)/5)) #for now all questions must be answered, so one is a good indication of all
+
+        except ZeroDivisionError:
+            print('Got a divide by Zero error, because there are no answers in this category ')
+
+        #get and average out control:
+        control_avg = 0
+        try:
+            control_answers = [a for a in answers if a.question.dimension == 'control']
+            control_total = 0
+            for a in control_answers:
+                control_total += a.value
+            control_avg = control_total / len(control_answers)
+        except ZeroDivisionError:
+            print('Got a divide by Zero error, because there are no answers in this category ')
+
+        #get and average out demands:
+        demands_avg = 0
+        try:
+            demands_answers = [a for a in answers if a.question.dimension == 'demands']
+            demands_total = 0
+            for a in demands_answers:
+                demands_total += a.value
+            demands_avg = demands_total / len(demands_answers)
+        except ZeroDivisionError:
+            print('Got a divide by Zero error, because there are no answers in this category ')
+
+        #get and average out relationships:
+        relationships_avg = 0
+        try:
+            relationships_answers = [a for a in answers if a.question.dimension == 'relationships']
+            relationships_total = 0
+            for a in relationships_answers:
+                relationships_total += a.value
+            relationships_avg = relationships_total / len(relationships_answers)
+        except ZeroDivisionError:
+            print('Got a divide by Zero error, because there are no answers in this category ')
+
+        #get and average out peer_support:
+        peer_support_avg = 0
+        try:
+            peer_support_answers = [a for a in answers if a.question.dimension == 'peer support']
+            peer_support_total = 0
+            for a in peer_support_answers:
+                peer_support_total += a.value
+            peer_support_avg = peer_support_total / len(peer_support_answers)
+        except ZeroDivisionError:
+            print('Got a divide by Zero error, because there are no answers in this category ')
+
+        #get and average out manager_support:
+        manager_support_avg = 0
+        try:
+            manager_support_answers = [a for a in answers if a.question.dimension == 'manager support']
+            manager_support_total = 0
+            for a in manager_support_answers:
+                manager_support_total += a.value
+            manager_support_avg = manager_support_total / len(manager_support_answers)
+        except ZeroDivisionError:
+            print('Got a divide by Zero error, because there are no answers in this category ')
+
+        survey_results = (
+            {
+                'dimension': 'role',
+                'name': 'Role clarity',
+                'score': role_clarity_avg,
+                'progress': (role_clarity_avg/5*100),
+            },
+            {
+                'dimension': 'control',
+                'name': 'Degree of control',
+                'score': control_avg,
+                'progress': (control_avg/5*100),
+            },
+            {
+                'dimension': 'demands',
+                'name': 'Demanding work',
+                'score': demands_avg,
+                'progress': (demands_avg/5*100),
+            },
+            {
+                'dimension': 'relationships',
+                'name': 'Workplace relations',
+                'score': relationships_avg,
+                'progress': (relationships_avg/5*100),
+            },
+            {
+                'dimension': 'peer support',
+                'name': 'Peer support',
+                'score': peer_support_avg,
+                'progress': (peer_support_avg/5*100),
+            },
+            {
+                'dimension': 'manager support',
+                'name': 'Manager support',
+                'score': manager_support_avg,
+                'progress': (manager_support_avg/5*100),
+            },
+        )
+
+        #if there was a previous survey, let's grab that data and add to our context as well:
+        if previous_survey is not None:
+            answers = IntAnswer.objects.filter(survey_instance__survey=previous_survey) #for now, all answers are IntAnswers
+
+            #get and average out role clarity:
+            #also decide the size of the bars to display
+            prole_clarity_avg = 0
+            try:
+
+                role_clarity_answers = [a for a in answers if a.question.dimension == 'role']
+                role_clarity_total = 0
+                for a in role_clarity_answers:
+                    role_clarity_total += a.value
+                prole_clarity_avg = role_clarity_total / len(role_clarity_answers)
+                #The blue bar should be equal to the smallest of the two results
+                blue_bar = (prole_clarity_avg/5*100)
+                if role_clarity_avg < prole_clarity_avg:
+                    blue_bar = (role_clarity_avg/5*100)
+
+                #the red bar should be equal to any negative change
+                red_bar = (0/5*100)
+                if role_clarity_avg < prole_clarity_avg:
+                    red_bar = ((prole_clarity_avg-role_clarity_avg)/5*100)
+                #the green bar should be equal to any postive change
+                green_bar = (0/5*100)
+                if role_clarity_avg > prole_clarity_avg:
+                    green_bar = ((role_clarity_avg-prole_clarity_avg)/5*100)
+
+                number_of_respondents_previous = int((len(role_clarity_answers)/5)) #for now all questions must be answered, so one is a good indication of all
+
+            except ZeroDivisionError:
+                print('Got a divide by Zero error, because there are no answers in this category ')
+                blue_bar = 0
+                red_bar = 0
+                green_bar = 0
+
+            finally:
+                survey_results[0].update ({
+
+                        'previous_score': prole_clarity_avg,
+                        'previous_progress': (prole_clarity_avg/5*100),
+                        'delta':  (role_clarity_avg-prole_clarity_avg),
+                        'blue_bar': blue_bar,
+                        'red_bar': red_bar,
+                        'green_bar': green_bar,
+                   })
+
+
+            #get and average out control:
+            pcontrol_avg = 0
+            try:
+
+                control_answers = [a for a in answers if a.question.dimension == 'control']
+                control_total = 0
+                for a in control_answers:
+                    control_total += a.value
+                pcontrol_avg = control_total / len(control_answers)
+                #The blue bar should be equal to the smallest of the two results
+                blue_bar = (pcontrol_avg/5*100)
+                if control_avg < pcontrol_avg:
+                    blue_bar = (control_avg/5*100)
+
+                #the red bar should be equal to any negative change
+                red_bar = (0/5*100)
+                if control_avg < pcontrol_avg:
+                    red_bar = ((pcontrol_avg-control_avg)/5*100)
+                #the green bar should be equal to any postive change
+                green_bar = (0/5*100)
+                if control_avg > pcontrol_avg:
+                    green_bar = ((control_avg-pcontrol_avg)/5*100)
+
+
+            except ZeroDivisionError:
+                print('Got a divide by Zero error, because there are no answers in this category ')
+                blue_bar = 0
+                red_bar = 0
+                green_bar = 0
+
+            finally:
+                survey_results[1].update ({
+
+                        'previous_score': pcontrol_avg,
+                        'previous_progress': (pcontrol_avg/5*100),
+                        'delta':  (control_avg-pcontrol_avg),
+                        'blue_bar': blue_bar,
+                        'red_bar': red_bar,
+                        'green_bar': green_bar,
+                   })
+
+            #get and average out demands:
+            pdemands_avg = 0
+            try:
+
+                demands_answers = [a for a in answers if a.question.dimension == 'demands']
+                demands_total = 0
+                for a in demands_answers:
+                    demands_total += a.value
+                pdemands_avg = demands_total / len(demands_answers)
+                #The blue bar should be equal to the smallest of the two results
+                blue_bar = (pdemands_avg/5*100)
+                if demands_avg < pdemands_avg:
+                    blue_bar = (demands_avg/5*100)
+
+                #the red bar should be equal to any negative change
+                red_bar = (0/5*100)
+                if demands_avg < pdemands_avg:
+                    red_bar = ((pdemands_avg-demands_avg)/5*100)
+                #the green bar should be equal to any postive change
+                green_bar = (0/5*100)
+                if demands_avg > pdemands_avg:
+                    green_bar = ((demands_avg-pdemands_avg)/5*100)
+
+
+            except ZeroDivisionError:
+                print('Got a divide by Zero error, because there are no answers in this category ')
+                blue_bar = 0
+                red_bar = 0
+                green_bar = 0
+
+            finally:
+                survey_results[2].update ({
+
+                        'previous_score': pdemands_avg,
+                        'previous_progress': (pdemands_avg/5*100),
+                        'delta':  (demands_avg-pdemands_avg),
+                        'blue_bar': blue_bar,
+                        'red_bar': red_bar,
+                        'green_bar': green_bar,
+                   })
+
+            #get and average out relationships:
+            prelationships_avg = 0
+            try:
+                
+                relationships_answers = [a for a in answers if a.question.dimension == 'relationships']
+                relationships_total = 0
+                for a in relationships_answers:
+                    relationships_total += a.value
+                prelationships_avg = relationships_total / len(relationships_answers)
+                #The blue bar should be equal to the smallest of the two results
+                blue_bar = (prelationships_avg/5*100)
+                if relationships_avg < prelationships_avg:
+                    blue_bar = (relationships_avg/5*100)
+
+                #the red bar should be equal to any negative change
+                red_bar = (0/5*100)
+                if relationships_avg < prelationships_avg:
+                    red_bar = ((prelationships_avg-relationships_avg)/5*100)
+                #the green bar should be equal to any postive change
+                green_bar = (0/5*100)
+                if relationships_avg > prelationships_avg:
+                    green_bar = ((relationships_avg-prelationships_avg)/5*100)
+
+
+            except ZeroDivisionError:
+                print('Got a divide by Zero error, because there are no answers in this category ')
+                blue_bar = 0
+                red_bar = 0
+                green_bar = 0
+
+            finally:
+                survey_results[3].update ({
+
+                        'previous_score': prelationships_avg,
+                        'previous_progress': (prelationships_avg/5*100),
+                        'delta':  (relationships_avg-prelationships_avg),
+                        'blue_bar': blue_bar,
+                        'red_bar': red_bar,
+                        'green_bar': green_bar,
+                   })
+
+            #get and average out peer_support:
+            ppeer_support_avg = 0
+            try:
+
+                peer_support_answers = [a for a in answers if a.question.dimension == 'peer support']
+                peer_support_total = 0
+                for a in peer_support_answers:
+                    peer_support_total += a.value
+                ppeer_support_avg = peer_support_total / len(peer_support_answers)
+                #The blue bar should be equal to the smallest of the two results
+                blue_bar = (ppeer_support_avg/5*100)
+                if peer_support_avg < ppeer_support_avg:
+                    blue_bar = (peer_support_avg/5*100)
+
+                #the red bar should be equal to any negative change
+                red_bar = (0/5*100)
+                if peer_support_avg < ppeer_support_avg:
+                    red_bar = ((ppeer_support_avg-peer_support_avg)/5*100)
+                #the green bar should be equal to any postive change
+                green_bar = (0/5*100)
+                if peer_support_avg > ppeer_support_avg:
+                    green_bar = ((peer_support_avg-ppeer_support_avg)/5*100)
+
+
+            except ZeroDivisionError:
+                print('Got a divide by Zero error, because there are no answers in this category ')
+                blue_bar = 0
+                red_bar = 0
+                green_bar = 0
+
+            finally:
+                survey_results[4].update ({
+
+                        'previous_score': ppeer_support_avg,
+                        'previous_progress': (ppeer_support_avg/5*100),
+                        'delta':  (peer_support_avg-ppeer_support_avg),
+                        'blue_bar': blue_bar,
+                        'red_bar': red_bar,
+                        'green_bar': green_bar,
+                   })
+
+            #get and average out manager_support:
+            pmanager_support_avg = 0
+            try:
+
+                manager_support_answers = [a for a in answers if a.question.dimension == 'manager support']
+                manager_support_total = 0
+                for a in manager_support_answers:
+                    manager_support_total += a.value
+                pmanager_support_avg = manager_support_total / len(manager_support_answers)
+                #The blue bar should be equal to the smallest of the two results
+                blue_bar = (pmanager_support_avg/5*100)
+                if manager_support_avg < pmanager_support_avg:
+                    blue_bar = (manager_support_avg/5*100)
+
+                #the red bar should be equal to any negative change
+                red_bar = (0/5*100)
+                if manager_support_avg < pmanager_support_avg:
+                    red_bar = ((pmanager_support_avg-manager_support_avg)/5*100)
+                #the green bar should be equal to any postive change
+                green_bar = (0/5*100)
+                if manager_support_avg > pmanager_support_avg:
+                    green_bar = ((manager_support_avg-pmanager_support_avg)/5*100)
+
+
+            except ZeroDivisionError:
+                print('Got a divide by Zero error, because there are no answers in this category ')
+                blue_bar = 0
+                red_bar = 0
+                green_bar = 0
+
+            finally:
+                survey_results[5].update ({
+
+                        'previous_score': pmanager_support_avg,
+                        'previous_progress': (pmanager_support_avg/5*100),
+                        'delta':  (manager_support_avg-pmanager_support_avg),
+                        'blue_bar': blue_bar,
+                        'red_bar': red_bar,
+                        'green_bar': green_bar,
+                   })
+
+            #prepare a filled list to pass to context
+            #survey_results = (
+            #    {
+            #        'dimension': 'role',
+            #        'name': 'Role clarity',
+            #        'score': role_clarity_avg,
+            #        'progress': (role_clarity_avg/5*100),
+            #        'previous_score': prole_clarity_avg,
+            #        'previous_progress': (prole_clarity_avg/5*100),
+            #        'delta':  (role_clarity_avg-prole_clarity_avg),
+            #        'blue_bar': (1/5*100),
+            #        'red_bar': (0/5*100),
+            #        'green_bar': (3/5*100),
+            #    },
+                #{'dimension': 'control', 'name': 'Controlling', 'score': control_avg, 'progress': (control_avg/5*100), 'previous_score': 3, 'previous_progress': (3/5*100), 'delta': 0, 'blue_bar': (3/5*100), 'red_bar': (0/5*100), 'green_bar': (0/5*100)},
+                #{'dimension': 'demands', 'name': 'Demanding', 'score': demands_avg, 'progress': (demands_avg/5*100), 'previous_score': 4, 'previous_progress': (4/5*100), 'delta': -2, 'blue_bar': (2/5*100), 'red_bar': (2/5*100), 'green_bar': (0/5*100)},
+                #{'dimension': 'relationships', 'name': 'Work relationships', 'score': relationships_avg, 'progress': (relationships_avg/5*100), 'previous_score': 2, 'previous_progress': (2/5*100), 'delta': -1, 'blue_bar': (1/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
+                #{'dimension': 'peer support', 'name': 'Peer support', 'score': peer_support_avg, 'progress': (peer_support_avg/5*100), 'previous_score': 3, 'previous_progress': (3/5*100), 'delta': -1, 'blue_bar': (2/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
+                #{'dimension': 'manager support', 'name': 'Manager support', 'score': manager_support_avg, 'progress': (manager_support_avg/5*100), 'previous_score': 4, 'previous_progress': (4/5*100), 'delta': 1, 'blue_bar': (4/5*100), 'red_bar': (0/5*100), 'green_bar': (1/5*100)},
+            #)
+
+    #get questions for the product
     questions = Question.objects.filter(product__name='Employee Satisfaction Tracking')
-    '''
-    latest_survey_results = (
-        {'name': 'Role clarity', 'score': 4, 'progress': (4/5*100)},
-        {'name': 'Controlling', 'score': 3, 'progress': (3/5*100)},
-        {'name': 'Demanding', 'score': 2, 'progress': (2/5*100)},
-        {'name': 'Work relationships', 'score': 1, 'progress': (1/5*100)},
-        {'name': 'Peer support', 'score': 2, 'progress': (2/5*100)},
-        {'name': 'Manager support', 'score': 5, 'progress': (5/5*100)},
-    )
-    previous_survey_results = (
-        {'name': 'Role clarity', 'score': 1, 'delta': 3, 'blue_bar': (1/5*100), 'red_bar': (0/5*100), 'green_bar': (3/5*100)},
-        {'name': 'Controlling', 'score': 3, 'delta': 0, 'blue_bar': (3/5*100), 'red_bar': (0/5*100), 'green_bar': (0/5*100)},
-        {'name': 'Demanding', 'score': 4, 'delta': -2, 'blue_bar': (2/5*100), 'red_bar': (2/5*100), 'green_bar': (0/5*100)},
-        {'name': 'Work relationships', 'score': 2, 'delta': -1, 'blue_bar': (1/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
-        {'name': 'Peer support', 'score': 3, 'delta': -1, 'blue_bar': (2/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
-        {'name': 'Manager support', 'score': 4, 'delta': 1, 'blue_bar': (4/5*100), 'red_bar': (0/5*100), 'green_bar': (1/5*100)},
-    )
-    '''
-    survey_results = (
-        {'dimension': 'role', 'name': 'Role clarity', 'description': 'Role clarity refers to how clearly ones role is defined. Unclear roles is a common, yet often overlooked, underlaying cause of dissatisfaction. When people feel it\'s unclear what their role is, and what is expected of them, it can lead to anxious feelings, and doubt as to whether or not one is living up to expectations.', 'score': 4, 'progress': (4/5*100), 'previous_score': 1, 'previous_progress': (1/5*100), 'delta': 3, 'blue_bar': (1/5*100), 'red_bar': (0/5*100), 'green_bar': (3/5*100)},
-        {'dimension': 'control', 'name': 'Controlling', 'description': 'Describe this dimension', 'score': 3, 'progress': (3/5*100), 'previous_score': 3, 'previous_progress': (3/5*100), 'delta': 0, 'blue_bar': (3/5*100), 'red_bar': (0/5*100), 'green_bar': (0/5*100)},
-        {'dimension': 'demands', 'name': 'Demanding', 'description': 'Describe this dimension', 'score': 2, 'progress': (2/5*100), 'previous_score': 4, 'previous_progress': (4/5*100), 'delta': -2, 'blue_bar': (2/5*100), 'red_bar': (2/5*100), 'green_bar': (0/5*100)},
-        {'dimension': 'relationships', 'name': 'Work relationships', 'description': 'Describe this dimension', 'score': 1, 'progress': (1/5*100), 'previous_score': 2, 'previous_progress': (2/5*100), 'delta': -1, 'blue_bar': (1/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
-        {'dimension': 'peer support', 'name': 'Peer support', 'description': 'Describe this dimension', 'score': 2, 'progress': (2/5*100), 'previous_score': 3, 'previous_progress': (3/5*100), 'delta': -1, 'blue_bar': (2/5*100), 'red_bar': (1/5*100), 'green_bar': (0/5*100)},
-        {'dimension': 'manager support', 'name': 'Manager support', 'description': 'Describe this dimension', 'score': 5, 'progress': (5/5*100), 'previous_score': 4, 'previous_progress': (4/5*100), 'delta': 1, 'blue_bar': (4/5*100), 'red_bar': (0/5*100), 'green_bar': (1/5*100)},
-    )
-    #get the number of respondents
-    number_of_respondents = 4
-    number_of_respondents_previous = 6
+
 
     context={
         'survey_results': survey_results,
         'number_of_respondents': number_of_respondents,
         'number_of_respondents_previous': number_of_respondents_previous,
         'questions': questions,
+        'this_survey': this_survey,
+        'previous_survey': previous_survey,
     }
     return render(request, 'co_worker_satisfaction_data.html', context)

@@ -2,6 +2,14 @@
 
 #dev
 
+- Create a test-data-creator that creates an organization with one closed survey, and one with two closed surveys
+
+
+--> must take into account 0, <5 and 5+ respondents
+- Adapt the dashboard view for a) No closed surveys, b) at least 1 closed survey
+
+
+
 
 #Product #1
 
@@ -30,7 +38,7 @@ terms of use, and all that
 #Stripe-redo
 Add better flow -> create customer, -> create payment method, and attach -> create, change, cancel subscription -> control that U can only have one
 tests for stripe views and models, and Plan and Subscriber and everything
-users deciding to resignup before their last billing period expired, should not be billed doubly.
+users deciding to re-signup before their last billing period expired, should not be billed doubly.
 
 #finishing touch
 more info in edit profile AND in sign up
@@ -40,3 +48,4 @@ use standard sign-up and change-password views?
 - When visiting add employees for the first time, it would be neat if user was already added
 - more tests (survey response view, )
 - add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages, and make option to revoke consent.
+Can we make a unique restraint on employee emails in DB?

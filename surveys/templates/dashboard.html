@@ -51,22 +51,74 @@
       {% else %}
       <div class="row">
         <div class="col-sm-6">
+
+
+
+
+
           {% if est_active == True %}
-          <div class="card text-center">
-            <div class="card-header">
+          <div class="card">
+            <div class="card-header text-center">
 
               Employee Satisfaction Tracking
 
             </div>
             <div class="card-body">
-              <h5 class="card-title">You are all set!</h5>
-              <p class="card-text">
+              {% if surveys %}
+              <h5 class="card-title text-left">Latest measurements</h5>
+              {% else %}
+              <h5 class="card-title text-center">You are all set!</h5>
+              {% endif %}
+              <p class="card-text text-center">
+
+                {% if survey_results %}
+                {% for result in survey_results %}
+                <div class="row">
+                  <div class="col-sm-4">
+
+                    {{ result.name }}
+                  </div><!-- col -->
+                  <div class="col-sm-8">
+                    <div class="progress"  style="height: 20px;">
+                      <div class="progress-bar{% if result.score < 2 %} bg-danger{% elif result.score >= 4 %} bg-success{% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ result.progress }}%" aria-valuenow="{{ result.role.progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.score|floatformat }}</div>
+                    </div>
+                  </div><!-- col -->
+                </div><!-- row -->
+                {% endfor %}
+                {% endif %}
+
+
+
+                {% if not surveys %}
                 Sit back and relax! We will now collect from your co-workers, and once data is in we will let you know, and we will display it here. <br />
+                {% endif %}
+                {% if next_survey_close %}
+                We are currently collecting data, which will be available once the survey closes, {{ next_survey_close }}.
+                {% endif %}
               </p>
-              <a href="{% url 'surveys-co-worker-satisfaction-data' %}" class="btn btn-info">View data</a>
-              <a href="{% url 'surveys-set-up-employee-satisfaction-tracking' %}" class="btn btn-info">Update settings</a>
+              {% if surveys %}
+              <center>
+              <a href="{% url 'surveys-co-worker-satisfaction-data' surveys.0.date_close %}" class="btn btn-info">View details</a>
+              </center>
+              
+              <h5 class="card-title text-left">Co-worker satisfaction tracking settings</h5>
+              {% endif %}
+              <center>
+              <a href="{% url 'surveys-set-up-employee-satisfaction-tracking' %}" class="btn btn-info">Review settings</a>
+              </center>
+              <p class="card-text">
+              {% if surveys %}
+              <h5 class="card-title text-left">Revisit earlier surveys</h5>
+              <ul>
+                {% for survey in surveys %}
+                  <li><a href="{% url 'surveys-co-worker-satisfaction-data' survey.date_close %}">{{ survey.date_close }}</a></li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+              </p>
+
             </div>
-            <div class="card-footer text-muted">
+            <div class="card-footer text-muted  text-center">
               <p class="card-text">
                 <small class="text-muted">Co-worker Satisfaction Tracking is currently <b>active</b></small>
               </p>
@@ -85,11 +137,19 @@
             </div>
             <div class="card-footer text-muted">
               <p class="card-text">
-                <small class="text-muted">CO-worker Satisfaction Tracking is currently <b>not activated</b></small>
+                <small class="text-muted">Co-worker Satisfaction Tracking is currently <b>not activated</b></small>
               </p>
             </div>
           </div>
         {% endif %}
+
+
+
+
+
+
+
+
         </div><!-- col -->
         <div class="col-sm-6">
           <div class="card">
