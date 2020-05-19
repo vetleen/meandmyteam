@@ -75,6 +75,8 @@ def dashboard_view(request):
         for a in demands_answers:
             demands_total += a.value
         demands_avg = demands_total / len(demands_answers)
+        #flip it around, since the statements are negative
+        demands_avg=((abs((demands_avg-1)-4))+1)
 
 
         #get and average out relationships:
@@ -83,7 +85,8 @@ def dashboard_view(request):
         for a in relationships_answers:
             relationships_total += a.value
         relationships_avg = relationships_total / len(relationships_answers)
-
+        #flip it around, since the statements are negative
+        relationships_avg=((abs((relationships_avg-1)-4))+1)
 
         #get and average out peer_support:
         peer_support_answers = [a for a in answers if a.question.dimension == 'peer support']
@@ -509,6 +512,8 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             for a in demands_answers:
                 demands_total += a.value
             demands_avg = demands_total / len(demands_answers)
+            #flip it, because statements are negative
+            demands_avg = ((abs((demands_avg-1)-4))+1)
         except ZeroDivisionError:
             print('Got a divide by Zero error, because there are no answers in this category ')
 
@@ -520,6 +525,8 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             for a in relationships_answers:
                 relationships_total += a.value
             relationships_avg = relationships_total / len(relationships_answers)
+            #flip it, because statements are negative
+            relationships_avg = ((abs((relationships_avg-1)-4))+1)
         except ZeroDivisionError:
             print('Got a divide by Zero error, because there are no answers in this category ')
 
@@ -679,6 +686,9 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                 for a in demands_answers:
                     demands_total += a.value
                 pdemands_avg = demands_total / len(demands_answers)
+
+                #flip it around, since the statements are negative
+                pdemands_avg=((abs((pdemands_avg-1)-4))+1)
                 #The blue bar should be equal to the smallest of the two results
                 blue_bar = (pdemands_avg/5*100)
                 if demands_avg < pdemands_avg:
@@ -718,6 +728,8 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                 for a in relationships_answers:
                     relationships_total += a.value
                 prelationships_avg = relationships_total / len(relationships_answers)
+                #flip it around, since the statements are negative
+                prelationships_avg=((abs((prelationships_avg-1)-4))+1)
                 #The blue bar should be equal to the smallest of the two results
                 blue_bar = (prelationships_avg/5*100)
                 if relationships_avg < prelationships_avg:
@@ -839,7 +851,11 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             relevant_answers_total = 0
             for a in relevant_answers:
                 relevant_answers_total += a.value
+            #most dimensions have theur scoire be the average, like this:
             relevant_answers_avg = relevant_answers_total / len(relevant_answers)
+            #but when there is a negative statement, we want to flip the score (e.g. a 1.5 avg is a 4.5 score, because that's good):
+            if q.dimension == 'demands' or q.dimension == 'relationships':
+                relevant_answers_avg = ((abs((relevant_answers_avg-1)-4))+1)
             answers_avgs.append((relevant_answers_avg, ((relevant_answers_avg/5)*100)))
         print(answers_avgs)
         questions = list(zip(questions, answers_avgs))

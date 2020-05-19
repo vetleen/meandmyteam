@@ -78,10 +78,19 @@
 
                     {{ result.name }}
                   </div><!-- col -->
-                  <div class="col-sm-8">
+                  <div class="col-sm text-right px-0">
+                    <span class="text-muted"><small> Weakn. </small></span>
+                  </div><!-- col -->
+                  <div class="col-sm-5">
                     <div class="progress"  style="height: 20px;">
-                      <div class="progress-bar{% if result.score < 2 %} bg-danger{% elif result.score >= 4 %} bg-success{% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ result.progress }}%" aria-valuenow="{{ result.role.progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.score|floatformat }}</div>
+                      <div class="progress-bar
+                      {% if result.score < 2 %} bg-danger
+                      {% elif result.score >= 4 %} bg-success
+                      {% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ result.progress }}%" aria-valuenow="{{ result.role.progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.score|floatformat }}</div>
                     </div>
+                  </div><!-- col -->
+                  <div class="col-sm text-left px-0">
+                    <span class="text-muted"><small>Strength</small></span>
                   </div><!-- col -->
                 </div><!-- row -->
                 {% endfor %}

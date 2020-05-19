@@ -45,3 +45,4 @@ use standard sign-up and change-password views?
 - more tests (survey response view, )
 - add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages, and make option to revoke consent.
 Can we make a unique restraint on employee emails in DB?
+When 3 surveys have been completed, a line chart may be a better way to present development
