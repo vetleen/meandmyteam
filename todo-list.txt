@@ -2,6 +2,7 @@
 
 #dev
 incomplete surveys: don't count towards respondents, get extra reminders? Display incomplete to customer.
+AND when you click the link, shouldn't you be taken to the first unanswered?
 
 
 

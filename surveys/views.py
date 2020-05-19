@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseForbidden, Http404, HttpResponseRedirect
 
+#from django.db import RelatedObjectDoesNotExist
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -35,15 +36,18 @@ def dashboard_view(request):
         employee_count = 0
 
     #get the organization's surveys, sorted by closing date
-    surveys_raw = Survey.objects.filter(product__name='Employee Satisfaction Tracking', owner=request.user.organization).order_by('-date_close') #the first item is the latest survey
+    try:
+        surveys_raw = Survey.objects.filter(product__name='Employee Satisfaction Tracking', owner=request.user.organization).order_by('-date_close') #the first item is the latest survey
 
-    #if any are not closed yet, remove it from the list, and add a note to show the user the closing date
-    surveys = [s for s in surveys_raw if s.date_close < date.today()]
-    next_survey_close=None
-    if len(surveys_raw) > len(surveys):
-        surplus_survey=surveys_raw[0]
-        next_survey_close=surplus_survey.date_close
-
+        #if any are not closed yet, remove it from the list, and add a note to show the user the closing date
+        surveys = [s for s in surveys_raw if s.date_close < date.today()]
+        next_survey_close=None
+        if len(surveys_raw) > len(surveys):
+            surplus_survey=surveys_raw[0]
+            next_survey_close=surplus_survey.date_close
+    except Organization.DoesNotExist:
+        surveys = ()
+        next_survey_close = None
     #get the latest completed survey results
     survey_results = () #empty list to be passed top context if 0 surveys
     number_of_respondents = 0 #make in case it's not set later
