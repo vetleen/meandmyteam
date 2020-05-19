@@ -1,10 +1,8 @@
 ##MeAndMyTeam
 
 #dev
+incomplete surveys: don't count towards respondents, get extra reminders? Display incomplete to customer.
 
-must take into account 0, 1-4 and 5+ respondents -> reduced info both in dash-view and specific survey-view
-
-add description for each dimension
 
 
 #Product #1
@@ -46,3 +44,4 @@ use standard sign-up and change-password views?
 - add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages, and make option to revoke consent.
 Can we make a unique restraint on employee emails in DB?
 When 3 surveys have been completed, a line chart may be a better way to present development
+"no change" in the survey results bars should be centered (make 100 blue bar if no change?)

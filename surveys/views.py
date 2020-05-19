@@ -46,6 +46,7 @@ def dashboard_view(request):
 
     #get the latest completed survey results
     survey_results = () #empty list to be passed top context if 0 surveys
+    number_of_respondents = 0 #make in case it's not set later
     if len(surveys) > 0: #if, however, there are more than 0 surveys, we want to grab the latest and get the results to display
         latest_survey = surveys[0]
 
@@ -59,6 +60,7 @@ def dashboard_view(request):
         for a in role_clarity_answers:
             role_clarity_total += a.value
         role_clarity_avg = role_clarity_total / len(role_clarity_answers)
+        number_of_respondents = int(len(role_clarity_answers)/5)
 
 
         #get and average out control:
@@ -134,6 +136,7 @@ def dashboard_view(request):
         'surveys': surveys,
         'next_survey_close': next_survey_close,
         'survey_results': survey_results,
+        'number_of_respondents': number_of_respondents,
 
 
     }
@@ -477,6 +480,10 @@ def co_worker_satisfaction_data_view(request, **kwargs):
     number_of_respondents = 0
     number_of_respondents_previous = 0
 
+    #make sure we have these variables to pass to view, even if they somehow don't get set later
+    lowest_score = (None, 5)
+    highest_score = (None, 0)
+
     if this_survey is not None:
         answers = IntAnswer.objects.filter(survey_instance__survey=this_survey) #for now, all answers are IntAnswers
 
@@ -501,6 +508,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             for a in control_answers:
                 control_total += a.value
             control_avg = control_total / len(control_answers)
+
         except ZeroDivisionError:
             print('Got a divide by Zero error, because there are no answers in this category ')
 
@@ -562,30 +570,35 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             },
             {
                 'dimension': 'control',
+                'description': 'Degree of control is the degree to which co-workers\' in your organization feels that they themselves have autonomy, meaning that they have control over what they do at work.',
                 'name': 'Degree of control',
                 'score': control_avg,
                 'progress': (control_avg/5*100),
             },
             {
                 'dimension': 'demands',
+                'description': 'Demanding work is a score for how demanding your co-workers feel work is. For simplicity sake, we have processed the data in such a way that a high score is good and a low score bad. This way you can compare this dimension to the others.',
                 'name': 'Demanding work',
                 'score': demands_avg,
                 'progress': (demands_avg/5*100),
             },
             {
                 'dimension': 'relationships',
+                'description': 'Workplace relationships is a score for how good relations between co-workers are. A low score may indicate workplace bullying, harassment or high levels of conflict.',
                 'name': 'Workplace relations',
                 'score': relationships_avg,
                 'progress': (relationships_avg/5*100),
             },
             {
                 'dimension': 'peer support',
+                'description': 'Peer support indicates the extent to which your co-workers feel they can rely on their co-workers to support them in execution of tasks.',
                 'name': 'Peer support',
                 'score': peer_support_avg,
                 'progress': (peer_support_avg/5*100),
             },
             {
                 'dimension': 'manager support',
+                'description': 'Manager support indicates the extent to which your co-workers feel they can rely on their manager(s) for support in execution of tasks.',
                 'name': 'Manager support',
                 'score': manager_support_avg,
                 'progress': (manager_support_avg/5*100),
@@ -857,8 +870,32 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             if q.dimension == 'demands' or q.dimension == 'relationships':
                 relevant_answers_avg = ((abs((relevant_answers_avg-1)-4))+1)
             answers_avgs.append((relevant_answers_avg, ((relevant_answers_avg/5)*100)))
-        print(answers_avgs)
+
         questions = list(zip(questions, answers_avgs))
+
+    #set highest and lowest scores for view, to be displayed if less than 4 respondent
+    #make list of all averages, with proper "key"
+    avgs = {'role': role_clarity_avg,
+            'control': control_avg,
+            'demands': demands_avg,
+            'relationships': relationships_avg,
+            'peer support': peer_support_avg,
+            'manager support': manager_support_avg,
+            }
+    #find the largest one and smallest and assign to appr. variables
+    print(highest_score, lowest_score)
+    for key in avgs:
+        print (key, '->', avgs[key])
+
+        if avgs[key] > highest_score[1]:
+            highest_score = (key, avgs[key])
+        if avgs[key] < lowest_score[1]:
+           lowest_score = (key, avgs[key])
+    print(highest_score, lowest_score)
+    highest_score = highest_score[0]
+    lowest_score = lowest_score[0]
+    print(highest_score, lowest_score)
+
 
     context={
         'survey_results': survey_results,
@@ -867,5 +904,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
         'questions': questions,
         'this_survey': this_survey,
         'previous_survey': previous_survey,
+        'highest_score': highest_score,
+        'lowest_score': lowest_score,
     }
     return render(request, 'co_worker_satisfaction_data.html', context)

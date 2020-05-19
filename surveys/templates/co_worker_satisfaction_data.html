@@ -25,7 +25,7 @@
       </p>
       <p class="text-body">
 
-{% if number_of_respondents > 4 %}
+{% if number_of_respondents > 3 %}
 We score your organization on six dimensions. Your organization's scores are
 summarized below.
 </p>
@@ -39,13 +39,15 @@ We score your organization on six dimensions. Your organization's scores are
 summarized below.
 </p>
 <p class="text-body">
-Since this survey had fewer than five respondents, we don't provide a more
-detailed view of the data. This is because we promised your co-workers that we
-would anonymize the data, and with less than five responents it starts to become
-possible to guesstimate individual answers.
+<span class="font-weight-bold">Since this survey had three or fewer respondents,
+we can only show you what your organizations highest and lowest scores
+are</span>. This is because we promised your co-workers that we would anonymize
+their data, and with this few responents it starts to become possible to guess
+individual answers based on the processed scores.<br />
 
 {% endif %}
       </p>
+    {% if number_of_respondents > 3 %}
       {% for result in survey_results %}
       <div class="row">
         <div class="col-sm-4">
@@ -68,6 +70,48 @@ possible to guesstimate individual answers.
         </div><!-- col -->
       </div><!-- row -->
       {% endfor %}
+    {% else %}
+
+    <ul class="list-group">
+      {% for result in survey_results %}
+      {% if highest_score == result.dimension %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{result.name}}
+        <span class="badge badge-success">Highest score!</span>
+      </li>
+      {% endif %}
+      {% if lowest_score == result.dimension %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{result.name}}
+        <span class="badge badge-warning">Lowest score</span>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+    {% comment "hides bars that COULD be used..." %}
+    {% for result in survey_results %}
+    <div class="row">
+      <div class="col-sm-4">
+
+        {{ result.name }}
+      </div><!-- col -->
+      <div class="col-sm-1 text-right px-0">
+        <span class="text-muted"><small> Weakn. </small></span>
+      </div><!-- col -->
+      <div class="col-sm-6">
+        <div class="progress"  style="height: 20px;">
+          <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">Score hidden</span></div>
+        </div>
+      </div><!-- col -->
+      <div class="col-sm-1 text-left px-0">
+        <span class="text-muted"><small>Strength</small></span>
+      </div><!-- col -->
+    </div><!-- row -->
+    {% endfor %}
+    {% endcomment %}
+    {% endif %}
+
+
     </div><!-- col -->
     <div class="w-100"></div>
 
@@ -92,9 +136,13 @@ possible to guesstimate individual answers.
         </div><!-- col -->
         <div class="col-sm-6">
           <div class="progress"  style="height: 20px;">
+            {% if number_of_respondents > 3 %}
             <div class="progress-bar bg-transparent" role="progressbar" style="width: {{ result.blue_bar }}%" aria-valuenow="{{ result.blue_bar }}" aria-valuemin="0" aria-valuemax="100">{% if result.delta == 0 %}<span class="text-dark">No change</span>{% endif %}</div>
             <div class="progress-bar bg-danger" role="progressbar" style="width: {{ result.red_bar }}%" aria-valuenow="{{ result.red_bar }}" aria-valuemin="0" aria-valuemax="100"> {{result.delta|floatformat}} </div>
             <div class="progress-bar bg-success" role="progressbar" style="width: {{ result.green_bar }}%" aria-valuenow="{{ result.green_bar }}" aria-valuemin="0" aria-valuemax="100"> +{{result.delta|floatformat}} </div>
+            {% else %}
+            <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">Exact change hidden</span></div>
+            {% endif %}
           </div>
         </div><!-- col -->
         <div class="col-sm-1 text-left px-0">
@@ -111,12 +159,23 @@ possible to guesstimate individual answers.
     {% endif %}
 
 
+
+
+
     <div class="w-100"></div>
     {% for result in survey_results %}
 
     <div class="col-md-6 mt-4 py-3">
       <h3>{{ forloop.counter|add:'1' }}. {{ result.name}}</h3>
+      {% if highest_score == result.dimension %}
+      <h3><center><span class="badge badge-success">Your organizations strongest point!</span></center></h3>
+      {% endif %}
+      {% if lowest_score == result.dimension %}
+      <h3><center><span class="badge badge-warning">Your organizations weakest point</span></center></h3>
+      {% endif %}
+
       {% if previous_survey %}
+
       <div class="row">
         <div class="col-sm-4">
           Previous score:
@@ -126,7 +185,11 @@ possible to guesstimate individual answers.
         </div><!-- col -->
         <div class="col-sm-6">
           <div class="progress"  style="height: 20px;">
+            {% if number_of_respondents > 3 %}
             <div class="progress-bar{% if result.previous_score < 2 %} bg-secondary{% elif result.previous_score >= 4 %} bg-secondary{% else %} bg-secondary{% endif %}" role="progressbar" style="width: {{ result.previous_progress }}%" aria-valuenow="{{ result.role.previous_progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.previous_score|floatformat }}</div>
+            {% else %}
+            <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">Score hidden</span></div>
+            {% endif %}
           </div>
         </div><!-- col -->
         <div class="col-sm-1 text-right px-0">
@@ -145,9 +208,13 @@ possible to guesstimate individual answers.
         </div><!-- col -->
         <div class="col-sm-6">
           <div class="progress"  style="height: 20px;">
+            {% if number_of_respondents > 3 %}
             <div class="progress-bar bg-transparent" role="progressbar" style="width: {{ result.blue_bar }}%" aria-valuenow="{{ result.blue_bar }}" aria-valuemin="0" aria-valuemax="100">{% if result.delta == 0 %}<span class="text-dark">No change</span>{% endif %}</div>
             <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ result.red_bar }}%" aria-valuenow="{{ result.red_bar }}" aria-valuemin="0" aria-valuemax="100"> {{result.delta|floatformat}} </div>
             <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ result.green_bar }}%" aria-valuenow="{{ result.green_bar }}" aria-valuemin="0" aria-valuemax="100"> +{{result.delta|floatformat}} </div>
+            {% else %}
+            <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">Exact change hidden</span></div>
+            {% endif %}
           </div>
         </div><!-- col -->
         <div class="col-sm-1 text-left px-0">
@@ -171,7 +238,11 @@ possible to guesstimate individual answers.
         </div><!-- col -->
         <div class="col-sm-6">
           <div class="progress"  style="height: 20px;">
+            {% if number_of_respondents > 3 %}
             <div class="progress-bar{% if result.score < 2 %} bg-danger{% elif result.score >= 4 %} bg-success{% else %} bg-warning{% endif %}" role="progressbar" style="width: {{ result.progress }}%" aria-valuenow="{{ result.role.progress }}" aria-valuemin="0" aria-valuemax="100">{{ result.score|floatformat }}</div>
+            {% else %}
+            <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">Score hidden</span></div>
+            {% endif %}
           </div>
         </div><!-- col -->
         <div class="col-sm-1 text-right px-0">
@@ -197,29 +268,44 @@ possible to guesstimate individual answers.
               <div class="col-sm-12">
                 {{ q.0 }}:
               </div><!-- col -->
-              <div class="col-sm-2 text-right px-0">
+              {% if number_of_respondents > 3 %}
+              <div class="col-sm text-right px-0">
                 <span class="text-muted"><small> Disagree </small></span>
               </div><!-- col -->
-              <div class="col-sm-8">
+              <div class="col-sm-9">
                 <div class="progress"  style="height: 20px;">
                   <div class="progress-bar{% if q.1.0 < 2 %} bg-primary{% elif q.1.0 >= 4 %} bg-primary{% else %} bg-primary{% endif %}" role="progressbar" style="width: {{ q.1.1 }}%" aria-valuenow="{{ q.1.1 }}" aria-valuemin="0" aria-valuemax="100">{{ q.1.0|floatformat }}</div>
                 </div>
               </div><!-- col -->
-              <div class="col-sm-2 text-left px-0">
+              <div class="col-sm text-left px-0">
                 <span class="text-muted"><small> Agree </small></span>
               </div><!-- col -->
+              {% else %}
+              <div class="col-sm text-right px-0">
+                <span class="text-muted"><small> Disagree </small></span>
+              </div><!-- col -->
+              <div class="col-sm-9">
+                <div class="progress"  style="height: 20px;">
+                  <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">Average hidden</span></div>
+                </div>
+              </div><!-- col -->
+              <div class="col-sm text-left px-0">
+                <span class="text-muted"><small> Agree </small></span>
+              </div><!-- col -->
+              {% endif %}
             </div><!-- row -->
           </li>
         {% endif %}
 
       {% endfor %}
       </ul>
+      {% if number_of_respondents > 3 %}
       <p class="text-muted"><small>
-Note that some statements may be negative. Here you see the average for
-each statement in your organization, so a "full bar" means your co-workers agreed with the statement,
-regardless of it being positive or negative. In the score for the whole
-dimension, however, we have accounted for this.
+The numbers represent the average rating for your organization. A "full bar"
+means your co-workers agreed with the statement, regardless of it being positive
+or negative.
       </small></p>
+      {% endif %}
 
 
 

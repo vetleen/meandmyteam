@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from surveys.functions import daily_survey_maintenance
 from surveys.models import User, Organization, Survey, SurveyInstance, Question, Answer, Product, Employee, Survey
+from website.models import Subscriber
 from django.db import IntegrityError
 from datetime import date, timedelta
 from surveys.functions import configure_product
@@ -11,8 +12,8 @@ class Command(BaseCommand):
     help = 'Creates a few surveys and so on so ...'
 
     def handle(*args, **kwargs):
-        orgname="TestOrganization13"
-        username="testorg13@aa.aa"
+        orgname="TestOrganization14"
+        username="testorg14@aa.aa"
         password="jjj43skjma@67#"
 
         print('creating test data, Organization and Employees')
@@ -21,6 +22,8 @@ class Command(BaseCommand):
             u.save()
             o = Organization(owner=u, name=orgname)
             o.save()
+            s = Subscriber(user=u)
+            s.save()
         except IntegrityError as err:
             print('the user was already created, let\'s retreive it...')
             u=User.objects.get(username=username)
@@ -37,7 +40,7 @@ class Command(BaseCommand):
         o.active_products.add(p)
         o.save()
         es = Employee.objects.filter(organization=o)
-        if len(es) < 5:
+        if len(es) < 4:
             try:
                 e1=Employee(
                     organization = o,
@@ -78,16 +81,7 @@ class Command(BaseCommand):
             except IntegrityError as err:
                 print('e4 was created before... let\'s retrieve instead...')
                 e4= Employee.objects.get(email='testrespondent4@aa.aa')
-            try:
-                e5=Employee(
-                    organization = o,
-                    email = 'testrespondent5@aa.aa',
-                    receives_surveys = True
-                )
-                e5.save()
-            except IntegrityError as err:
-                print('e5 was created before... let\'s retrieve instead...')
-                e5= Employee.objects.get(email='testrespondent5@aa.aa')
+
 
 
         print('running daily survey tasks...')
