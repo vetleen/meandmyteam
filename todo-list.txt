@@ -1,15 +1,18 @@
 ##MeAndMyTeam
 
 #dev
+Your organizations weakest point and strongest popint should only be visible when no other data is visible
 incomplete surveys: don't count towards respondents, get extra reminders? Display incomplete to customer.
 AND when you click the link, shouldn't you be taken to the first unanswered?
 
+Make sure there are try/except all over dashboard and data views
 
 
 #Product #1
-
-add data visuallization on web
 add report-generator (I see there are heroku addons for html->pdf)
+
+
+
 
 #fun stuff
 add screenshots to show of products on front page
@@ -46,3 +49,4 @@ use standard sign-up and change-password views?
 Can we make a unique restraint on employee emails in DB?
 When 3 surveys have been completed, a line chart may be a better way to present development
 "no change" in the survey results bars should be centered (make 100 blue bar if no change?)
+make a switch for toggeling products, and make it toggleable from dashboard.
