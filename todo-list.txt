@@ -1,10 +1,10 @@
 ##MeAndMyTeam
 
 #dev
-Your organizations weakest point and strongest popint should only be visible when no other data is visible
-incomplete surveys: don't count towards respondents, get extra reminders? Display incomplete to customer.
-AND when you click the link, shouldn't you be taken to the first unanswered?
 
+links from dimensions to #dimension
+
+AND when you click the link, shouldn't you be taken to the first unanswered?
 Make sure there are try/except all over dashboard and data views
 
 
@@ -50,3 +50,5 @@ Can we make a unique restraint on employee emails in DB?
 When 3 surveys have been completed, a line chart may be a better way to present development
 "no change" in the survey results bars should be centered (make 100 blue bar if no change?)
 make a switch for toggeling products, and make it toggleable from dashboard.
+When you didn't answer all the questions, but try to finish the survey, get sent to the page with the first unanswered question.
+progress bar for question pages

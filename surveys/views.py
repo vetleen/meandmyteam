@@ -50,7 +50,8 @@ def dashboard_view(request):
         next_survey_close = None
     #get the latest completed survey results
     survey_results = () #empty list to be passed top context if 0 surveys
-    number_of_respondents = 0 #make in case it's not set later
+    latest_survey = None
+    #number_of_respondents = 0 #make in case it's not set later
     if len(surveys) > 0: #if, however, there are more than 0 surveys, we want to grab the latest and get the results to display
         latest_survey = surveys[0]
 
@@ -64,7 +65,7 @@ def dashboard_view(request):
         for a in role_clarity_answers:
             role_clarity_total += a.value
         role_clarity_avg = role_clarity_total / len(role_clarity_answers)
-        number_of_respondents = int(len(role_clarity_answers)/5)
+        #number_of_respondents = int(len(role_clarity_answers)/5)
 
 
         #get and average out control:
@@ -112,13 +113,28 @@ def dashboard_view(request):
 
         #prepare a filled list to pass to context
         survey_results = (
-            {'name': 'Role clarity', 'score': role_clarity_avg, 'progress': (role_clarity_avg/5*100)},
-            {'name': 'Controlling', 'score': control_avg, 'progress': (control_avg/5*100)},
-            {'name': 'Demanding', 'score': demands_avg, 'progress': (demands_avg/5*100)},
-            {'name': 'Work relationships', 'score': relationships_avg, 'progress': (relationships_avg/5*100)},
-            {'name': 'Peer support', 'score': peer_support_avg, 'progress': (peer_support_avg/5*100)},
-            {'name': 'Manager support', 'score': manager_support_avg, 'progress': (manager_support_avg/5*100)},
+            {'dimension': 'role', 'name': 'Role clarity', 'score': role_clarity_avg, 'progress': (role_clarity_avg/5*100)},
+            {'dimension': 'control', 'name': 'Degree of control', 'score': control_avg, 'progress': (control_avg/5*100)},
+            {'dimension': 'demands', 'name': 'Demanding work', 'score': demands_avg, 'progress': (demands_avg/5*100)},
+            {'dimension': 'relationships', 'name': 'Workplace relations', 'score': relationships_avg, 'progress': (relationships_avg/5*100)},
+            {'dimension': 'peer support', 'name': 'Peer support', 'score': peer_support_avg, 'progress': (peer_support_avg/5*100)},
+            {'dimension': 'manager support', 'name': 'Manager support', 'score': manager_support_avg, 'progress': (manager_support_avg/5*100)},
         )
+
+    #count respondents
+    number_of_respondents = 0 #make in case it's not set later
+    number_of_invited = 0
+    if latest_survey is not None:
+        #print ('there was a latest_survey')
+        sis = SurveyInstance.objects.filter(survey=latest_survey)
+        number_of_invited = len(sis)
+        #print ('%s was invited to respond'%(len(sis)))
+        for si in sis:
+            if si.completed:
+                number_of_respondents += 1
+        #print ('%s responded'%(number_of_respondents))
+
+
 
     #make the est_active variable and correctly set it
     est_active = False
@@ -140,6 +156,7 @@ def dashboard_view(request):
         'surveys': surveys,
         'next_survey_close': next_survey_close,
         'survey_results': survey_results,
+        'number_of_invited': number_of_invited,
         'number_of_respondents': number_of_respondents,
 
 
@@ -439,10 +456,19 @@ def answer_survey_view(request, **kwargs):
                     return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(token, int(page)+1)))
                 #else, we are done answering, and redirect to thank you message
                 else:
-                    print('survey complete')
-                    si.completed=True
-                    si.save()
-                    return HttpResponseRedirect(reverse('surveys-answer-survey', args=(token, )))
+                    print('survey complete?')
+                    #compare number of answers to number of questions:
+                    answers = IntAnswer.objects.filter(survey_instance=si)
+                    print('comparing %s to %s.'%(len(answers), len(questions)))
+                    if len(answers) >= len(questions):
+                        print('enough answers!')
+                        si.completed=True
+                        si.save()
+                        return HttpResponseRedirect(reverse('surveys-answer-survey', args=(token, )))
+                    else:
+                        print('not enough answers!')
+                        messages.warning(request, 'Ups. There are still %s unanswered questions. Would you mind going through again and making sure everything got answered?'%(len(questions)-len(answers)), extra_tags='alert alert-warning')
+                        return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(token, 1)))
 
     #In case a valid form was not submitted, we present the current form
     return render(request, 'answer_survey.html', context)
@@ -900,11 +926,35 @@ def co_worker_satisfaction_data_view(request, **kwargs):
     lowest_score = lowest_score[0]
     print(highest_score, lowest_score)
 
+    #count respondents
+    number_of_respondents = 0 #make in case it's not set later
+    if this_survey:
+        #print ('there was a latest_survey')
+        sis = SurveyInstance.objects.filter(survey=this_survey)
+        number_of_invited = len(sis)
+        #print ('%s was invited to respond'%(len(sis)))
+        for si in sis:
+            if si.completed:
+                number_of_respondents += 1
+        #print ('%s responded'%(number_of_respondents))
+
+    number_of_respondents_previous = 0 #make in case it's not set later
+    if previous_survey:
+        #print ('there was a latest_survey')
+        sis = SurveyInstance.objects.filter(survey=previous_survey)
+        number_of_invited_previous = len(sis)
+        #print ('%s was invited to respond'%(len(sis)))
+        for si in sis:
+            if si.completed:
+                number_of_respondents_previous += 1
+        #print ('%s responded'%(number_of_respondents))
 
     context={
         'survey_results': survey_results,
         'number_of_respondents': number_of_respondents,
         'number_of_respondents_previous': number_of_respondents_previous,
+        'number_of_invited': number_of_invited,
+        'number_of_invited_previous': number_of_invited_previous,
         'questions': questions,
         'this_survey': this_survey,
         'previous_survey': previous_survey,

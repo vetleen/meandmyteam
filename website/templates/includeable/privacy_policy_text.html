@@ -18,7 +18,7 @@ We collect and process data about individuals solely on a consentual basis.
 <p>
 The main purpose for data collection is to provide the services as described on
 our web-site, and on any other marketing material. In short, we collect
-HR-related information about an organizations employees, process it, and serve
+HR-related information about an organization's employees, process it, and serve
 it back to the organization that is the customer. In doing so we seek to help
 the organization improve their decision making around employee well-being.
 </p>
@@ -26,7 +26,7 @@ the organization improve their decision making around employee well-being.
 Secondarily, we also use or will use anonymized data for statistical processing,
 for example in AI-models. This data may be shared with others through scientific
 publishing, blogging, or otherwise, but is always anonymized and to the best of
-ourknowledge and ability, made completely untraceable.
+our knowledge and ability, made completely untraceable.
 </p>
 
 <h4 class="text-body">Sharing of personal data</h4>
@@ -40,30 +40,35 @@ sometimes share NON-ANONYMIZED data between employer (customer) and employee
     meant to be shared, for example as preparation for a performance review.
   </li>
   <li>
-    Cases where a customer is able to extrapolate individual answers despite our
-    reasonable effort to avoid this. For example if a survey has 25 respondents,
-    and nearly all of them answer 1 or 2 on a scale to 5 on the question "How
-    likely are you to quit your job in the next 6 months?", then it is easy to
-    extrapolate each individual responendts general disposition.
+    Edge cases where a customer is able to extrapolate individual answers
+    despite our
+    reasonable effort to avoid this. For example given that all respondents
+    give the
+    lowest possible score to a question (lets say they all give a 1 on a scale
+    from 1 to 5). The smart observer, noticing that the average for that
+    question is 1, could reasonably deduce that the only way that happened was
+    if everyone answered 1, and would thus know that each individual respondent
+    gave a 1.
   </li>
 </ul>
 
 We seek to minimize the latter case, by providing extra layers of abstraction
 for small data sets. For example, we don't present data from single respondent
-surveys, and we only provide aggregate scores for data sets with less than 5
-respondents.
+surveys, and we only provide averages and computed scores for data sets with at
+least 4 respondents.
 </p>
 <p>
 Transfer of NON-ANONYMOUS data out of the EU does as general rule not occur on
 our end, but our customers are free to bring data from our website with them,
-and a customers data may be accessed anywhere in the world so long as the proper
-login credentials are provided.
+and customers may access our website and it's data from anywhere in the world so
+long as the proper login credentials are provided.
 </p>
 <p>
   * We DO use cloud services to host our webpage and data. Though these have
   access to our data in a technical sense, we do not allow them to process or
   use such data for their own purposes. All our infrastructure is located in the
-  EU.
+  EU to ensure these services are governed by the same strict privacy
+  regulations that we are.
 </p>
 <h4 class="text-body">How long do we store data?</h4>
 <p>
@@ -107,11 +112,12 @@ Anyone whose data we store have the following rights:
   </li>
   <li>
     <b>Right to object to use of your data for direct marketing, or processing
-    of your personal information where the basis is lawful interest </b>:
+    of your personal information where the basis is lawful interest </b>: We do
+    not use data in this manner.
   </li>
   <li>
     <b>Rights in relation to automated decision making and profiling </b>: We do
-    not use data in this manner at motpanel.
+    not use data in this manner.
   </li>
 </ul>
 

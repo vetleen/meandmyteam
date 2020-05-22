@@ -50,7 +50,7 @@
 
       {% else %}
       <div class="row">
-        <div class="col-sm-6">
+        <div class="col-md-6">
 
 
 
@@ -78,14 +78,14 @@
                 {% if survey_results %}
                 {% for result in survey_results %}
                 <div class="row">
-                  <div class="col-sm-4">
-
-                    {{ result.name }}
+                  <div class="col-lg-4">
+                    <a href="{% url 'surveys-co-worker-satisfaction-data' surveys.0.date_close %}#{{ result.dimension|slugify }}">{{ result.name }}</a>
                   </div><!-- col -->
-                  <div class="col-sm text-right px-0">
+
+                  <div class="col-2 text-right px-0">
                     <span class="text-muted"><small> Weakn. </small></span>
                   </div><!-- col -->
-                  <div class="col-sm-5">
+                  <div class="col">
                     <div class="progress"  style="height: 20px;">
                       {% if number_of_respondents > 3 %}
                       <div class="progress-bar
@@ -98,9 +98,10 @@
                     {% endif %}
                   </div>
                   </div><!-- col -->
-                  <div class="col-sm text-left px-0">
+                  <div class="col-2 text-left px-0">
                     <span class="text-muted"><small>Strength</small></span>
                   </div><!-- col -->
+
                 </div><!-- row -->
                 {% endfor %}
                 {% endif %}
