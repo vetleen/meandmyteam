@@ -12,8 +12,8 @@ class Command(BaseCommand):
     help = 'Creates a few surveys and so on so ...'
 
     def handle(*args, **kwargs):
-        orgname="TestOrganization14"
-        username="testorg14@aa.aa"
+        orgname="TestOrganization01"
+        username="testorg01@aa.aa"
         password="jjj43skjma@67#"
 
         print('creating test data, Organization and Employees')
