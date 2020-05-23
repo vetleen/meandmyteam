@@ -558,7 +558,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             #number_of_respondents = int((len(role_clarity_answers)/5)) #for now all questions must be answered, so one is a good indication of all
 
         except ZeroDivisionError:
-            print('Got a divide by Zero error, because there are no answers in this category ')
+            pass #print('Got a divide by Zero error, because there are no answers in this category ')
 
         #get and average out control:
         control_avg = 0
@@ -570,7 +570,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             control_avg = control_total / len(control_answers)
 
         except ZeroDivisionError:
-            print('Got a divide by Zero error, because there are no answers in this category ')
+            pass #print('Got a divide by Zero error, because there are no answers in this category ')
 
         #get and average out demands:
         demands_avg = 0
@@ -583,7 +583,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             #flip it, because statements are negative
             demands_avg = ((abs((demands_avg-1)-4))+1)
         except ZeroDivisionError:
-            print('Got a divide by Zero error, because there are no answers in this category ')
+            pass #print('Got a divide by Zero error, because there are no answers in this category ')
 
         #get and average out relationships:
         relationships_avg = 0
@@ -596,7 +596,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             #flip it, because statements are negative
             relationships_avg = ((abs((relationships_avg-1)-4))+1)
         except ZeroDivisionError:
-            print('Got a divide by Zero error, because there are no answers in this category ')
+            pass #print('Got a divide by Zero error, because there are no answers in this category ')
 
         #get and average out peer_support:
         peer_support_avg = 0
@@ -607,7 +607,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                 peer_support_total += a.value
             peer_support_avg = peer_support_total / len(peer_support_answers)
         except ZeroDivisionError:
-            print('Got a divide by Zero error, because there are no answers in this category ')
+            pass #print('Got a divide by Zero error, because there are no answers in this category ')
 
         #get and average out manager_support:
         manager_support_avg = 0
@@ -618,7 +618,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                 manager_support_total += a.value
             manager_support_avg = manager_support_total / len(manager_support_answers)
         except ZeroDivisionError:
-            print('Got a divide by Zero error, because there are no answers in this category ')
+            pass #print('Got a divide by Zero error, because there are no answers in this category ')
 
         survey_results = (
             {
@@ -697,7 +697,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                 number_of_respondents_previous = int((len(role_clarity_answers)/5)) #for now all questions must be answered, so one is a good indication of all
 
             except ZeroDivisionError:
-                print('Got a divide by Zero error, because there are no answers in this category ')
+                pass #print('Got a divide by Zero error, because there are no answers in this category ')
                 blue_bar = 0
                 red_bar = 0
                 green_bar = 0
@@ -737,7 +737,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                     green_bar = ((control_avg-pcontrol_avg)/5*100)
 
             except ZeroDivisionError:
-                print('Got a divide by Zero error, because there are no answers in this category ')
+                pass #print('Got a divide by Zero error, because there are no answers in this category ')
                 blue_bar = 0
                 red_bar = 0
                 green_bar = 0
@@ -779,7 +779,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                     green_bar = ((demands_avg-pdemands_avg)/5*100)
 
             except ZeroDivisionError:
-                print('Got a divide by Zero error, because there are no answers in this category ')
+                pass #print('Got a divide by Zero error, because there are no answers in this category ')
                 blue_bar = 0
                 red_bar = 0
                 green_bar = 0
@@ -820,7 +820,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                     green_bar = ((relationships_avg-prelationships_avg)/5*100)
 
             except ZeroDivisionError:
-                print('Got a divide by Zero error, because there are no answers in this category ')
+                pass #print('Got a divide by Zero error, because there are no answers in this category ')
                 blue_bar = 0
                 red_bar = 0
                 green_bar = 0
@@ -859,7 +859,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                     green_bar = ((peer_support_avg-ppeer_support_avg)/5*100)
 
             except ZeroDivisionError:
-                print('Got a divide by Zero error, because there are no answers in this category ')
+                pass #print('Got a divide by Zero error, because there are no answers in this category ')
                 blue_bar = 0
                 red_bar = 0
                 green_bar = 0
@@ -878,7 +878,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             #get and average out manager_support:
             pmanager_support_avg = 0
             try:
-                manager_support_answers = [a for a in answers if a.question.dimension == 'manager support']
+                manager_support_answers = [a for a in panswers if a.question.dimension == 'manager support']
                 manager_support_total = 0
                 for a in manager_support_answers:
                     manager_support_total += a.value
@@ -898,7 +898,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                     green_bar = ((manager_support_avg-pmanager_support_avg)/5*100)
 
             except ZeroDivisionError:
-                print('Got a divide by Zero error, because there are no answers in this category ')
+                pass #print('Got a divide by Zero error, because there are no answers in this category ')
                 blue_bar = 0
                 red_bar = 0
                 green_bar = 0
@@ -913,7 +913,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                         'red_bar': red_bar,
                         'green_bar': green_bar,
                    })
-
+            print("comparing: %s, %s..." %(manager_support_avg, pmanager_support_avg))
     #get questions for the product to display under each category
     questions = Question.objects.filter(product__name='Employee Satisfaction Tracking')
     print('found %s questions'%(len(questions)))
@@ -947,18 +947,17 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             'manager support': manager_support_avg,
             }
     #find the largest one and smallest and assign to appr. variables
-    print("Higest score: %s, lowest score: %s."%(highest_score, lowest_score))
+    #print("Higest score: %s, lowest score: %s."%(highest_score, lowest_score))
     for key in avgs:
-        print (key, '->', avgs[key])
-
+        #print (key, '->', avgs[key])
         if avgs[key] > highest_score[1]:
             highest_score = (key, avgs[key])
         if avgs[key] < lowest_score[1]:
            lowest_score = (key, avgs[key])
-    print(highest_score, lowest_score)
+
     highest_score = highest_score[0]
     lowest_score = lowest_score[0]
-    print(highest_score, lowest_score)
+
     print("Higest score: %s, lowest score: %s."%(highest_score, lowest_score))
 
     #count respondents
@@ -967,7 +966,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
     print("is there a this_survey?")
     if this_survey:
         print("YES!")
-        
+
         sis = SurveyInstance.objects.filter(survey=this_survey)
         number_of_invited = len(sis)
         #print ('%s was invited to respond'%(len(sis)))

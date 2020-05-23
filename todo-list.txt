@@ -1,6 +1,8 @@
 ##MeAndMyTeam
 
 #dev
+0 respondents should not give a data-page.
+
 
 #Product #1
 add report-generator (I see there are heroku addons for html->pdf)

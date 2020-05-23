@@ -12,8 +12,8 @@ class Command(BaseCommand):
     help = 'Creates a few surveys and so on so ...'
 
     def handle(*args, **kwargs):
-        orgname="TestOrganization01"
-        username="testorg01@aa.aa"
+        orgname="TestOrganization02"
+        username="testorg02@aa.aa"
         password="jjj43skjma@67#"
 
         print('creating test data, Organization and Employees')
@@ -104,6 +104,8 @@ class Command(BaseCommand):
                 value = random.randint(1, 4)
                 q.answer(value=value, survey_instance=si)
                 #print('... %s.'%(value))
+            si.completed=True
+            si.save()
         print('Done!')
 
 
@@ -117,8 +119,8 @@ class Command(BaseCommand):
             owner=o
         ).order_by('date_close') #the last item is the last survey
         s = surveys[0]
-        s.date_open = s.date_open + timedelta(days=-90)
-        s.date_close = s.date_close + timedelta(days=-90)
+        s.date_open = s.date_open + timedelta(days=-300)
+        s.date_close = s.date_close + timedelta(days=-300)
         s.save()
 
         #get fresh data to print
@@ -131,8 +133,8 @@ class Command(BaseCommand):
 
         #get product settings and update those dates as well
         ps=configure_product(organization=o, product=p)
-        last_survey_open = ps.last_survey_open + timedelta(days=-190)
-        last_survey_close = ps.last_survey_close + timedelta(days=-190)
+        last_survey_open = ps.last_survey_open + timedelta(days=-300)
+        last_survey_close = ps.last_survey_close + timedelta(days=-300)
         ps=configure_product(organization=o, product=p, last_survey_open=last_survey_open, last_survey_close=last_survey_close)
         ps.save()
 
@@ -175,4 +177,39 @@ class Command(BaseCommand):
                 value = random.randint(2, 5)
                 q.answer(value=value, survey_instance=si)
                 #print('... %s.'%(value))
+            si.completed=True
+            si.save()
+        print('Done!')
+
+        print('Cheating by making that survey look old!')
+
+        #get the survey and change the date close and open
+        surveys = Survey.objects.filter(
+            product__name='Employee Satisfaction Tracking',
+            owner=o
+        ).order_by('date_close') #the last item is the last survey
+        s = surveys[1]
+        s.date_open = s.date_open + timedelta(days=-100)
+        s.date_close = s.date_close + timedelta(days=-100)
+        s.save()
+
+        #get fresh data to print
+        surveys = Survey.objects.filter(
+            product__name='Employee Satisfaction Tracking',
+            owner=o
+        ).order_by('date_close') #the last item is the last survey
+        s = surveys[0]
+        print('Surveys date_close should be %s.'%(s.date_close))
+
+        #get product settings and update those dates as well
+        ps=configure_product(organization=o, product=p)
+        last_survey_open = ps.last_survey_open + timedelta(days=-100)
+        last_survey_close = ps.last_survey_close + timedelta(days=-100)
+        ps=configure_product(organization=o, product=p, last_survey_open=last_survey_open, last_survey_close=last_survey_close)
+        ps.save()
+
+        #get fresh data to print
+        ps=configure_product(organization=o, product=p)
+        print('PS last_survey_close should be %s.'%(ps.last_survey_close))
+
         print('Done!')
