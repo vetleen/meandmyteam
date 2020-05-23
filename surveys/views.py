@@ -14,6 +14,7 @@ from surveys.models import Product, Organization, Employee, ProductSetting, Surv
 from surveys.forms import CreateOrganizationForm, AddEmployeeForm, EditEmployeeForm, ConfigureEmployeeSatisfactionTrackingForm, AnswerQuestionsForm
 
 from datetime import date, datetime
+import math
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode
@@ -396,17 +397,31 @@ def answer_survey_view(request, **kwargs):
     page=kwargs.get('page', None)
     context.update({'page': page})
 
+    page_size = 5 #questions per page
+
+    #get the questions in the survey, we are going to use them anyway
+    questions = Question.objects.filter(product=si.survey.product).order_by('pk')
+
+
     #if it's not paginated, we present the user with the "start survey" help text and button
     if page is None:
-        pass
+        #check of this survey was started before, and if so, find the first unanswered and go there
+        alist = IntAnswer.objects.filter(survey_instance=si)
+        if len(alist) > 0:
+            q_counter = 0
+            for q in questions:
+                q_counter += 1
+                alist = IntAnswer.objects.filter(question=q, survey_instance=si)
+                print('%s answers to Question %s.'%(len(alist), q.pk))
+                if len(alist) < 1:
+                    missing_page = math.ceil((q_counter/page_size))
+                    print('going for question %s at page %s'%(q_counter, missing_page))
+                    return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(token, missing_page)))
 
     #else, it is a paginated page, and we should probably present some questions
     else:
-        #get the questions in the survey, we are going to use them anyway
-        questions = Question.objects.filter(product=si.survey.product).order_by('pk')
 
         #make a list 'qlist' containing exactly the questions the user should be asked
-        page_size = 5 #questions per page
         qlist = []
         last_q_id = int(page)*page_size
         for i, q in enumerate(questions):
@@ -423,7 +438,7 @@ def answer_survey_view(request, **kwargs):
                     data.update({'question_%s'%(q.pk): alist[0].value})
                 except IndexError:
                     pass
-        print (data)
+        #print (data)
 
         #make a form, with pre-existing data if any
         form=AnswerQuestionsForm(questions=qlist, initial=data)
@@ -466,7 +481,19 @@ def answer_survey_view(request, **kwargs):
                         si.save()
                         return HttpResponseRedirect(reverse('surveys-answer-survey', args=(token, )))
                     else:
-                        print('not enough answers!')
+                        #find first unanswered in questions, calculate wich page that should be on
+                        #redirect there instead of page 1.
+                        q_counter = 0
+                        for q in questions:
+                            q_counter += 1
+                            alist = IntAnswer.objects.filter(question=q, survey_instance=si)
+                            print('%s answers to Question %s.'%(len(alist), q.pk))
+                            if len(alist) < 1:
+                                missing_page = math.ceil((q_counter/page_size))
+                                print('going for question %s at page %s'%(q_counter, missing_page))
+                                messages.warning(request, 'There are still %s unanswered questions in this survey. Would you mind going through again and making sure everything got answered?'%(len(questions)-len(answers)), extra_tags='alert alert-warning')
+                                return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(token, missing_page)))
+                        #catchall, should only trigger if code can't find what is unanswered. So never?
                         messages.warning(request, 'Ups. There are still %s unanswered questions. Would you mind going through again and making sure everything got answered?'%(len(questions)-len(answers)), extra_tags='alert alert-warning')
                         return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(token, 1)))
 
@@ -928,6 +955,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
 
     #count respondents
     number_of_respondents = 0 #make in case it's not set later
+    number_of_invited = 0
     if this_survey:
         #print ('there was a latest_survey')
         sis = SurveyInstance.objects.filter(survey=this_survey)
@@ -939,6 +967,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
         #print ('%s responded'%(number_of_respondents))
 
     number_of_respondents_previous = 0 #make in case it's not set later
+    number_of_invited_previous = 0
     if previous_survey:
         #print ('there was a latest_survey')
         sis = SurveyInstance.objects.filter(survey=previous_survey)

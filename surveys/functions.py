@@ -80,7 +80,7 @@ def make_surveys_for_active_products(organization):
     for product in active_products:
         #make sure it's configured and we have the config available
         ps = configure_product(organization=organization, product=product)
-        print('Making surveyInstances for %s'%(organization))
+        print('Making Surveys for %s'%(organization))
         print('ps.last_survey_close is %s.'%(ps.last_survey_close))
 
         #get existing surveys

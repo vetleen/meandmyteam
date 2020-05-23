@@ -21,7 +21,7 @@
       <p class="text-muted">
         Completion date: {{ this_survey.date_close }}<br />
         {% if number_of_respondents < 4 %}<span class="text-danger">{% endif %}
-        <b>{{ number_of_respondents }}</b> respondend out of <b>{{ number_of_invited }}</b> invited.
+        <b>{{ number_of_respondents }}</b> responded out of <b>{{ number_of_invited }}</b> invited
         {% if number_of_respondents < 4 %}</span><small><span class="text-muted">(some information will be hidden for privacy reasons)</span></small>{% endif %}
       </p>
       <p class="text-body">
@@ -107,7 +107,7 @@ individual answers based on the processed scores.<br />
         Completion date: {{ previous_survey.date_close }}<br />
 
         {% if number_of_respondents_previous < 4 %}<span class="text-danger">{% endif %}
-        <b>{{ number_of_respondents_previous }}</b> respondend out of <b>{{ number_of_invited_previous }}</b> invited.
+        <b>{{ number_of_respondents_previous }}</b> responded out of <b>{{ number_of_invited_previous }}</b> invited
         {% if number_of_respondents_previous < 4 %}</span><small><span class="text-muted">(some information will be hidden for privacy reasons)</span></small>{% endif %}
 
       </p>

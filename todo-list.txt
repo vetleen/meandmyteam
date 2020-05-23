@@ -2,16 +2,8 @@
 
 #dev
 
-links from dimensions to #dimension
-
-AND when you click the link, shouldn't you be taken to the first unanswered?
-Make sure there are try/except all over dashboard and data views
-
-
 #Product #1
 add report-generator (I see there are heroku addons for html->pdf)
-
-
 
 
 #fun stuff
