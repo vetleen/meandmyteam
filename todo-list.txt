@@ -1,16 +1,15 @@
 ##MeAndMyTeam
 
 #dev
-0 respondents should not give a data-page.
-
+add screenshots to show of products on front page
+create "customers" for social-proof bar
 
 #Product #1
 add report-generator (https://www.google.com/search?client=ubuntu&channel=fs&q=django+create+pdf&ie=utf-8&oe=utf-8#kpvalbx=_PDbJXo7qCNGXmwX_jbeQDQ28)
 
 
 #fun stuff
-add screenshots to show of products on front page
-create "customers" for social-proof bar
+
 add impact stories to front page, and possibly own page
 add about us explaining scientific background of test (if any...)
 about us page and link in footer

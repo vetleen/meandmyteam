@@ -40,8 +40,10 @@ def index(request):
     """View function for home page of site."""
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('surveys-dashboard'))
+    plans = Plan.objects.filter(can_be_viewed=True).order_by('monthly_price')[:3]
     context = {
-        'foo': 'bar',
+        'plans': plans,
+        'show_footer': True,
     }
 
     # Render the HTML template index.html with the data in the context variable

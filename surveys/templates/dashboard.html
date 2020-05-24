@@ -106,8 +106,9 @@
                   </div><!-- col -->
 
                 </div><!-- row -->
+
                 {% endfor %}
-                {% else %}
+                {% elif survey_results and number_of_respondents == 0  %}
                 <div class="alert alert-warning" role="alert">
                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -122,7 +123,7 @@
 
 
                 {% if not surveys %}
-                Sit back and relax! We will now collect from your co-workers, and once data is in we will let you know, and we will display it here. <br />
+                Sit back and relax! We will now collect data from your co-workers, and once data is in we will let you know, and we will display it here. <br />
                 {% endif %}
                 {% if next_survey_close %}
                 We are currently collecting data, which will be available once the survey closes, {{ next_survey_close }}.

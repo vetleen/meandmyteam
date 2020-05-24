@@ -7,7 +7,7 @@
     <div class="row">
       <div class="col-sm-12 text-center">
         <p>&nbsp;</p>
-        <h1 class="display-5 main-page-headline text-white-50">Great leaders lead happy people.</h1>
+        <h1 class="display-5 main-page-headline text-info" style="color: #94f1ff !important;">Great leaders lead motivated people.</h1>
           <p class="text-white">
             <!-- Software to help you increase employee satisfaction and loyalty. -->
             Automatic employee satisfaction tracking.
@@ -48,24 +48,100 @@
 
 <!-- three steps explanation begins -->
   <div class="row">
-    <div class="col-sm-4 text-center pt-5 pb-4">
-      <h5><strong>Add employees to track</strong></h5>
-      <img src="{% static 'images/survey-employees.svg' %}" class="img-fluid" width="50%" alt="Add employees that you want to track." />
-      <p>Add each employee who's satisfaction you want to track. All we need is an email address.</p>
+    <div class="col-12 text-center pt-3 pb-3">
+      <h3> How does it work?</h3>
     </div>
-    <div class="col-sm-4 text-center pt-5 pb-4">
-      <h5><strong>Employees answer quarterly survey</strong></h5>
-      <img src="{% static 'images/employees-respond-to-survey.svg' %}" class="img-fluid" width="50%" alt="Employees answer simple questions." />
-      <p>Each employee receives a quartely (or you can set a custom interval) survey with key questions regarding their satisfaction. </p>
+
+    <div class="col-sm-4 text-center pb-4">
+      <h5>1. Add co-workers to track</h5>
+      <img src="{% static 'images/survey-employees.svg' %}" class="img-fluid" width="40%" alt="Add employees that you want to track." />
+
     </div>
-    <div class="col-sm-4 text-center pt-5 pb-4">
-      <h5><strong>Always be ahead of the curve</strong></h5>
-      <img src="{% static 'images/analyze-employee-data.svg' %}" class="img-fluid" width="50%" alt="Access beautifully processed data about employee satisfaction." />
-      <p>Data over time shows employee satisfaction snap-shot and trends. See where efforts to increase satisfaction and retention will have the biggest impact. </p>
+    <div class="col-sm-4 text-center pb-4">
+      <h5>2. Co-workers get regular surveys</h5>
+      <img src="{% static 'images/employees-respond-to-survey.svg' %}" class="img-fluid" width="40%" alt="Employees answer simple questions." />
+
+    </div>
+    <div class="col-sm-4 text-center pb-4">
+      <h5>3. You get the results </h5>
+      <img src="{% static 'images/analyze-employee-data.svg' %}" class="img-fluid" width="50%" alt="Access processed data about employee motivation." />
+
+    </div>
+
+    <div class="col-sm-4 text-center pb-4">
+
+      <p>Add email addresses for the co-workers whos motivation you want to monitor. We'll contact them directly.</p>
+    </div>
+    <div class="col-sm-4 text-center pb-4">
+
+      <p>Each employee receives a regular (e.g. quarterly) survey with key questions regarding their motivation. </p>
+    </div>
+    <div class="col-sm-4 text-center pb-4">
+
+      <p>Receive comprehensive reports showing employee satisfaction snap-shots and trends, and see what is working to improve your scores. </p>
     </div>
   </div> <!-- row -->
 
 </div><!-- container -->
+<div class="py-5 bg-dark">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 text-center ">
+        <img src="{% static 'images/add-and-remove-employees-screenshot.png' %}" class="img-fluid" alt="Easily add and remove co-workers.">
+      </div>
+      <div class="col-md-6 text-center text-light align-self-center">
+        <h3>Easily add co-workers</h3>
+        You can easily add co-workers in a matter of seconds using our simple tool, or email us a list, and we'll add your co-workers for you.
+        <p>
+          <br />
+          <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">Try for free</a><br />
+          <a href="{% url 'choose-plan' %}" class="text-white"><small>Pick a plan, cancel anytime.</small></a>
+        </p>
+      </div>
+    </div> <!-- row -->
+    <hr>
+    <div class="row">
+      <div class="col-md-6 text-center text-light align-self-center">
+        <h3>Get an overview from the dashboard </h3>
+        Clicking "start here" in the menu will always show you the next step to get started with employee satisfaction tracking. When all is set, it will show you to the dashboard, where you can access all settings and data.
+        <p>
+          <br />
+          <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">Try for free</a><br />
+          <a href="{% url 'choose-plan' %}" class="text-white"><small>Pick a plan, cancel anytime.</small></a>
+        </p>
+      </div>
+      <div class="col-md-6 text-center ">
+        <img src="{% static 'images/dashboard-screenshot.png' %}" class="img-fluid" alt="Full overview from your dashboard.">
+      </div>
+    </div> <!-- row -->
+    <hr>
+    <div class="row">
+      <div class="col-md-6 text-center ">
+        <img src="{% static 'images/data-screenshot.png' %}" class="img-fluid" alt="View simple and meaningful data-graphics.">
+      </div>
+      <div class="col-md-6 text-center text-light align-self-center">
+        <h3>View data for your organization</h3>
+        When data is in, meaning your co-workers have answered the survey we send them, the data will be made available for you. See your organization's strong and weak points, and get recommendations about how you can improve employee satisfaction and retention.
+        <p>
+          <br />
+          <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">Try for free</a><br />
+          <a href="{% url 'choose-plan' %}" class="text-white"><small>Pick a plan, cancel anytime.</small></a>
+        </p>
+      </div>
+    </div> <!-- row -->
+
+  </div><!-- container -->
+</div><!-- custom dark div -->
+<div class="container">
+  <div class="row justify-content-center pt-2">
+    <div class="col-12 text-center pt-3 pb-3">
+      <h3> Plans and pricing </h3>
+    </div>
+
+  {% include "includeable/plan_displayer.html" %}
+</div><!-- row -->
+
+
 {% endblock %}
 
 {% block footer %}
