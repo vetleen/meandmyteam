@@ -89,6 +89,9 @@ class SurveyInstance(models.Model):
         hash_string = self.get_hash_string()
         return "%s-%s"%(si, hash_string)
 
+    def get_owner(self):
+        return self.survey.owner
+
     def __str__(self):
         """String for representing the SurveyInstance object (in Admin site etc.)."""
         return 'SurveyInstance of Product: %s for Organization: %s.'%(self.survey.product.name, self.survey.owner.name)

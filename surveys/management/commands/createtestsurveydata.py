@@ -12,8 +12,8 @@ class Command(BaseCommand):
     help = 'Creates a few surveys and so on so ...'
 
     def handle(*args, **kwargs):
-        orgname="TestOrganization02"
-        username="testorg02@aa.aa"
+        orgname="TestOrganization03"
+        username="testorg03@aa.aa"
         password="jjj43skjma@67#"
 
         print('creating test data, Organization and Employees')
@@ -159,7 +159,7 @@ class Command(BaseCommand):
         ss = Survey.objects.filter(owner=o)
         print('after second daily_SM-step there are %s surveys.'%(len(ss)))
 
-
+        '''
         print('answering survey...')
         es = Employee.objects.filter(organization=o)
         print ('got %s employees that must answer...'%(len(es)))
@@ -180,7 +180,7 @@ class Command(BaseCommand):
             si.completed=True
             si.save()
         print('Done!')
-
+        '''
         print('Cheating by making that survey look old!')
 
         #get the survey and change the date close and open

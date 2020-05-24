@@ -68,14 +68,17 @@
               <h5 class="card-title text-left">Latest measurements</h5>
               <p class="text-muted">
                 Completion date: {{surveys.0.date_close}}<br />
-                Respondents: {{ number_of_respondents }}
+
+                {% if number_of_respondents < 4 %}<span class="text-danger">{% endif %}
+                <b>{{ number_of_respondents }}</b> responded out of <b>{{ number_of_invited }}</b> invited
+                {% if number_of_respondents < 4 %}</span>{% if number_of_respondents > 0 %}<small><span class="text-muted">(some information will be hidden for privacy reasons)</span></small>{% endif %}{% endif %}
               </p>
               {% else %}
               <h5 class="card-title text-center">You are all set!</h5>
               {% endif %}
               <p class="card-text text-center">
 
-                {% if survey_results %}
+                {% if survey_results and number_of_respondents > 0 %}
                 {% for result in survey_results %}
                 <div class="row">
                   <div class="col-lg-4">
@@ -104,6 +107,16 @@
 
                 </div><!-- row -->
                 {% endfor %}
+                {% else %}
+                <div class="alert alert-warning" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  <h4 class="alert-heading">Oh no!</h4>
+                  <hr />
+                  <p>Nobody replied to this survey, and so we have no data to show you. </p>
+
+                </div>
                 {% endif %}
 
 
@@ -115,7 +128,7 @@
                 We are currently collecting data, which will be available once the survey closes, {{ next_survey_close }}.
                 {% endif %}
               </p>
-              {% if surveys %}
+              {% if surveys and number_of_respondents > 0 %}
               <center>
               <a href="{% url 'surveys-co-worker-satisfaction-data' surveys.0.date_close %}" class="btn btn-info">View details</a>
               </center>
@@ -127,7 +140,7 @@
               </center>
               <p class="card-text">
               {% if surveys %}
-              <h5 class="card-title text-left mt-4">Your organizations surveys</h5>
+              <h5 class="card-title text-left mt-4">Your organization's surveys</h5>
               <ul>
                 {% for survey in surveys %}
                   <li><a href="{% url 'surveys-co-worker-satisfaction-data' survey.date_close %}">{{ survey.date_close }}</a>{% if forloop.counter == 1 %} (latest){% endif %}</li>

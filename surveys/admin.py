@@ -43,7 +43,7 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 @admin.register(SurveyInstance)
 class SurveyInstanceAdmin(admin.ModelAdmin):
-        list_display = ('respondent', 'survey', 'get_url_token', 'completed')
+        list_display = ('respondent', 'get_owner', 'get_url_token', 'survey', 'completed')
 
 
 

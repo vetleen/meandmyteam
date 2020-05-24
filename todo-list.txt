@@ -5,7 +5,7 @@
 
 
 #Product #1
-add report-generator (I see there are heroku addons for html->pdf)
+add report-generator (https://www.google.com/search?client=ubuntu&channel=fs&q=django+create+pdf&ie=utf-8&oe=utf-8#kpvalbx=_PDbJXo7qCNGXmwX_jbeQDQ28)
 
 
 #fun stuff

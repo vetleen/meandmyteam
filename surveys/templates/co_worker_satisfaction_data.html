@@ -12,12 +12,29 @@
   {% include "includeable/message_displayer.html" %}
   </div><!-- row -->
 
-
-
+{% if number_of_respondents < 1 %}{% comment "this if spans the entire page" %}{% endcomment %}
+<div class="row justify-content-center">
+  <div class="col-md-6 mt-4">
+    <div class="alert alert-warning" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h4 class="alert-heading">No data!</h4>
+      <hr />
+      <p>Nobody replied to this survey, and so we have no data to show you. </p>
+    </div>
+    <a href="{% url 'surveys-dashboard' %}">Return to dashboard</a>
+  </div><!-- col -->
+{% else %}{% comment "this is for the MAIN if that spans all the content" %}{% endcomment %}
   <div class="row justify-content-center">
     <div class="col-md-8 mt-4">
       <h3>1. Summary</h3>
       <h5>1.1 Summary of scores for latest survey</h5>
+
+
+
+
+
       <p class="text-muted">
         Completion date: {{ this_survey.date_close }}<br />
         {% if number_of_respondents < 4 %}<span class="text-danger">{% endif %}
@@ -306,6 +323,7 @@ or negative.
     {% endfor %}
 
   </div> <!-- row -->
+{% endif %}{% comment "this is for the MAIN if-statement that spans all the content" %}{% endcomment %}
 </div><!-- container -->
 
 {% endblock %}

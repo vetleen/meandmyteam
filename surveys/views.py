@@ -61,65 +61,90 @@ def dashboard_view(request):
         answers = IntAnswer.objects.filter(survey_instance__survey=latest_survey) #for now, all answers are IntAnswers
 
         #get and average out role clarity:
-        role_clarity_answers = [a for a in answers if a.question.dimension == 'role']
-        role_clarity_total = 0
-        for a in role_clarity_answers:
-            role_clarity_total += a.value
-        role_clarity_avg = role_clarity_total / len(role_clarity_answers)
-        #number_of_respondents = int(len(role_clarity_answers)/5)
-
+        try:
+            role_clarity_answers = [a for a in answers if a.question.dimension == 'role']
+            role_clarity_total = 0
+            for a in role_clarity_answers:
+                role_clarity_total += a.value
+            role_clarity_avg = role_clarity_total / len(role_clarity_answers)
+            role_clarity_prog = (role_clarity_avg/5*100)
+            #number_of_respondents = int(len(role_clarity_answers)/5)
+        except ZeroDivisionError:
+            role_clarity_avg = None
+            role_clarity_prog = None
 
         #get and average out control:
-        control_answers = [a for a in answers if a.question.dimension == 'control']
-        control_total = 0
-        for a in control_answers:
-            control_total += a.value
-        control_avg = control_total / len(control_answers)
-
+        try:
+            control_answers = [a for a in answers if a.question.dimension == 'control']
+            control_total = 0
+            for a in control_answers:
+                control_total += a.value
+            control_avg = control_total / len(control_answers)
+            control_prog = (control_avg/5*100)
+        except ZeroDivisionError:
+            control_avg = None
+            control_prog = None
 
         #get and average out demands:
-        demands_answers = [a for a in answers if a.question.dimension == 'demands']
-        demands_total = 0
-        for a in demands_answers:
-            demands_total += a.value
-        demands_avg = demands_total / len(demands_answers)
-        #flip it around, since the statements are negative
-        demands_avg=((abs((demands_avg-1)-4))+1)
-
+        try:
+            demands_answers = [a for a in answers if a.question.dimension == 'demands']
+            demands_total = 0
+            for a in demands_answers:
+                demands_total += a.value
+            demands_avg = demands_total / len(demands_answers)
+            #flip it around, since the statements are negative
+            demands_avg=((abs((demands_avg-1)-4))+1)
+            demands_prog = (demands_avg/5*100)
+        except ZeroDivisionError:
+            demands_avg = None
+            demands_prog = None
 
         #get and average out relationships:
-        relationships_answers = [a for a in answers if a.question.dimension == 'relationships']
-        relationships_total = 0
-        for a in relationships_answers:
-            relationships_total += a.value
-        relationships_avg = relationships_total / len(relationships_answers)
-        #flip it around, since the statements are negative
-        relationships_avg=((abs((relationships_avg-1)-4))+1)
+        try:
+            relationships_answers = [a for a in answers if a.question.dimension == 'relationships']
+            relationships_total = 0
+            for a in relationships_answers:
+                relationships_total += a.value
+            relationships_avg = relationships_total / len(relationships_answers)
+            #flip it around, since the statements are negative
+            relationships_avg=((abs((relationships_avg-1)-4))+1)
+            relationships_prog = (relationships_avg/5*100)
+        except ZeroDivisionError:
+            relationships_avg = None
+            relationships_prog = None
 
         #get and average out peer_support:
-        peer_support_answers = [a for a in answers if a.question.dimension == 'peer support']
-        peer_support_total = 0
-        for a in peer_support_answers:
-            peer_support_total += a.value
-        peer_support_avg = peer_support_total / len(peer_support_answers)
-
+        try:
+            peer_support_answers = [a for a in answers if a.question.dimension == 'peer support']
+            peer_support_total = 0
+            for a in peer_support_answers:
+                peer_support_total += a.value
+            peer_support_avg = peer_support_total / len(peer_support_answers)
+            peer_support_prog = (peer_support_avg/5*100)
+        except ZeroDivisionError:
+            peer_support_avg = None
+            peer_support_prog = None
 
         #get and average out manager_support:
-        manager_support_answers = [a for a in answers if a.question.dimension == 'manager support']
-        manager_support_total = 0
-        for a in manager_support_answers:
-            manager_support_total += a.value
-        manager_support_avg = manager_support_total / len(manager_support_answers)
-
+        try:
+            manager_support_answers = [a for a in answers if a.question.dimension == 'manager support']
+            manager_support_total = 0
+            for a in manager_support_answers:
+                manager_support_total += a.value
+            manager_support_avg = manager_support_total / len(manager_support_answers)
+            manager_support_prog = (manager_support_avg/5*100)
+        except ZeroDivisionError:
+            manager_support_avg = None
+            manager_support_prog = None
 
         #prepare a filled list to pass to context
         survey_results = (
-            {'dimension': 'role', 'name': 'Role clarity', 'score': role_clarity_avg, 'progress': (role_clarity_avg/5*100)},
-            {'dimension': 'control', 'name': 'Degree of control', 'score': control_avg, 'progress': (control_avg/5*100)},
-            {'dimension': 'demands', 'name': 'Demanding work', 'score': demands_avg, 'progress': (demands_avg/5*100)},
-            {'dimension': 'relationships', 'name': 'Workplace relations', 'score': relationships_avg, 'progress': (relationships_avg/5*100)},
-            {'dimension': 'peer support', 'name': 'Peer support', 'score': peer_support_avg, 'progress': (peer_support_avg/5*100)},
-            {'dimension': 'manager support', 'name': 'Manager support', 'score': manager_support_avg, 'progress': (manager_support_avg/5*100)},
+            {'dimension': 'role', 'name': 'Role clarity', 'score': role_clarity_avg, 'progress': (role_clarity_prog)},
+            {'dimension': 'control', 'name': 'Degree of control', 'score': control_avg, 'progress': (control_prog)},
+            {'dimension': 'demands', 'name': 'Demanding work', 'score': demands_avg, 'progress': (demands_prog)},
+            {'dimension': 'relationships', 'name': 'Workplace relations', 'score': relationships_avg, 'progress': (relationships_prog)},
+            {'dimension': 'peer support', 'name': 'Peer support', 'score': peer_support_avg, 'progress': (peer_support_prog)},
+            {'dimension': 'manager support', 'name': 'Manager support', 'score': manager_support_avg, 'progress': (manager_support_prog)},
         )
 
     #count respondents
