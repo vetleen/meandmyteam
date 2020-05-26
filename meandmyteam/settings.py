@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'website',
     'surveys',
+    'payments',
 ]
 
 MIDDLEWARE = [

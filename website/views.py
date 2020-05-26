@@ -43,6 +43,7 @@ def index(request):
     plans = Plan.objects.filter(can_be_viewed=True).order_by('monthly_price')[:3]
     context = {
         'plans': plans,
+        'show_sales_arguments': False,
         'show_footer': True,
     }
 
@@ -111,6 +112,7 @@ class PasswordResetView(SuccessMessageMixin, auth_views.PasswordResetConfirmView
 
 class PasswordResetCompleteView(auth_views.PasswordChangeDoneView):
     template_name = ''
+
 def password_reset_complete_view(request):
     #messages.success(request, 'Your password was changed. You can now use the new password to log in.', extra_tags='alert alert-success')
     return render(request, 'account/password_reset_complete.html')

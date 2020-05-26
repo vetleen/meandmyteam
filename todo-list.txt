@@ -23,7 +23,8 @@ SEO?
 Google ads
 Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)
 password validation for signup
-terms of use, and all that
+terms of use, cookie consent?
+Logging: Some places, you need to be notified whjen something goes wrong, like when setting up payments.
 
 #Stripe-redo
 Add better flow -> create customer, -> create payment method, and attach -> create, change, cancel subscription -> control that U can only have one
@@ -32,15 +33,15 @@ users deciding to re-signup before their last billing period expired, should not
 
 #finishing touch
 more info in edit profile AND in sign up
-remake illustrations with the right color
+
 Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#customize-pages
 use standard sign-up and change-password views?
 - When visiting add employees for the first time, it would be neat if user was already added
 - more tests (survey response view, )
 - add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages, and make option to revoke consent.
-Can we make a unique restraint on employee emails in DB?
+
 When 3 surveys have been completed, a line chart may be a better way to present development
-"no change" in the survey results bars should be centered (make 100 blue bar if no change?)
+
 make a switch for toggeling products, and make it toggleable from dashboard.
-When you didn't answer all the questions, but try to finish the survey, get sent to the page with the first unanswered question.
+
 progress bar for question pages

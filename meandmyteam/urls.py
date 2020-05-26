@@ -28,6 +28,7 @@ urlpatterns = [
     path('', include('website.urls')),
     path('answer-survey/<token>/', survey_views.answer_survey_view, name='surveys-answer-survey'),
     path('answer-survey/<token>/<page>/', survey_views.answer_survey_view, name='surveys-answer-survey-pages'),
+    path('payments/', include('payments.urls')),
 
 ]
 
