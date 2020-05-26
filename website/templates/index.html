@@ -23,24 +23,25 @@
 <div class="social-proof py-5">
   <div class="container">
     <div class="row">
-      <div class="col-sm-2 lead text-center">
-        &nbsp;
-      </div> <!-- col -->
-      <div class="col-sm-2 lead text-center">
-        A+ Realestate
-      </div> <!-- col -->
-      <div class="col-sm-2 lead text-center">
-        Busy B Business
-      </div> <!-- col -->
-      <div class="col-sm-2 lead text-center">
-        Cee Corp.
-      </div> <!-- col -->
-      <div class="col-sm-2 lead text-center">
-        Double DeeDee's
-      </div> <!-- col -->
-      <div class="col-sm-2 lead text-center">
-        &nbsp;
-      </div> <!-- col -->
+      <!--
+      <div class="col-sm-3 lead text-center align-self-center">
+        <img src="{% static 'images/fiesta-24.png' %}" height="75px" alt="Fiesta 24." />
+      </div>
+
+      <div class="col-sm-3 lead text-center align-self-center">
+        <img src="{% static 'images/bellas-studio.png' %}" height="50px" alt="Bellas Studio" />
+      </div>
+      <div class="col-sm-3 lead text-center align-self-center">
+        <img src="{% static 'images/buddy-burger.png' %}" height="75px" alt="Buddy Burger" />
+      </div>
+      <div class="col-sm-3 lead text-center align-self-center">
+        <img src="{% static 'images/bitalert.png' %}" height="60px" alt="bitalert" />
+      </div>
+      -->
+      <div class="col-12 lead text-center align-self-center">
+        Show your co-workers that you care!
+      </div>
+
     </div><!-- row -->
   </div><!-- container -->
 </div>
@@ -48,45 +49,47 @@
 
 <!-- three steps explanation begins -->
   <div class="row">
+
     <div class="col-12 text-center pt-3 pb-3">
       <h3> How does it work?</h3>
     </div>
 
-    <div class="col-sm-4 text-center pb-4">
+  <div class="col-md-4">
+    <div class="col-12 text-center pb-4">
       <h5>1. Add co-workers to track</h5>
       <img src="{% static 'images/survey-employees.svg' %}" class="img-fluid" width="40%" alt="Add employees that you want to track." />
-
     </div>
-    <div class="col-sm-4 text-center pb-4">
-      <h5>2. Co-workers get regular surveys</h5>
-      <img src="{% static 'images/employees-respond-to-survey.svg' %}" class="img-fluid" width="40%" alt="Employees answer simple questions." />
-
-    </div>
-    <div class="col-sm-4 text-center pb-4">
-      <h5>3. You get the results </h5>
-      <img src="{% static 'images/analyze-employee-data.svg' %}" class="img-fluid" width="50%" alt="Access processed data about employee motivation." />
-
-    </div>
-
-    <div class="col-sm-4 text-center pb-4">
-
+    <div class="col-12 text-center pb-4">
       <p>Add email addresses for the co-workers whos motivation you want to monitor. We'll contact them directly.</p>
     </div>
-    <div class="col-sm-4 text-center pb-4">
+  </div>
 
+  <div class="col-md-4">
+    <div class="col-12 text-center pb-4">
+      <h5>2. Co-workers get regular surveys</h5>
+      <img src="{% static 'images/employees-respond-to-survey.svg' %}" class="img-fluid" width="40%" alt="Employees answer simple questions." />
+    </div>
+    <div class="col-12 text-center pb-4">
       <p>Each employee receives a regular (e.g. quarterly) survey with key questions regarding their motivation. </p>
     </div>
-    <div class="col-sm-4 text-center pb-4">
+  </div>
 
+  <div class="col-md-4">
+    <div class="col-12 text-center pb-4">
+      <h5>3. You get the results </h5>
+      <img src="{% static 'images/analyze-employee-data.svg' %}" class="img-fluid" width="50%" alt="Access processed data about employee motivation." />
+    </div>
+    <div class="col-12 text-center pb-4">
       <p>Receive comprehensive reports showing employee satisfaction snap-shots and trends, and see what is working to improve your scores. </p>
     </div>
+  </div>
   </div> <!-- row -->
 
 </div><!-- container -->
 <div class="py-5 bg-dark">
   <div class="container">
     <div class="row">
-      <div class="col-md-6 text-center ">
+      <div class="col-md-6 text-center">
         <img src="{% static 'images/add-and-remove-employees-screenshot.png' %}" class="img-fluid" alt="Easily add and remove co-workers.">
       </div>
       <div class="col-md-6 text-center text-light align-self-center">
@@ -101,7 +104,11 @@
     </div> <!-- row -->
     <hr>
     <div class="row">
-      <div class="col-md-6 text-center text-light align-self-center">
+
+      <div class="col-md-6 text-center order-md-last">
+        <img src="{% static 'images/dashboard-screenshot.png' %}" class="img-fluid" alt="Full overview from your dashboard.">
+      </div>
+      <div class="col-md-6 text-center text-light align-self-center order-md-first">
         <h3>Get an overview from the dashboard </h3>
         Clicking "start here" in the menu will always show you the next step to get started with employee satisfaction tracking. When all is set, it will show you to the dashboard, where you can access all settings and data.
         <p>
@@ -110,13 +117,10 @@
           <a href="{% url 'choose-plan' %}" class="text-white"><small>Pick a plan, cancel anytime.</small></a>
         </p>
       </div>
-      <div class="col-md-6 text-center ">
-        <img src="{% static 'images/dashboard-screenshot.png' %}" class="img-fluid" alt="Full overview from your dashboard.">
-      </div>
     </div> <!-- row -->
     <hr>
     <div class="row">
-      <div class="col-md-6 text-center ">
+      <div class="col-md-6 text-center">
         <img src="{% static 'images/data-screenshot.png' %}" class="img-fluid" alt="View simple and meaningful data-graphics.">
       </div>
       <div class="col-md-6 text-center text-light align-self-center">
