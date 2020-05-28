@@ -36,7 +36,7 @@ function stripeRedirect(){
   <div class="row">
     <div class="col-12">
       <div class="row">
-        <div class="col-6">
+        <div class="col-lg-6">
           <h4>Subscription</h4>
             {% if stripe_subscription is not None %}
                 ID: {{stripe_subscription.id}}<br />
@@ -54,31 +54,32 @@ function stripeRedirect(){
               No Subscription, bruh
             {% endif %}
         </div><!-- col -->
-        <div class="col-6 text-lef">
+        <div class="col-lg-6 text-left">
           {% if default_payment_method is not None %}
-           
+
             <h5>Active payment method</h5>
-            <ul class="list-group list-group-horizontal mb-2 ">
-              <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>{{ default_payment_method.card.brand|capfirst }} ending in:</small></span><br /> {{ default_payment_method.card.last4 }}</li>
+            <ul class="list-group list-group-horizontal-sm mb-2 ">
+              <li class="list-group-item col-sm-3 list-group-item-info"><span class="text-muted"><small>{{ default_payment_method.card.brand|capfirst }} ending in:</small></span><br /> {{ default_payment_method.card.last4 }}</li>
               <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>Cardholder name:</small></span><br />  {{ default_payment_method.billing_details.name }}</li>
-              <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>Expires:</small></span><br />  {{ default_payment_method.card.exp_month }}/{{ default_payment_method.card.exp_year }}</li>
-              <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>Actions:</small></span><br /><center> <a class="badge badge-danger" href="{% url 'payments-delete-payment-method' default_payment_method.id %}">Delete</a></center></li>
+              <li class="list-group-item col-sm-2 list-group-item-info"><span class="text-muted"><small>Expires:</small></span><br />  {{ default_payment_method.card.exp_month }}/{{ default_payment_method.card.exp_year }}</li>
+              <li class="list-group-item col-sm-3 list-group-item-info"><span class="text-muted"><small>Actions:</small></span><br /><center> <a class="badge badge-danger" href="{% url 'payments-delete-payment-method' default_payment_method.id %}">Delete</a></center></li>
             </ul>
 
           <p class="text-center">
             <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">Change payment method</a>
           </p>
           {% endif %}
-          {% if pm_list is not None and pm_list.data|length != 0 %}
+          {% if pm_list is not None and pm_list.data|length > 1 %}
+
 
           <h5>Payment methods</h5>
             {% for pm in pm_list %}
             {% if pm.id %}
-            <ul class="list-group list-group-horizontal mb-2 ">
-              <li class="list-group-item flex-fill{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>{{ pm.card.brand|capfirst }} ending in:</small></span><br /> {{ pm.card.last4 }}</li>
+            <ul class="list-group list-group-horizontal-sm mb-2 ">
+              <li class="list-group-item col-sm-3{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>{{ pm.card.brand|capfirst }} ending in:</small></span><br /> {{ pm.card.last4 }}</li>
               <li class="list-group-item flex-fill{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>Cardholder name:</small></span><br />  {{ pm.billing_details.name }}</li>
-              <li class="list-group-item flex-fill{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>Expires:</small></span><br />  {{ pm.card.exp_month }}/{{ pm.card.exp_year }}</li>
-              <li class="list-group-item flex-fill{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}">
+              <li class="list-group-item col-sm-2{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>Expires:</small></span><br />  {{ pm.card.exp_month }}/{{ pm.card.exp_year }}</li>
+              <li class="list-group-item col-sm-3{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}">
                 {% if pm.id == default_payment_method.id %}
                   <small><center>(active<br>card)</center></small>
                 {% else %}
@@ -91,8 +92,7 @@ function stripeRedirect(){
             <p class="text-center">
               <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">New payment method</a>
             </p>
-          {% else %}
-          No payments methods
+
           {% endif %}
           {% if default_payment_method is None %}
           <h5>Add payment method</h5>

@@ -47,8 +47,8 @@ def current_plan_view(request):
     #get a list of payment methods
     pm_list = list_stripe_payment_methods(stripe_id)
 
-    print('default_payment_method: %s.'%(default_payment_method))
-    print('pm_list: %s.'%(pm_list))
+    #print('default_payment_method: %s.'%(default_payment_method))
+    #print('pm_list: %s.'%(pm_list))
     context = {
 
         'stripe_subscription': stripe_subscription,
