@@ -20,8 +20,11 @@ def current_plan_view(request):
     stripe_id = request.user.subscriber.stripe_id
     #get the subscription object id from DB
     stripe_subscription_id = request.user.subscriber.stripe_subscription_id
-    #get the customer object from Stripe
-    stripe_customer = retrieve_stripe_customer(stripe_id)
+
+    #get the customer object from Stripe, if any, or make one
+    stripe_customer = None
+    if stripe_id is not None and stripe_id != '':
+        stripe_customer = retrieve_stripe_customer(stripe_id)
     if stripe_customer == None:
         #Try make a customer
         stripe_customer = create_stripe_customer(request.user.organization)
@@ -35,7 +38,9 @@ def current_plan_view(request):
         request.user.subscriber.save()
 
     #get the subscription object from Stripe, if there is a sub_id
-    stripe_subscription = retrieve_stripe_subscription(stripe_subscription_id)
+    stripe_subscription = None
+    if stripe_subscription_id is not None and stripe_subscription_id != '':
+        stripe_subscription = retrieve_stripe_subscription(stripe_subscription_id)
     if stripe_subscription_id is not None and stripe_subscription is None:
         print('Unable to get a Subscription object from Stripe for user %s.'%(request.user))
         return HttpResponseServerError()
