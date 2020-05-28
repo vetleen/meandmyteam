@@ -7,13 +7,6 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe_pk = settings.STRIPE_PUBLISHABLE_KEY
 stripe_sk = settings.STRIPE_SECRET_KEY
 
-## stripe things:
-#create Customer
-#create PaymentMethod and save to Customer
-#create Subscription for a Customer and attach PaymentMethod
-#cancel Subscription
-#change Subscription
-
 
 
 ##create Customer & save connection to User in db
@@ -21,7 +14,7 @@ def create_stripe_customer(organization):
     #Make sure an Organization was provided
     assert isinstance(organization, Organization)
     if organization.address_line_1 == '':
-        raise ValueError('The provided organization has not provided an address line 1 in it\'s profile, but this is required by stripe to do payments. Add a full address, and try again.')
+        raise ValueError('The %s has not provided an address line 1 in it\'s profile, but this is required by Stripe to do payments. Add a full address, and try again.'%(organization))
     #address should be a dictionary with the following keys:
         #line1 (required)
         #city (optional)
@@ -38,12 +31,12 @@ def create_stripe_customer(organization):
         #'country' : organization.country,
     }
 
-
     #Make sure there is a minimum of adress info provided
     try:
+
         s = stripe.Customer.create(
             address=address,
-            description="My Test Customer - make a better description thingy later",
+            description="%s"%(organization),
             email= organization.owner.email,
             shipping={
                 'address': address,
@@ -52,7 +45,7 @@ def create_stripe_customer(organization):
             }
         )
     except Exception as err:
-        print(err)
+        print('create_stripe_customer(organization) produces error: %s.'%(err))
         return None
     return s
 
@@ -61,7 +54,7 @@ def retrieve_stripe_customer(stripe_customer_id):
         s = stripe.Customer.retrieve(stripe_customer_id)
         return s
     except Exception as err:
-        print(err)
+        print('retrieve_stripe_customer produces error: %s: %s.'%(type(err), err))
         return None
 
 def delete_stripe_customer(stripe_customer_id):
@@ -69,7 +62,7 @@ def delete_stripe_customer(stripe_customer_id):
         s = stripe.Customer.delete(stripe_customer_id)
         return s
     except Exception as err:
-        print (err)
+        print('delete_stripe_customer produces error: %s: %s.'%(type(err), err))
         return None
 
 def create_stripe_payment_method(card, customer_id):
@@ -93,9 +86,51 @@ def create_stripe_payment_method(card, customer_id):
         c = stripe.Customer.modify(customer_id, invoice_settings=invoice_settings)
 
     except Exception as err:
-        print(err)
+        print('create_stripe_payment_method produces error: %s.'%(err))
         return None
     return pm
+
+def set_default_stripe_payment_method(customer_id, payment_method_id):
+    try:
+        pm = retrieve_stripe_payment_method(payment_method_id)
+        invoice_settings = {'default_payment_method': pm}
+        c = stripe.Customer.modify(customer_id, invoice_settings=invoice_settings)
+    except Exception as err:
+        print('create_stripe_payment_method produces error: %s.'%(err))
+        return None
+    return pm
+
+def retrieve_stripe_payment_method(payment_method_id):
+
+    try:
+        pm = stripe.PaymentMethod.retrieve(
+            payment_method_id,
+        )
+    except Exception as err:
+        print('retrieve_stripe_payment_method produces error: %s.'%(err))
+        return None
+    return pm
+
+def list_stripe_payment_methods(stripe_customer_id):
+    try:
+        pm_list = stripe.PaymentMethod.list(
+            customer=stripe_customer_id,
+            type="card",
+        )
+    except Exception as err:
+        print(err)
+        return None
+    return pm_list
+
+def delete_stripe_payment_method(stripe_payment_method_id):
+    try:
+        dpm = stripe.PaymentMethod.detach(
+            stripe_payment_method_id,
+        )
+        return dpm
+    except Exception as err:
+        print('delete_stripe_payment_method produces error: %s: %s.'%(type(err), err))
+        return None
 
 def create_stripe_subscription(stripe_customer_id, price_id="price_HLqVxG4RGJstNV", trial_from_plan=True, quantity=0):
     try:
@@ -109,12 +144,20 @@ def create_stripe_subscription(stripe_customer_id, price_id="price_HLqVxG4RGJstN
             )
         return s
     except Exception as err:
-        print(err)
+        print('create_stripe_subscription, produces error: %s.'%(err))
         return None
 
 def delete_stripe_subscription(stripe_subscription_id):
     try:
         s=stripe.Subscription.delete(stripe_subscription_id)
+        return s
+    except Exception as err:
+        print(err)
+        return None
+
+def retrieve_stripe_subscription(stripe_subscription_id):
+    try:
+        s=stripe.Subscription.retrieve(stripe_subscription_id)
         return s
     except Exception as err:
         print(err)

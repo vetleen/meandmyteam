@@ -55,6 +55,8 @@ class HandleSubscribersTest(TestCase):
             "exp_year": 2021,
             "cvc": "314",
         }
+
+        self.assertNotEqual(c, None)
         self.assertEqual(c.invoice_settings.default_payment_method, None)
         pm = create_stripe_payment_method(card, c.id)
         #test that PM was created and attached
@@ -81,6 +83,25 @@ class HandleSubscribersTest(TestCase):
         #Test that a subscription was created and that trial period was set correctly
         self.assertEqual(s.object, "subscription")
         self.assertEqual(s.quantity, 25)
+
+        #clean up
+        dc = delete_stripe_customer(c.id)
+
+    def test_retrieve_stripe_subscription(self):
+        o = Organization.objects.get(pk=1)
+        c = create_stripe_customer(o)
+        card ={
+            "number": "4242424242424242",
+            "exp_month": 5,
+            "exp_year": 2021,
+            "cvc": "314",
+        }
+        pm = create_stripe_payment_method(card, c.id)
+        s = create_stripe_subscription(stripe_customer_id=c.id, quantity=25)
+        rs = retrieve_stripe_subscription(s.id)
+        #Test that a subscription was created and that trial period was set correctly
+        self.assertEqual(s.id, rs.id)
+
 
         #clean up
         dc = delete_stripe_customer(c.id)

@@ -1,0 +1,114 @@
+{% extends "base_generic.html" %}
+
+{% block extrascripts %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+var stripe = Stripe('{{ stripe_pk }}');
+
+function stripeRedirect(){
+  stripe.redirectToCheckout({
+  sessionId: '{{ stripe_session.id }}'
+}).then(function (result) {
+  // If `redirectToCheckout` fails due to a browser or network
+  // error, display the localized error message to your customer
+  // using `result.error.message`.
+  if (result.error) {
+          // If `redirectToCheckout` fails due to a browser or network
+          // error, display the localized error message to your customer.
+          var displayError = document.getElementById('error-message');
+          displayError.textContent = result.error.message;
+      }
+});
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row pt-4">
+    <div class="col-12">
+      <h3> Plans and payments</h3>
+    </div>
+  </div> <!-- row -->
+  <div class="row justify-content-center pt-2">
+  {% include "includeable/message_displayer.html" %}
+  </div><!-- row -->
+  <div class="row">
+    <div class="col-12">
+      <div class="row">
+        <div class="col-6">
+          <h4>Subscription</h4>
+            {% if stripe_subscription is not None %}
+                ID: {{stripe_subscription.id}}<br />
+                quantity: {{stripe_subscription.quantity}}<br />
+                status: {{stripe_subscription.status}}<br />
+                plan.currency: {{stripe_subscription.plan.currency}}<br />
+                plan.interval: {{stripe_subscription.plan.interval}}<br />
+                created: {{stripe_subscription.created}}<br />
+                current_period_end: {{stripe_subscription.current_period_end}}<br />
+                current_period_start: {{stripe_subscription.current_period_start}}<br />
+                days_until_due: {{stripe_subscription.days_until_due}}<br />
+                OOMNKLJMN: {{stripe_subscription.items.data}}<br />
+
+            {% else %}
+              No Subscription, bruh
+            {% endif %}
+        </div><!-- col -->
+        <div class="col-6 text-lef">
+          {% if default_payment_method is not None %}
+           
+            <h5>Active payment method</h5>
+            <ul class="list-group list-group-horizontal mb-2 ">
+              <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>{{ default_payment_method.card.brand|capfirst }} ending in:</small></span><br /> {{ default_payment_method.card.last4 }}</li>
+              <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>Cardholder name:</small></span><br />  {{ default_payment_method.billing_details.name }}</li>
+              <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>Expires:</small></span><br />  {{ default_payment_method.card.exp_month }}/{{ default_payment_method.card.exp_year }}</li>
+              <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>Actions:</small></span><br /><center> <a class="badge badge-danger" href="{% url 'payments-delete-payment-method' default_payment_method.id %}">Delete</a></center></li>
+            </ul>
+
+          <p class="text-center">
+            <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">Change payment method</a>
+          </p>
+          {% endif %}
+          {% if pm_list is not None and pm_list.data|length != 0 %}
+
+          <h5>Payment methods</h5>
+            {% for pm in pm_list %}
+            {% if pm.id %}
+            <ul class="list-group list-group-horizontal mb-2 ">
+              <li class="list-group-item flex-fill{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>{{ pm.card.brand|capfirst }} ending in:</small></span><br /> {{ pm.card.last4 }}</li>
+              <li class="list-group-item flex-fill{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>Cardholder name:</small></span><br />  {{ pm.billing_details.name }}</li>
+              <li class="list-group-item flex-fill{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>Expires:</small></span><br />  {{ pm.card.exp_month }}/{{ pm.card.exp_year }}</li>
+              <li class="list-group-item flex-fill{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}">
+                {% if pm.id == default_payment_method.id %}
+                  <small><center>(active<br>card)</center></small>
+                {% else %}
+                  <span class="text-muted"><small>Actions:</small></span><br /><a class="badge badge-success" href="{% url 'payments-use-payment-method' pm.id %}">Use</a> <a class="badge badge-danger" href="{% url 'payments-delete-payment-method' pm.id %}">Delete</a>
+                {% endif %}
+              </li>
+            </ul>
+            {% endif %}
+            {% endfor %}
+            <p class="text-center">
+              <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">New payment method</a>
+            </p>
+          {% else %}
+          No payments methods
+          {% endif %}
+          {% if default_payment_method is None %}
+          <h5>Add payment method</h5>
+            <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">Add payment method</a>
+          {% endif %}
+        </div><!-- col -->
+        <div class="col-6">
+          Yo!
+        </div><!-- col -->
+
+      </div><!-- row -->
+    </div><!-- col -->
+
+      <div class="w-100"></div>
+
+  </div> <!-- row -->
+</div><!-- container -->
+
+{% endblock %}

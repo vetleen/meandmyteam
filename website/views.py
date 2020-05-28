@@ -239,6 +239,8 @@ def edit_account_view(request):
         messages.error(request, "Can't edit profile when you are not logged in.", extra_tags='alert alert-danger')
         return HttpResponseRedirect(reverse('loginc'))
 
+
+'''
 @login_required
 def your_plan_view(request):
     """View function for viewing and updating your plan"""
@@ -303,7 +305,7 @@ def change_plan_view(request):
 
 @login_required
 def show_interest_in_unavailable_plan(request):
-    ''' a view for marking a subscriber as interested in an unavailable plan '''
+
     if request.method == 'POST':
         form = ChoosePlanForm(request.POST)
         if form.is_valid():
@@ -324,7 +326,6 @@ def show_interest_in_unavailable_plan(request):
 
 @login_required
 def set_up_subscription(request):
-    ''' a view for confirming subscriber-intent, and sending new subscribers to Stripe '''
 
     if request.method != 'POST':
         messages.info(request, 'You must pick a plan before you can set up a subscription.', extra_tags='alert alert-warning')
@@ -400,7 +401,7 @@ def set_up_subscription(request):
 
 @login_required
 def set_up_subscription_success(request):
-    ''' a view for receiving success message from stripe '''
+    "a view for receiving success message from stripe"
     # GET stripes session-id and retrieve the session,
     stripe_session_id = request.GET['stripe_session_id']
     try:
@@ -426,7 +427,8 @@ def set_up_subscription_success(request):
 
 @login_required
 def set_up_subscription_cancel(request):
-    ''' a view for receiving error message from stripe '''
+    "a view for receiving error message from stripe"
 
     messages.error(request, 'The subscription setup process was cancelled. Try again?', extra_tags='alert alert-danger')
     return HttpResponseRedirect(reverse('choose-plan'))
+'''
