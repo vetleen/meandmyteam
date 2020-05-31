@@ -45,7 +45,7 @@ def create_stripe_customer(organization):
             }
         )
     except Exception as err:
-        print('create_stripe_customer(organization) produces error: %s.'%(err))
+        print('create_stripe_customer() returned an error: %s: %s.'%(type(err), err))
         return None
     return s
 
@@ -54,7 +54,7 @@ def retrieve_stripe_customer(stripe_customer_id):
         s = stripe.Customer.retrieve(stripe_customer_id)
         return s
     except Exception as err:
-        print('retrieve_stripe_customer produces error: %s: %s.'%(type(err), err))
+        print('retrieve_stripe_customer() returned an error: %s: %s.'%(type(err), err))
         return None
 
 def delete_stripe_customer(stripe_customer_id):
@@ -62,7 +62,7 @@ def delete_stripe_customer(stripe_customer_id):
         s = stripe.Customer.delete(stripe_customer_id)
         return s
     except Exception as err:
-        print('delete_stripe_customer produces error: %s: %s.'%(type(err), err))
+        print('delete_stripe_customer() returned an error: %s: %s.'%(type(err), err))
         return None
 
 def create_stripe_payment_method(card, customer_id):
@@ -86,7 +86,7 @@ def create_stripe_payment_method(card, customer_id):
         c = stripe.Customer.modify(customer_id, invoice_settings=invoice_settings)
 
     except Exception as err:
-        print('create_stripe_payment_method produces error: %s.'%(err))
+        print('create_stripe_payment_method() returned an error: %s: %s.'%(type(err), err))
         return None
     return pm
 
@@ -96,7 +96,7 @@ def set_default_stripe_payment_method(customer_id, payment_method_id):
         invoice_settings = {'default_payment_method': pm}
         c = stripe.Customer.modify(customer_id, invoice_settings=invoice_settings)
     except Exception as err:
-        print('create_stripe_payment_method produces error: %s.'%(err))
+        print('create_stripe_payment_method() returned an error: %s: %s.'%(type(err), err))
         return None
     return pm
 
@@ -107,7 +107,7 @@ def retrieve_stripe_payment_method(payment_method_id):
             payment_method_id,
         )
     except Exception as err:
-        print('retrieve_stripe_payment_method produces error: %s.'%(err))
+        print('retrieve_stripe_payment_method() returned an error: %s: %s.'%(type(err), err))
         return None
     return pm
 
@@ -129,10 +129,10 @@ def delete_stripe_payment_method(stripe_payment_method_id):
         )
         return dpm
     except Exception as err:
-        print('delete_stripe_payment_method produces error: %s: %s.'%(type(err), err))
+        print('delete_stripe_payment_method() returned an error: %s: %s.'%(type(err), err))
         return None
 
-def create_stripe_subscription(stripe_customer_id, price_id="price_HLqVxG4RGJstNV", trial_from_plan=True, quantity=0):
+def create_stripe_subscription(stripe_customer_id, price_id, trial_from_plan=True, quantity=0):
     try:
         s=stripe.Subscription.create(
             customer=stripe_customer_id,
@@ -144,7 +144,7 @@ def create_stripe_subscription(stripe_customer_id, price_id="price_HLqVxG4RGJstN
             )
         return s
     except Exception as err:
-        print('create_stripe_subscription, produces error: %s.'%(err))
+        print('create_stripe_subscription() returned an error: %s: %s.'%(type(err), err))
         return None
 
 def delete_stripe_subscription(stripe_subscription_id):
@@ -152,7 +152,29 @@ def delete_stripe_subscription(stripe_subscription_id):
         s=stripe.Subscription.delete(stripe_subscription_id)
         return s
     except Exception as err:
-        print(err)
+        print('delete_stripe_subscription() returned an error: %s: %s.'%(type(err), err))
+        return None
+
+def cancel_stripe_subscription(stripe_subscription_id):
+    try:
+        cs=stripe.Subscription.modify(
+            stripe_subscription_id,
+            cancel_at_period_end=True
+        )
+        return cs
+    except Exception as err:
+        print('cancel_stripe_subscription() returned an error: %s: %s.'%(type(err), err))
+        return None
+
+def restart_cancelled_stripe_subscription(stripe_subscription_id):
+    try:
+        cs=stripe.Subscription.modify(
+            stripe_subscription_id,
+            cancel_at_period_end=False
+        )
+        return cs
+    except Exception as err:
+        print('cancel_stripe_subscription() returned an error: %s: %s.'%(type(err), err))
         return None
 
 def retrieve_stripe_subscription(stripe_subscription_id):
@@ -160,7 +182,7 @@ def retrieve_stripe_subscription(stripe_subscription_id):
         s=stripe.Subscription.retrieve(stripe_subscription_id)
         return s
     except Exception as err:
-        print(err)
+        print('retrieve_stripe_subscription() returned an error: %s: %s.'%(type(err), err))
         return None
 
 def modify_stripe_subscription(stripe_subscription_id, **kwargs):
@@ -173,5 +195,41 @@ def modify_stripe_subscription(stripe_subscription_id, **kwargs):
         )
         return s
     except Exception as err:
-        print(err)
+        print('modify_stripe_subscription() returned an error: %s: %s.'%(type(err), err))
+        return None
+
+def list_stripe_products():
+    try:
+        #print('product:')
+        #print(dir(stripe))
+        ps=stripe.Product.list()
+        return ps
+    except Exception as err:
+        print('list_stripe_products() returned an error: %s: %s.'%(type(err), err))
+        return None
+
+def retrieve_stripe_product(stripe_product_id):
+    try:
+        #print('price:')
+        #print(dir(stripe))
+        p = stripe.Product.retrieve(stripe_product_id)
+        return p
+    except Exception as err:
+        print('retrieve_stripe_product() returned an error: %s: %s.'%(type(err), err))
+        return None
+
+def list_stripe_plans(stripe_product_id=None, active=True):
+    try:
+        ps=stripe.Plan.list(product=stripe_product_id, active=active)
+        return ps
+    except Exception as err:
+        print('retrieve_stripe_plans() returned an error: %s: %s.'%(type(err), err))
+        return None
+
+def list_stripe_invoices(customer=None):
+    try:
+        ins = stripe.Invoice.list(customer=customer)
+        return ins
+    except Exception as err:
+        print('retrieve_stripe_plans() returned an error: %s: %s.'%(type(err), err))
         return None

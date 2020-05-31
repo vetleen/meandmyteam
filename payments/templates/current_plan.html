@@ -1,5 +1,5 @@
 {% extends "base_generic.html" %}
-
+{% load static %}
 {% block extrascripts %}
 <script src="https://js.stripe.com/v3/"></script>
 <script>
@@ -37,21 +37,69 @@ function stripeRedirect(){
     <div class="col-12">
       <div class="row">
         <div class="col-lg-6">
-          <h4>Subscription</h4>
+
             {% if stripe_subscription is not None %}
-                ID: {{stripe_subscription.id}}<br />
-                quantity: {{stripe_subscription.quantity}}<br />
-                status: {{stripe_subscription.status}}<br />
-                plan.currency: {{stripe_subscription.plan.currency}}<br />
-                plan.interval: {{stripe_subscription.plan.interval}}<br />
-                created: {{stripe_subscription.created}}<br />
-                current_period_end: {{stripe_subscription.current_period_end}}<br />
-                current_period_start: {{stripe_subscription.current_period_start}}<br />
-                days_until_due: {{stripe_subscription.days_until_due}}<br />
-                OOMNKLJMN: {{stripe_subscription.items.data}}<br />
+            <h5>Your Subscription</h5>
+            <div class="card-group">
+
+
+            <div class="card col-12">
+              <img src="{% static 'images/standard-plan.svg' %}" class="card-img-top" alt="{{ plan.name }} plan">
+              <div class="card-body">
+                <h3 class="card-title">{{ stripe_subscription.plan_name }}
+                  {% if stripe_subscription.cancel_at_period_end == True %}
+                  <span class="badge badge-warning">CANCELLED</span>
+                  {% elif stripe_subscription.plan_active == True %}
+                  <span class="badge badge-success">ACTIVE</span>
+                  {% else %}
+                  {% endif %}
+                </h3>
+                  <!--<span class="text-muted"><span class="lead">${{ stripe_subscription.plan_interval_amount }} <small></small>{{ stripe_subscription.plan_currency|upper }} / {{ stripe_subscription.plan_interval }} </span>per co-worker</span><br />-->
+                  <p>
+                    <span class="text-muted">Subscription is <span class="text-success font-weight-bold">{{ stripe_subscription.status }}</span> until {{ stripe_subscription.current_period_end }}.</span><br />
+                    {% if stripe_subscription.cancel_at_period_end == True %}
+                      <span class="text-danger"> (will not renew automatically!)</span>
+                    {% else %}
+                        <span class="text-success"> (renews automatically!)</span>
+                    {% endif %}
+                  </p>
+
+                  <p class="card-text">Currently subscribing to {{ stripe_subscription.quantity }} co-workers, for a total of ${{ stripe_subscription.plan_total }}{{ stripe_subscription.plan_currency|upper }} per {{ stripe_subscription.plan_interval }}, billed {{ stripe_subscription.plan_name|lower }}.</p>
+                  <br />
+                  {% if stripe_subscription.cancel_at_period_end == True %}
+                    <center><a href="{% url 'payments-restart_cancelled-subscription' stripe_subscription.id %}" class="btn btn-success">Restart subscription</a></center>
+                  {% else %}
+                    <center><a href="{% url 'payments-cancel-subscription' stripe_subscription.id %}" class="btn btn-danger">Cancel subscription</a></center>
+                  {% endif %}
+
+              </div> <!-- card-body -->
+            </div><!-- card -->
+
+            </div><!-- card group-->
+
 
             {% else %}
-              No Subscription, bruh
+            <h5>Plans</h5>
+                <div class="card-group">
+                {% for plan in plan_list %}
+
+                <div class="card col-md-6">
+                  <img src="{% static 'images/standard-plan.svg' %}" class="card-img-top" alt="{{ plan.name }} plan">
+                  <div class="card-body">
+                    <h3 class="card-title">{{ plan.name }}</h3>
+                    <!--<span class="text-muted"><span class="lead">$3 <small>USD</small> / month </span> per {{ product.unit_label }}</span><br />-->
+
+                      <span class="text-muted"><span class="lead">${{ plan.interval_amount }} <small></small>{{ plan.currency|upper }} / {{ plan.interval }} </span><br /> per {{ product.unit_label }}</span><br />
+                      <center><span class="text-success">{{ plan.trial_period_days }} days free trial!</span></center>
+
+                      <p class="card-text">{{ product.description }}.</p>
+                    <a href="{% url 'payments-create-subscription' plan.id %}" class="btn btn-success">Start subscription</a>
+                  </div> <!-- card-body -->
+                </div><!-- card -->
+                {% endfor %}
+                </div><!-- card group-->
+
+              <center><span class="text-muted">(We only have one plan, so it's an easy choice, right?)</span></center>
             {% endif %}
         </div><!-- col -->
         <div class="col-lg-6 text-left">
@@ -72,7 +120,7 @@ function stripeRedirect(){
           {% if pm_list is not None and pm_list.data|length > 1 %}
 
 
-          <h5>Payment methods</h5>
+          <h5>All payment methods</h5>
             {% for pm in pm_list %}
             {% if pm.id %}
             <ul class="list-group list-group-horizontal-sm mb-2 ">
@@ -92,17 +140,51 @@ function stripeRedirect(){
             <p class="text-center">
               <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">New payment method</a>
             </p>
-
           {% endif %}
           {% if default_payment_method is None %}
           <h5>Add payment method</h5>
             <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">Add payment method</a>
           {% endif %}
         </div><!-- col -->
-        <div class="col-6">
-          Yo!
+        {% if invoice_list is not None %}
+        <div class="col-12">
+          <h5 class="mt-3">Invoices</h5>
+          {% for invoice in invoice_list %}
+          <ul class="list-group list-group-horizontal-sm mb-2 ">
+            <li class="list-group-item flex-fill{% if invoice.paid == True %} list-group-item-success{% else %}ist-group-item-warning{% endif %}">
+              <span class="text-muted"><small>Invoice number/date:</small></span><br />
+              <a href="{{ invoice.invoice_pdf }}" targte="_blank">{{ invoice.number }} &#11016;</a><br /> {{ invoice.created }}
+            </li>
+            <li class="list-group-item flex-fill{% if invoice.paid == True %} list-group-item-success{% else %}ist-group-item-warning{% endif %}">
+              <span class="text-muted"><small>Plan:</small></span><br />
+              {% for item in invoice.line_items %}
+                {{ item.plan_name }}
+              {% endfor %}
+            </li>
+            <li class="list-group-item flex-fill{% if invoice.paid == True %} list-group-item-success{% else %}ist-group-item-warning{% endif %}">
+              <span class="text-muted"><small>Billing Period:</small></span><br />
+              {% for item in invoice.line_items %}
+                {{ item.period_start }} to<br />  {{ item.period_end }}
+              {% endfor %}
+            </li>
+            <li class="list-group-item flex-fill{% if invoice.paid == True %} list-group-item-success{% else %}ist-group-item-warning{% endif %}">
+              <span class="text-muted"><small>Amount:</small></span><br />
+              {% for item in invoice.line_items %}
+                $ {{ item.amount }} {{ item.currency|upper }}
+              {% endfor %}
+            </li>
+            <li class="list-group-item flex-fill{% if invoice.paid == True %} list-group-item-success{% else %}ist-group-item-warning{% endif %}">
+              <span class="text-muted"><small>Status:</small></span><br />
+              {% if invoice.paid == True %}
+                Paid
+              {% else %}
+                Not paid
+              {% endif %}
+            </li>
+          </ul>
+          {% endfor %}
         </div><!-- col -->
-
+      {% endif %}
       </div><!-- row -->
     </div><!-- col -->
 

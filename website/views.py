@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from website.forms import ChangePasswordForm, SignUpForm, LoginForm, EditAccountForm, ChoosePlanForm, CancelPlanForm, ResetPasswordForm
-from website.models import Subscriber, Plan
+from website.models import Subscriber
 from django.views.generic.edit import CreateView, UpdateView, DeleteView #dont think this is needed anymore
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator

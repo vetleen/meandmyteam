@@ -10,7 +10,7 @@ import datetime
 from django.utils import timezone
 
 # Create your models here.
-
+'''
 class SalesArgument(models.Model):
     """Model representing the sales arguments Plans can have."""
     argument = models.CharField(max_length=255, help_text='What is the argument?')
@@ -41,9 +41,10 @@ class SalesArgument(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return self.argument
-
+    '''
+'''
 class Plan(models.Model):
-    """The plans Subscribers can choose from."""
+
 
     # Fields
     name = models.CharField(max_length=60, help_text='Name of the plan')
@@ -78,21 +79,24 @@ class Plan(models.Model):
     def __str__(self):
         """String for representing the Plan object (in Admin site etc.)."""
         return self.name
-
+    '''
 class Subscriber(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, blank=True, null=True)
+    #plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, blank=True, null=True)
+    '''
     date_current_plan_expires = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='The date the current stripe subscription ends')
     status = models.CharField(max_length=35, blank=True, null=True, default=None, help_text='The subscrition status of the Subscriber')
     date_last_synced_with_stripe = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='The date this object was synced with Stripe')
     flagged_interest_in_plan = models.CharField(max_length=60, blank=True, null=True, help_text='Subscriber is interested in this plan')
+    '''
 
     #stripe
     stripe_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='Subscribers Customer object ID in Stripe API')
     stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='Subscribers Subscription object ID in Stripe API')
 
+    '''
     def sync_with_stripe_plan(self):
-        ''' Syncs the SUBSCRIPTION with stripe '''
+
         if self.stripe_subscription_id is None:
             #avoid errors caused by tryiong to retrieve a stripe-subscription that's not there.
             return self
@@ -131,7 +135,7 @@ class Subscriber(models.Model):
 
         self.save()
         return self
-
+        '''
     def __str__(self):
         """String for representing the Plan object (in Admin site etc.)."""
         return self.user.username
