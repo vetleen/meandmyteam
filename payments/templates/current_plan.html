@@ -38,7 +38,7 @@ function stripeRedirect(){
       <div class="row">
         <div class="col-lg-6">
 
-            {% if stripe_subscription is not None %}
+            {% if stripe_subscription is not None and stripe_subscription.status != 'canceled' %}
             <h5>Your Subscription</h5>
             <div class="card-group">
 
