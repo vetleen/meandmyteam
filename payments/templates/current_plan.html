@@ -66,10 +66,19 @@ function stripeRedirect(){
 
                   <p class="card-text">Currently subscribing to {{ stripe_subscription.quantity }} co-workers, for a total of ${{ stripe_subscription.plan_total }}{{ stripe_subscription.plan_currency|upper }} per {{ stripe_subscription.plan_interval }}, billed {{ stripe_subscription.plan_name|lower }}.</p>
                   <br />
+                  <center>
                   {% if stripe_subscription.cancel_at_period_end == True %}
-                    <center><a href="{% url 'payments-restart_cancelled-subscription' stripe_subscription.id %}" class="btn btn-success">Restart subscription</a></center>
-                  {% else %}
-                    <center><a href="{% url 'payments-cancel-subscription' stripe_subscription.id %}" class="btn btn-danger">Cancel subscription</a></center>
+                    <a href="{% url 'payments-restart_cancelled-subscription' stripe_subscription.id %}" class="btn btn-success btn-sm">Restart subscription</a>
+                  {% endif %}
+
+                  {% for plan in plan_list %}
+                    {% if plan.id != stripe_subscription.plan_id %}
+                      <a href="{% url 'payments-change-subscription-price' plan.id %}" class="btn btn-info btn-sm">Switch to {{ plan.name|lower }} billing </a>
+                    {% endif %}
+                  {% endfor %}
+                  {% if stripe_subscription.cancel_at_period_end != True %}
+                    <a href="{% url 'payments-cancel-subscription' stripe_subscription.id %}" class="btn btn-danger btn-sm">Cancel subscription</a>
+                    </center>
                   {% endif %}
 
               </div> <!-- card-body -->

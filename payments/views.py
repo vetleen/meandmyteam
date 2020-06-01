@@ -366,9 +366,24 @@ def restart_cancelled_subscription_view(request, **kwargs):
             if rs is not None:
                 messages.success(request, 'Your subscription was restarted!', extra_tags='alert alert-success')
             else:
-                messages.warning(request, 'We tried to restart your subscription, but it may not have work. Try again later, or contact support.', extra_tags='alert alert-warning')
+                messages.warning(request, 'We tried to restart your subscription, but it may not have worked. Try again later, or contact support.', extra_tags='alert alert-warning')
         else:
             return HttpResponseForbidden()
+    except Exception as err:
+        print (type(err), ': ', err)
+        return HttpResponseServerError()
+    return HttpResponseRedirect(reverse('payments_current_plan'))
+
+@login_required
+def change_subscription_price_view(request, **kwargs):
+    """View function for ..."""
+    price_id = kwargs.get('price_id', None)
+    try:
+        s = change_stripe_subscription_price(request.user.subscriber.stripe_subscription_id, price_id)
+        if s is not None:
+            messages.success(request, 'Your subscription was updated with the chosen plan!', extra_tags='alert alert-success')
+        else:
+            messages.warning(request, 'We tried to update your subscription, but it may not have worked. Try again later, or contact support.', extra_tags='alert alert-warning')
     except Exception as err:
         print (type(err), ': ', err)
         return HttpResponseServerError()
