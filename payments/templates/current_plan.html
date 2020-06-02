@@ -36,41 +36,49 @@ function stripeRedirect(){
   <div class="row">
     <div class="col-12">
       <div class="row">
-        <div class="col-lg-6">
 
             {% if stripe_subscription is not None and stripe_subscription.status != 'canceled' %}
+        <div class="col-lg-6">
             <h5>Your Subscription</h5>
             <div class="card-group">
 
 
-            <div class="card col-12">
-              <img src="{% static 'images/standard-plan.svg' %}" class="card-img-top" alt="{{ plan.name }} plan">
+            <div class="card col-12 px-0">
+              <img src="{% static 'images/standard-plan.svg' %}" class="card-img-top mt-2"  style="height: 20rem;" alt="{{ plan.name }} plan">
               <div class="card-body">
-                <h3 class="card-title">{{ stripe_subscription.plan_name }}
+                <h5 class="card-title text-center text-body">{{ stripe_subscription.plan_name }}
                   {% if stripe_subscription.cancel_at_period_end == True %}
                   <span class="badge badge-warning">CANCELLED</span>
                   {% elif stripe_subscription.plan_active == True %}
                   <span class="badge badge-success">ACTIVE</span>
                   {% else %}
                   {% endif %}
-                </h3>
+                </h5>
+                <h3 class="card-subtitle text-info text-center">${{ stripe_subscription.plan_total }} {{ stripe_subscription.plan_currency|upper }}/{{ stripe_subscription.plan_interval }}* </h3>
+                <span class="text-muted"><center><small>for  {{ stripe_subscription.quantity }} co-worker billed {{ stripe_subscription.plan_name|lower }}</small></center></span>
                   <!--<span class="text-muted"><span class="lead">${{ stripe_subscription.plan_interval_amount }} <small></small>{{ stripe_subscription.plan_currency|upper }} / {{ stripe_subscription.plan_interval }} </span>per co-worker</span><br />-->
-                  <p>
-                    <span class="text-muted">Subscription is <span class="text-success font-weight-bold">{{ stripe_subscription.status }}</span> until {{ stripe_subscription.current_period_end }}.</span><br />
-                    {% if stripe_subscription.cancel_at_period_end == True %}
-                      <span class="text-danger"> (will not renew automatically!)</span>
-                    {% else %}
-                        <span class="text-success"> (renews automatically!)</span>
-                    {% endif %}
-                  </p>
+                <p class="text-center">
+                  <span class="text-muted lead">Subscription is <span class="text-success font-weight-bold">{{ stripe_subscription.status }}</span>
+                  {% if stripe_subscription.status == 'active' or stripe_subscription.status == 'trialing' %}
+                    until {{ stripe_subscription.current_period_end }}.</span><br />
+                  {% else %}
+                    .<br />
+                  {% endif %}
+                  {% if stripe_subscription.cancel_at_period_end == True %}
+                    <span class="text-danger"> (will not renew automatically!)</span>
+                  {% else %}
+                    <span class="text-success"> (renews automatically!)</span>
+                  {% endif %}
+                </p>
 
-                  <p class="card-text">Currently subscribing to {{ stripe_subscription.quantity }} co-workers, for a total of ${{ stripe_subscription.plan_total }}{{ stripe_subscription.plan_currency|upper }} per {{ stripe_subscription.plan_interval }}, billed {{ stripe_subscription.plan_name|lower }}.</p>
-                  <br />
-                  <center>
+                <p class="card-text">* The plan scales automatically to the number of surveyed co-workers, so the next invoice price may be higher or lower depending on the size of your organization at that point. </p>
+                <br />
+              </div> <!-- card-body -->
+              <div class="text-center card-footer">
+                <center>
                   {% if stripe_subscription.cancel_at_period_end == True %}
                     <a href="{% url 'payments-restart_cancelled-subscription' stripe_subscription.id %}" class="btn btn-success btn-sm">Restart subscription</a>
                   {% endif %}
-
                   {% for plan in plan_list %}
                     {% if plan.id != stripe_subscription.plan_id %}
                       <a href="{% url 'payments-change-subscription-price' plan.id %}" class="btn btn-info btn-sm">Switch to {{ plan.name|lower }} billing </a>
@@ -78,40 +86,42 @@ function stripeRedirect(){
                   {% endfor %}
                   {% if stripe_subscription.cancel_at_period_end != True %}
                     <a href="{% url 'payments-cancel-subscription' stripe_subscription.id %}" class="btn btn-danger btn-sm">Cancel subscription</a>
-                    </center>
+                </center>
+              </div> <!-- card-footer -->
                   {% endif %}
 
-              </div> <!-- card-body -->
+
             </div><!-- card -->
 
             </div><!-- card group-->
 
-
+        </div><!-- col -->
             {% else %}
+        <div class="col-lg-6 {% if default_payment_method is None %}offset-lg-3{% endif %} justify-content-center">
             <h5>Plans</h5>
                 <div class="card-group">
                 {% for plan in plan_list %}
-
-                <div class="card col-md-6">
-                  <img src="{% static 'images/standard-plan.svg' %}" class="card-img-top" alt="{{ plan.name }} plan">
+                <div class="card col-md-6 px-0">
+                  <img src="{% static 'images/standard-plan.svg' %}" class="card-img-top mt-2" style="height: 10rem;" alt="{{ plan.name }} plan">
                   <div class="card-body">
-                    <h3 class="card-title">{{ plan.name }}</h3>
+                    <h5 class="card-title text-center text-body"> {{ plan.name }}</h5>
                     <!--<span class="text-muted"><span class="lead">$3 <small>USD</small> / month </span> per {{ product.unit_label }}</span><br />-->
-
-                      <span class="text-muted"><span class="lead">${{ plan.interval_amount }} <small></small>{{ plan.currency|upper }} / {{ plan.interval }} </span><br /> per {{ product.unit_label }}</span><br />
-                      <center><span class="text-success">{{ plan.trial_period_days }} days free trial!</span></center>
-
-                      <p class="card-text">{{ product.description }}.</p>
-                    <a href="{% url 'payments-create-subscription' plan.id %}" class="btn btn-success">Start subscription</a>
+                    <h3 class="card-subtitle text-info text-center">${{ plan.interval_amount }} {{ plan.currency|upper }}/{{ plan.interval }} </h3>
+                    <span class="text-muted"><center><small>per {{ product.unit_label }} billed {{ plan.name|lower }}</small></center></span>
+                    <center><span class="badge badge-success">{{ plan.trial_period_days }} days free trial!</span></center>
+                    <p class="card-text">{{ product.description }}.</p>
                   </div> <!-- card-body -->
+                  <div class="text-center card-footer">
+                    <a href="{% url 'payments-create-subscription' plan.id %}" class="btn btn-success text-center my-2">Start subscription</a>
+                  </div> <!-- card-footer -->
                 </div><!-- card -->
                 {% endfor %}
                 </div><!-- card group-->
-
               <center><span class="text-muted">(We only have one plan, so it's an easy choice, right?)</span></center>
-            {% endif %}
         </div><!-- col -->
-        <div class="col-lg-6 text-left">
+            {% endif %}
+
+        <div class="col-lg-6">
           {% if default_payment_method is not None %}
 
             <h5>Active payment method</h5>
@@ -151,7 +161,7 @@ function stripeRedirect(){
             </p>
           {% endif %}
           {% if default_payment_method is None and stripe_subscription is not None and stripe_subscription.status != 'canceled' %}
-          
+
           <h5>Add payment method</h5>
             <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">Add payment method</a>
           {% endif %}

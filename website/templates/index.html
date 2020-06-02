@@ -138,8 +138,29 @@
 </div><!-- custom dark div -->
 <div class="container">
   <div class="row justify-content-center pt-2">
-    <div class="col-12 text-center pt-3 pb-3">
-      <h3> Plans and pricing </h3>
+    <div class="col-12 pt-3 pb-3">
+      <h3 class="text-center"> Plans and pricing </h3>
+      <div class="card-group col-12 justify-content-center">
+      {% for plan in plan_list %}
+
+      <div class="card col-md-3 px-0">
+        <img src="{% static 'images/standard-plan.svg' %}" class="card-img-top mt-2" style="height: 10rem;" alt="{{ plan.name }} plan">
+        <div class="card-body">
+          <h5 class="card-title text-center text-body"> {{ plan.name }}</h5>
+          <!--<span class="text-muted"><span class="lead">$3 <small>USD</small> / month </span> per {{ product.unit_label }}</span><br />-->
+          <h3 class="card-subtitle text-info text-center">${{ plan.interval_amount }} {{ plan.currency|upper }}/{{ plan.interval }} </h3>
+          <span class="text-muted"><center><small>per co-worker billed {{ plan.name|lower }}</small></center></span>
+          <center><span class="badge badge-success">{{ plan.trial_period_days }} days free trial!</span></center>
+          {% if product.description is not None %}
+            <p class="card-text">{{ product.description }}.</p>
+          {% endif %}
+        </div> <!-- card-body -->
+        <div class="text-center card-footer">
+          <a href="{% url 'sign-up' %}" class="btn btn-info text-center my-2"> Choose </a>
+        </div> <!-- card-footer -->
+      </div><!-- card -->
+      {% endfor %}
+      </div><!-- card group-->
     </div>
 
 </div><!-- row -->

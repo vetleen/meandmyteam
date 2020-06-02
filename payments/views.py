@@ -81,6 +81,7 @@ def current_plan_view(request):
     #get a list of payment methods
     pm_list = list_stripe_payment_methods(stripe_id)
 
+    ##PLANS
     #get a list of the product and all of its plans:
     product = retrieve_stripe_product('prod_HLqVCyWrjJFx6v') #test-product, must be changed for production, and preferably got through some more elegant meansd
     plan_list = list_stripe_plans(product.id)
