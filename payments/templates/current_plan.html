@@ -44,7 +44,7 @@ function stripeRedirect(){
 
 
             <div class="card col-12 px-0">
-              <img src="{% static 'images/standard-plan.svg' %}" class="card-img-top mt-2"  style="height: 20rem;" alt="{{ plan.name }} plan">
+              <img src="{% static 'images/basic-plan-1.svg' %}" class="card-img-top mt-2"  style="height: 20rem;" alt="{{ plan.name }} plan">
               <div class="card-body">
                 <h5 class="card-title text-center text-body">{{ stripe_subscription.plan_name }}
                   {% if stripe_subscription.cancel_at_period_end == True %}
@@ -102,7 +102,7 @@ function stripeRedirect(){
                 <div class="card-group">
                 {% for plan in plan_list %}
                 <div class="card col-md-6 px-0">
-                  <img src="{% static 'images/standard-plan.svg' %}" class="card-img-top mt-2" style="height: 10rem;" alt="{{ plan.name }} plan">
+                  <img src="{% static 'images/basic-plan-1.svg' %}" class="card-img-top mt-2" style="height: 10rem;" alt="{{ plan.name }} plan">
                   <div class="card-body">
                     <h5 class="card-title text-center text-body"> {{ plan.name }}</h5>
                     <!--<span class="text-muted"><span class="lead">$3 <small>USD</small> / month </span> per {{ product.unit_label }}</span><br />-->

@@ -45,39 +45,9 @@ def index(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('surveys-dashboard'))
 
-    ##PLANS
-    #get a list of the product and all of its plans:
-    product = None
-    plan_list = []
-    try:
-        product = retrieve_stripe_product('prod_HLqVCyWrjJFx6v') #test-product, must be changed for production, and preferably got through some more elegant meansd
-        plan_list = list_stripe_plans(product.id)
-    except Exception as err:
-        print(err)
-
-    #Clean it up for display
-    clean_plan_list = []
-    for plan in plan_list:
-        if plan.product == product.id and plan.active == True:
-
-            #clean data and dict for each plan
-            cleaned_plan = {
-                'name': plan.nickname,
-                'currency': plan.currency,
-                'id': plan.id,
-                'interval': plan.interval,
-                'interval_count': plan.interval_count,
-                'trial_period_days': plan.trial_period_days,
-                'amount': "%.0f" % int(plan.amount/100),
-                'interval_amount': "%.0f" % int(plan.amount/plan.interval_count/100),
-                'tiers': [] #make room for tiers, which will be appended later
-            }
-            clean_plan_list.append(cleaned_plan)
-    clean_plan_list2 = sorted(clean_plan_list, key=itemgetter('amount'), reverse=True)
 
     context = {
-        'plan_list': clean_plan_list2,
-        'product': product,
+
     }
 
     # Render the HTML template index.html with the data in the context variable
