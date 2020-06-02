@@ -150,7 +150,8 @@ function stripeRedirect(){
               <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">New payment method</a>
             </p>
           {% endif %}
-          {% if default_payment_method is None %}
+          {% if default_payment_method is None and stripe_subscription is not None and stripe_subscription.status != 'canceled' %}
+          
           <h5>Add payment method</h5>
             <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">Add payment method</a>
           {% endif %}

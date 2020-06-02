@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from surveys.models import Organization, Employee
-
+from django_countries.widgets import CountrySelectWidget
+from django_countries.fields import CountryField
 
 class CreateOrganizationForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -9,11 +10,12 @@ class CreateOrganizationForm(forms.Form):
          super(CreateOrganizationForm, self).__init__(*args, **kwargs)
 
     name = forms.CharField(max_length = 255, label="Organization name", widget=forms.TextInput(attrs={}))
-    address_line_1 = forms.CharField(max_length = 255, label="Address", required=False,widget=forms.TextInput(attrs={}))
+    address_line_1 = forms.CharField(max_length = 255, label="Address", widget=forms.TextInput(attrs={}))
     address_line_2 =forms.CharField(max_length = 255, label="Address contd.", required=False, widget=forms.TextInput(attrs={}))
     zip_code = forms.CharField(max_length = 20, label="Zip", widget=forms.TextInput(attrs={}))
     city = forms.CharField(max_length = 255, label="City", required=False, widget=forms.TextInput(attrs={}))
-    country = forms.CharField(max_length = 255, label="Country", widget=forms.TextInput(attrs={}))
+    #CountryField().formfield()
+    country = CountryField(blank_label='(Select country)').formfield()
 
     def clean_name(self):
         if Organization.objects.filter(name=self.cleaned_data['name']).exists():

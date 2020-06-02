@@ -4,6 +4,8 @@ from django.utils.encoding import force_bytes
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 import datetime
+from django_countries.fields import CountryField
+
 from django.contrib.auth.models import User
 
 from django.conf import settings
@@ -26,7 +28,7 @@ class Organization(models.Model):
     address_line_2 = models.CharField(max_length=255, blank=True, null=True, help_text='Address contd.')
     zip_code =  models.CharField(max_length=255, blank=True, null=True, help_text='Zip code of the Organization')
     city =  models.CharField(max_length=255, blank=True, null=True, help_text='City where the Organization is located')
-    country =  models.CharField(max_length=255, blank=True, null=True, help_text='Country where the Organization is located')
+    country =  CountryField(blank=True, null=True, help_text='Country where the Organization is located')
 
 
     ##Todo

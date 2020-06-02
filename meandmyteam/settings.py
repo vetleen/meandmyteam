@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'website',
     'surveys',
     'payments',
+    'django_countries',
 ]
 
 MIDDLEWARE = [

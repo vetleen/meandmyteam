@@ -23,6 +23,7 @@ from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 
 from surveys.functions import configure_product
+from payments.utils.stripe_logic import retrieve_stripe_subscription
 # Create your views here.
 
 @login_required
@@ -49,8 +50,14 @@ def dashboard_view(request):
     except Organization.DoesNotExist:
         surveys = ()
         next_survey_close = None
+
+    #get the subscription and pass that in in there
+    s = None
+    if request.user.subscriber.stripe_subscription_id is not None:
+        s = retrieve_stripe_subscription(request.user.subscriber.stripe_subscription_id)
+
     #get the latest completed survey results
-    survey_results = () #empty list to be passed top context if 0 surveys
+    survey_results = () #empty list to be passed to context if 0 surveys
     latest_survey = None
     #number_of_respondents = 0 #make in case it's not set later
     if len(surveys) > 0: #if, however, there are more than 0 surveys, we want to grab the latest and get the results to display
@@ -177,6 +184,7 @@ def dashboard_view(request):
         'todays_date': date.today(),
         'employee_count': employee_count,
         #'active_products_count': active_products_count,
+        'stripe_subscription': s,
         'employee_list': employee_list,
         'est_active': est_active,
         'surveys': surveys,
@@ -213,7 +221,15 @@ def edit_organization_view(request):
             'submit_button_text': 'Edit organization details',
         }
     else:
-        form = CreateOrganizationForm
+        data={
+            'name':  None,
+            'address_line_1': None,
+            'address_line_2': None,
+            'zip_code': None,
+            'city': None,
+            'country': None,
+        }
+        form = CreateOrganizationForm(initial=data)
         context = {
             'form': form,
             'submit_button_text': 'Save organization details',

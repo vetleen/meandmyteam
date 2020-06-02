@@ -2,6 +2,7 @@ from django.conf import settings
 
 from website.forms import ChangePasswordForm, SignUpForm, LoginForm, EditAccountForm, ChoosePlanForm, CancelPlanForm, ResetPasswordForm
 from website.models import Subscriber
+from surveys.models import Organization
 from django.views.generic.edit import CreateView, UpdateView, DeleteView #dont think this is needed anymore
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -40,12 +41,8 @@ def index(request):
     """View function for home page of site."""
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('surveys-dashboard'))
-    plans = Plan.objects.filter(can_be_viewed=True).order_by('monthly_price')[:3]
-    context = {
-        'plans': plans,
-        'show_sales_arguments': False,
-        'show_footer': True,
-    }
+
+    context = {}
 
     # Render the HTML template index.html with the data in the context variable
     return render(request, 'index.html', context=context)
@@ -143,6 +140,8 @@ def sign_up(request):
             user.save()
             subscriber = Subscriber(user=user)
             subscriber.save()
+            organization = Organization(owner=user)
+            organization.save()
             messages.success(request, 'Welcome aboard. Let\'s pick a plan.', extra_tags='alert alert-success')
             send_mail(
                 '[www] New user: %s!'%(user.username),
@@ -155,7 +154,7 @@ def sign_up(request):
                 auth.login(request, user)
             # redirect to a new URL:
 
-            return HttpResponseRedirect(reverse('choose-plan'))
+            return HttpResponseRedirect(reverse('surveys-dashboard'))
 
     return render(request, 'sign_up_form.html', context)
 
@@ -187,8 +186,7 @@ def login_view(request):
                 #print("user is: %s" % request.user)
                 #print("user is authenticated?: %s" % request.user.is_authenticated)
                 messages.success(request, 'You have logged in.', extra_tags='alert alert-success')
-                s = Subscriber.objects.get(user__username=request.user.username)
-                s = s.sync_with_stripe_plan()
+
                 return HttpResponseRedirect(request.GET.get('next', '/'))
             else:
                 #I don't see this happening, as my form validation should take care of this

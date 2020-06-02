@@ -49,12 +49,10 @@ def current_plan_view(request):
         print('Unable to get a Subscription object from Stripe for user %s, and sub_id %s.'%(request.user, stripe_subscription_id))
         return HttpResponseServerError()
 
-
-
     #clean it up for the template:
-    print(stripe_subscription)
-    clean_stripe_subscription = {}
+    clean_stripe_subscription = None
     if stripe_subscription is not None:
+        clean_stripe_subscription = {}
         clean_stripe_subscription = {
             'id': stripe_subscription.id,
             'cancel_at_period_end': stripe_subscription.cancel_at_period_end,
@@ -73,15 +71,12 @@ def current_plan_view(request):
             'billing_cycle_anchor': datetime.datetime.fromtimestamp(stripe_subscription.billing_cycle_anchor).date(),
         }
 
-    #stripe_items=stripe_subscription['items']
-    #for i in stripe_items:
-    #    print(i)
-    #print(stripe_items.data[0])
-
     ##PAYMENT METHOD
     #get the default payment method if any, and assign to variable
     payment_method_id = stripe_customer.invoice_settings.default_payment_method
-    default_payment_method = retrieve_stripe_payment_method(payment_method_id)
+    default_payment_method = None
+    if payment_method_id != None:
+        default_payment_method = retrieve_stripe_payment_method(payment_method_id)
 
     #get a list of payment methods
     pm_list = list_stripe_payment_methods(stripe_id)
@@ -138,9 +133,7 @@ def current_plan_view(request):
 
                 }
                 cleaned_invoice['line_items'].append(clean_line)
-
             clean_invoice_list.append(cleaned_invoice)
-
 
     context = {
 
@@ -184,11 +177,6 @@ def set_up_payment_view(request):
         if stripe_subscription is None:
             print('Unable to retrieve a Subscription object from Stripe for user %s, with stripe ID %s.'%(request.user, stripe_id))
             return HttpResponseServerError()
-        #used to catch cases where there is already a subscription
-        #else:
-        #    messages.error(request, 'You already have a subscription.', extra_tags='alert alert-warning')
-        #    return HttpResponseRedirect(reverse('payments_current_plan'))
-
 
     #Now we know we have a stripe Customer object: That means we can get to work:
     #Prepare a NEW PAYMENT-METHOD.-checkout-session if customer DON'T have a subscription-id from before
@@ -198,15 +186,12 @@ def set_up_payment_view(request):
         #subsc_price = 'price_HLqVxG4RGJstNV' #for now only one price. PS. This is the test_price.
 
         #Create the session
-
-        #make the success URL: request.build_absolute_uri(reverse('payments-set-up-payment-method-success'))+'?stripe_session_id={CHECKOUT_SESSION_ID}'
-
+        #make the success URL:
         success_url = request.build_absolute_uri(reverse('payments-set-up-payment-method-success'))+'?stripe_session_id={CHECKOUT_SESSION_ID}'
         next_url = request.GET.get('next', None)
         if next_url is not None:
             success_url = success_url+'&next='+next_url
-
-        print('success_url: %s'%(success_url))
+        #make session
         stripe_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             mode='setup',
@@ -243,10 +228,6 @@ def set_up_payment_method_success(request):
         return HttpResponseRedirect(reverse('payments_current_plan'))
 
     #get the new payment method, and set it to default
-    #print('completed_stripe_session:')
-    #print(completed_stripe_session)
-    #print('completed_stripe_session.setup_intent.payment_method')
-    #print(completed_stripe_session.setup_intent.payment_method)
     pm = completed_stripe_session.setup_intent.payment_method
     invoice_settings = {'default_payment_method': pm}
     c = stripe.Customer.modify(request.user.subscriber.stripe_id, invoice_settings=invoice_settings)
@@ -388,8 +369,3 @@ def change_subscription_price_view(request, **kwargs):
         print (type(err), ': ', err)
         return HttpResponseServerError()
     return HttpResponseRedirect(reverse('payments_current_plan'))
-
-#view current plan and payments etc. Later, invoices also.
-#view to set up a subscription incl. adding payment method
-#view to cancel a subscription
-#view to modify subscription, incl. modifying payment method.
