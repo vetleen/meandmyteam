@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '2#q*c)!_g3tw2vj_p%7+rjyq+taizilidc*lvc0m$y)$7@^09!')
-DEBUG = False#os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'meandmyteam.herokuapp.com'] #should probs specify when a sub-domain is created in heroku
 
 

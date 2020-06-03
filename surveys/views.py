@@ -35,7 +35,7 @@ logger = logging.getLogger('__name__')
 @login_required
 def dashboard_view(request):
     """View function for the dashboard"""
-    print('checkpoint #01')
+
     try:
         employee_list = request.user.organization.employee_set.all()
         employee_count = employee_list.count()
@@ -58,7 +58,7 @@ def dashboard_view(request):
         surveys = ()
         next_survey_close = None
 
-    print('checkpoint #02')
+
     #get the subscription and pass that in in there
     s = None
     try:
@@ -168,7 +168,7 @@ def dashboard_view(request):
             {'dimension': 'peer support', 'name': 'Peer support', 'score': peer_support_avg, 'progress': (peer_support_prog)},
             {'dimension': 'manager support', 'name': 'Manager support', 'score': manager_support_avg, 'progress': (manager_support_prog)},
         )
-    print('checkpoint #03')
+
     #count respondents
     number_of_respondents = 0 #make in case it's not set later
     number_of_invited = 0
@@ -185,7 +185,7 @@ def dashboard_view(request):
 
 
     #make the est_active variable and correctly set it
-    print('checkpoint #04')
+    
     est_active = False
     p=None
     try:
@@ -215,18 +215,7 @@ def dashboard_view(request):
 
 
     }
-    print('checkpoint #05')
-    print(context['todays_date'])
-    print(context['employee_count'])
-    print(context['stripe_subscription'])
-    print(context['employee_list'])
-    print(context['est_active'])
-    print(context['surveys'])
-    print(context['next_survey_close'])
-    print(context['survey_results'])
-    print(context['number_of_invited'])
-    print(context['number_of_respondents'])
-    print('checkpoint #06')
+
     try:
         return render(request, 'dashboard.html', context)
     except Exception as err:
