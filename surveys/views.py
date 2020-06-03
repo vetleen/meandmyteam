@@ -227,8 +227,10 @@ def dashboard_view(request):
     print(context['number_of_invited'])
     print(context['number_of_respondents'])
     print('checkpoint #06')
-
-    return render(request, 'dashboard.html', context)
+    try:
+        return render(request, 'dashboard.html', context)
+    except Exception as err:
+        print(type(err), ': ', err)
 
 @login_required
 def edit_organization_view(request):
