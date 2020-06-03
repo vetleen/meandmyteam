@@ -26,6 +26,12 @@ from surveys.functions import configure_product
 from payments.utils.stripe_logic import *
 # Create your views here.
 
+#set up logging
+import logging
+import datetime
+logger = logging.getLogger('__name__')
+
+
 @login_required
 def dashboard_view(request):
     """View function for the dashboard"""
@@ -274,7 +280,7 @@ def edit_coworker_view(request):
     try:
         organization = request.user.organization
     except Organization.DoesNotExist:
-        messages.error(request, 'You have to set up your organization before adding coworkers.', extra_tags='alert alert-warning')
+        logger.error("%s %s: edit_coworker_view: User %s, tried top set up co-workjers before adding an organization, was redirected."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'ERROR: ', request.user))
         return HttpResponseRedirect(reverse('surveys-create-organization'))
     employee_list = organization.employee_set.all()
     form = AddEmployeeForm
@@ -310,6 +316,7 @@ def edit_coworker_view(request):
                 try:
                     s = modify_stripe_subscription(request.user.subscriber.stripe_subscription_id, quantity=current_sub_quantity)
                 except Exception as err:
+                    logger.exception("%s %s: edit_coworker_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
                     print('Tried to change the subscription quantity for usr %s, but got error: %s.'%(request.user.username, err))
 
 
@@ -366,7 +373,7 @@ def delete_coworker_view(request, **kwargs):
             try:
                 s = modify_stripe_subscription(request.user.subscriber.stripe_subscription_id, quantity=current_sub_quantity)
             except Exception as err:
-                print('Tried to change the subscription quantity for usr %s, but got error: %s.'%(request.user.username, err))
+                logger.exception("%s %s: delete_coworker_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         return HttpResponseRedirect(request.GET.get('next', reverse('surveys-edit-coworker')))
     else:
         return HttpResponseForbidden()
@@ -382,7 +389,7 @@ def set_up_employee_satisfaction_tracking(request, **kwargs):
     if est in apset:
         est_is_active=True
 
-    #set default: assume it's not activated yet
+    #set default
     form=ConfigureEmployeeSatisfactionTrackingForm(label_suffix='')
     context = {
         'form': form,
@@ -458,7 +465,8 @@ def answer_survey_view(request, **kwargs):
         #ensure the survey that the si belonmgs to is still open
         assert si.survey.date_close >= date.today()
         context.update({'si': si})
-    except:
+    except Exception as err:
+        logger.exception("%s %s: answer_survey_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         raise Http404("The survey you asked for does not exist. If you pasted a link, make sure you got the entire link.")
 
     #this view also takes a page argument that we use for pagination of questions
@@ -515,14 +523,14 @@ def answer_survey_view(request, **kwargs):
 
         #did the user POST something?
         if request.method == 'POST':
-            print('received form')
+
             #make a fresh form insatnce, and bind it with the posted value
             form=AnswerQuestionsForm(request.POST, questions=qlist)
             context.update({'form': form})
 
             #deal with data if it's valid
             if form.is_valid():
-                print('form is valid')
+
                 for item in form.cleaned_data:
                     # identify the question that has been answered
                     q_id= int(item.replace('question_', ''))
@@ -539,12 +547,12 @@ def answer_survey_view(request, **kwargs):
                     return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(token, int(page)+1)))
                 #else, we are done answering, and redirect to thank you message
                 else:
-                    print('survey complete?')
+
                     #compare number of answers to number of questions:
                     answers = IntAnswer.objects.filter(survey_instance=si)
-                    print('comparing %s to %s.'%(len(answers), len(questions)))
+
                     if len(answers) >= len(questions):
-                        print('enough answers!')
+
                         si.completed=True
                         si.save()
                         return HttpResponseRedirect(reverse('surveys-answer-survey', args=(token, )))
@@ -555,13 +563,14 @@ def answer_survey_view(request, **kwargs):
                         for q in questions:
                             q_counter += 1
                             alist = IntAnswer.objects.filter(question=q, survey_instance=si)
-                            print('%s answers to Question %s.'%(len(alist), q.pk))
+
                             if len(alist) < 1:
                                 missing_page = math.ceil((q_counter/page_size))
-                                print('going for question %s at page %s'%(q_counter, missing_page))
+                                logger.warning("%s %s: answer_survey_view (token: %s): someone tried to finish the survey, but there were still unanswered questions. They were redirected..."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', token))
                                 messages.warning(request, 'There are still %s unanswered questions in this survey. Would you mind going through again and making sure everything got answered?'%(len(questions)-len(answers)), extra_tags='alert alert-warning')
                                 return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(token, missing_page)))
                         #catchall, should only trigger if code can't find what is unanswered. So never?
+                        logger.warning("%s %s: answer_survey_view (token: %s): someone tried to finish the survey, but there were still unanswered questions. They were redirected..."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', token))
                         messages.warning(request, 'Ups. There are still %s unanswered questions. Would you mind going through again and making sure everything got answered?'%(len(questions)-len(answers)), extra_tags='alert alert-warning')
                         return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(token, 1)))
 

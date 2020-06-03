@@ -13,6 +13,10 @@ from payments.utils.stripe_logic import *
 from operator import itemgetter
 import datetime
 
+#set up logging
+import logging
+logger = logging.getLogger('__name__')
+
 # Create your views here.
 @login_required
 def current_plan_view(request):
@@ -33,7 +37,7 @@ def current_plan_view(request):
         stripe_customer = create_stripe_customer(request.user.organization)
         #if it wasnt made, error connecting to Stripe
         if stripe_customer == None:
-            print('Unable to get a Customer object from Stripe for user %s.'%(request.user))
+            logger.warning("%s %s: current_plan_view: Unable to get a Customer object from Stripe for user %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
             return HttpResponseServerError()
         #if it WAS made, save it, so we can retrieve it later
         stripe_id = stripe_customer.id
@@ -46,7 +50,7 @@ def current_plan_view(request):
     if stripe_subscription_id is not None and stripe_subscription_id != '':
         stripe_subscription = retrieve_stripe_subscription(stripe_subscription_id)
     if stripe_subscription_id is not None and stripe_subscription is None:
-        print('Unable to get a Subscription object from Stripe for user %s, and sub_id %s.'%(request.user, stripe_subscription_id))
+        logger.warning("%s %s: current_plan_view: Unable to get a Subscription object from Stripe for user %s, and sub_id %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user, stripe_subscription_id))
         return HttpResponseServerError()
 
     #clean it up for the template:
@@ -166,6 +170,7 @@ def set_up_payment_view(request):
         #If it wasnt made, error connecting to stripe
         if stripe_customer == None:
             print('Unable to get a Customer object from Stripe for user %s.'%(request.user))
+            logger.warning("%s %s: set_up_payment_view: Unable to get a Customer object from Stripe for user %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
             return HttpResponseServerError()
         #if it was made, save it in DB, so we can use it later
         stripe_id = stripe_customer.id
@@ -177,30 +182,29 @@ def set_up_payment_view(request):
         stripe_subscription = retrieve_stripe_subscription(stripe_subscription_id)
         if stripe_subscription is None:
             print('Unable to retrieve a Subscription object from Stripe for user %s, with stripe ID %s.'%(request.user, stripe_id))
+            logger.warning("%s %s: set_up_payment_view: Unable to retrieve a Subscription object from Stripe for user %s, with stripe ID %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user, stripe_id))
             return HttpResponseServerError()
 
     #Now we know we have a stripe Customer object: That means we can get to work:
-    #Prepare a NEW PAYMENT-METHOD.-checkout-session if customer DON'T have a subscription-id from before
-    stripe_session=None
-    if stripe_subscription_id is None or stripe_subscription_id == '':
-        #Get the price to use
-        #subsc_price = 'price_HLqVxG4RGJstNV' #for now only one price. PS. This is the test_price.
+    #Prepare a NEW PAYMENT-METHOD.-checkout-session
 
-        #Create the session
-        #make the success URL:
-        success_url = request.build_absolute_uri(reverse('payments-set-up-payment-method-success'))+'?stripe_session_id={CHECKOUT_SESSION_ID}'
-        next_url = request.GET.get('next', None)
-        if next_url is not None:
-            success_url = success_url+'&next='+next_url
-        #make session
-        stripe_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            mode='setup',
-            customer=stripe_customer,
-            success_url=success_url,
-            cancel_url=request.build_absolute_uri(reverse('payments-set-up-payment-method-cancel'))
-            )
-        messages.info(request, 'Use this credit card in testing: 4242424242424242', extra_tags='alert alert-info')
+    #make the success URL:
+    success_url = request.build_absolute_uri(reverse('payments-set-up-payment-method-success'))+'?stripe_session_id={CHECKOUT_SESSION_ID}'
+    next_url = request.GET.get('next', None)
+    if next_url is not None:
+        success_url = success_url+'&next='+next_url #This is used if we also should set up a subscription
+
+    #make session
+    stripe_session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        mode='setup',
+        customer=stripe_customer,
+        success_url=success_url,
+        cancel_url=request.build_absolute_uri(reverse('payments-set-up-payment-method-cancel'))
+        )
+    messages.info(request, 'Use this credit card in testing: Visa: 4242 4242 4242 4242', extra_tags='alert alert-info')
+    messages.info(request, 'Use this credit card in testing: American Express: 3782 822463 10005', extra_tags='alert alert-info')
+    messages.info(request, 'Use this credit card in testing: Mastercard: 5555 5555 5555 4444', extra_tags='alert alert-info')
 
     #initiate context variable to send to view
     context = {
@@ -214,6 +218,7 @@ def set_up_payment_view(request):
 def set_up_payment_method_cancel(request):
     "a view for receiving error message from stripe"
     messages.error(request, 'The subscription setup process was cancelled. Try again?', extra_tags='alert alert-warning')
+    logger.warning("%s %s: set_up_payment_method_cancel: Stripe returned a failed payment attempt for user %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
     return HttpResponseRedirect(reverse('payments-set-up-payment-method'))
 
 @login_required
@@ -224,8 +229,8 @@ def set_up_payment_method_success(request):
     try:
         completed_stripe_session = stripe.checkout.Session.retrieve(stripe_session_id, expand=['setup_intent'])
     except:
-        print('Boy, we need a logging system to catch these things!') #on todo-list
-        messages.success(request, 'Looks like you were able to set up a payment method, but we were unable to get data from our payment provider just now. Don\'t worry though, this usualy resolves itself in a few hours, if not, we are notified and will fix it! It may mean that you have to manually pick this card as your "default payment method", but don\'t worry, we\'ll make it easy.', extra_tags='alert alert-success')
+        logger.error("%s %s: set_up_payment_method_success: Stripe returned a successful payment attempt for user %s, but we were unable to retrieve the stripe session. We should set default payment method manually, and check that everything is in order!"%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'ERROR: ', request.user))
+        messages.success(request, 'Looks like you were able to set up a payment method, but we were unable to get data from our payment provider just now. Don\'t worry though, our support staff have been notified and will fix it!', extra_tags='alert alert-success')
         return HttpResponseRedirect(reverse('payments_current_plan'))
 
     #get the new payment method, and set it to default
@@ -251,10 +256,11 @@ def use_payment_method_view(request, **kwargs):
                 messages.success(request, 'Your preferred payment method was updated!', extra_tags='alert alert-success')
             else:
                 messages.warning(request, 'We tried to change your payment method, but it may not have work. Feel free to try again!', extra_tags='alert alert-warning')
+                logger.warning("%s %s: use_payment_method_view: Tried to change payment method for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
         else:
             return HttpResponseForbidden()
     except Exception as err:
-        print (type(err), ': ', err)
+        logger.exception("%s %s: use_payment_method_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user, type(err), err))
         return HttpResponseServerError()
     return HttpResponseRedirect(reverse('payments_current_plan'))
 
@@ -270,11 +276,12 @@ def delete_payment_method_view(request, **kwargs):
             if dpm is not None:
                 messages.success(request, 'The selected card was deleted!', extra_tags='alert alert-success')
             else:
+                logger.warning("%s %s: delete_payment_method_view: Tried to delete payment method for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
                 messages.warning(request, 'We tried to delete your card, but it may not have work. Feel free to try again!', extra_tags='alert alert-warning')
         else:
             return HttpResponseForbidden()
     except Exception as err:
-        print (type(err), ': ', err)
+        logger.exception("%s %s: delete_payment_method_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         return HttpResponseServerError()
     return HttpResponseRedirect(reverse('payments_current_plan'))
     #return HttpResponseRedirect(request.GET.get('next', reverse('surveys-dashboard')))
@@ -288,7 +295,7 @@ def create_subscription_view(request, **kwargs):
     #get the default payment method if any, and assign to variable
     stripe_customer = retrieve_stripe_customer(request.user.subscriber.stripe_id)
     if stripe_customer == None:
-        #this should not happen
+        logger.error("%s %s: create_subscription_view: Tried to retrieve stripe Subscriber object for user %s, with ID %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'ERROR: ', request.user, request.user.subscriber.stripe_id))
         return HttpResponseServerError()
 
     payment_method_id = stripe_customer.invoice_settings.default_payment_method
@@ -312,10 +319,11 @@ def create_subscription_view(request, **kwargs):
         if s is not None:
             messages.success(request, 'Your subscription was started!', extra_tags='alert alert-success')
         else:
+            logger.warning("%s %s: create_subscription_view: Tried to start subscription for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
             messages.warning(request, 'We tried to start your subscription, but something went wrong. You can try again, and we\'ll make sure you don\'t get charged twice!', extra_tags='alert alert-warning')
 
     except Exception as err:
-        print (type(err), ': ', err)
+        logger.exception("%s %s: create_subscription_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         return HttpResponseServerError()
 
     return HttpResponseRedirect(reverse('payments_current_plan'))
@@ -330,11 +338,12 @@ def cancel_subscription_view(request, **kwargs):
             if cs is not None:
                 messages.success(request, 'Your subscription was cancelled, it will not renew next billing cycle.', extra_tags='alert alert-success')
             else:
+                logger.warning("%s %s: cancel_subscription_view: Tried to cancel subscription for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
                 messages.warning(request, 'We tried to cancel your subscription, but it may not have work.Try again later, or contact support.', extra_tags='alert alert-warning')
         else:
             return HttpResponseForbidden()
     except Exception as err:
-        print (type(err), ': ', err)
+        logger.exception("%s %s: cancel_subscription_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         return HttpResponseServerError()
     return HttpResponseRedirect(reverse('payments_current_plan'))
 
@@ -348,11 +357,12 @@ def restart_cancelled_subscription_view(request, **kwargs):
             if rs is not None:
                 messages.success(request, 'Your subscription was restarted!', extra_tags='alert alert-success')
             else:
+                logger.warning("%s %s: restart_cancelled_subscription_view: Tried to restart subscription for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
                 messages.warning(request, 'We tried to restart your subscription, but it may not have worked. Try again later, or contact support.', extra_tags='alert alert-warning')
         else:
             return HttpResponseForbidden()
     except Exception as err:
-        print (type(err), ': ', err)
+        logger.exception("%s %s: restart_cancelled_subscription_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         return HttpResponseServerError()
     return HttpResponseRedirect(reverse('payments_current_plan'))
 
@@ -365,8 +375,9 @@ def change_subscription_price_view(request, **kwargs):
         if s is not None:
             messages.success(request, 'Your subscription was updated with the chosen plan!', extra_tags='alert alert-success')
         else:
+            logger.warning("%s %s: change_subscription_price_view: Tried to changet subscription Price for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
             messages.warning(request, 'We tried to update your subscription, but it may not have worked. Try again later, or contact support.', extra_tags='alert alert-warning')
     except Exception as err:
-        print (type(err), ': ', err)
+        logger.exception("%s %s: change_subscription_price_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         return HttpResponseServerError()
     return HttpResponseRedirect(reverse('payments_current_plan'))

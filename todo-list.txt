@@ -2,7 +2,6 @@
 
 #dev
 
-logging tool
 add countries to stripe calls
 
 # more

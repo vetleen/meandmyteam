@@ -7,6 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView #dont t
 from payments.utils.stripe_logic import *
 
 from operator import itemgetter
+import datetime
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode
@@ -32,12 +33,15 @@ from django.core.mail import send_mail
 from django.contrib.auth import views as auth_views
 from django.contrib.messages.views import SuccessMessageMixin
 
-
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe_pk = settings.STRIPE_PUBLISHABLE_KEY
 stripe_sk = settings.STRIPE_SECRET_KEY
-#from catalog.models import ...
+
+#set up logging
+import logging
+logger = logging.getLogger('__name__')
+
 
 # Create your views here.
 def index(request):
@@ -45,10 +49,7 @@ def index(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('surveys-dashboard'))
 
-
-    context = {
-
-    }
+    context = {}
 
     # Render the HTML template index.html with the data in the context variable
     return render(request, 'index.html', context=context)
@@ -240,6 +241,7 @@ def edit_account_view(request):
     #if user not authenticated
     else:
         #this should never occcur
+        logger.warning("%s %s: %s tried to edit someone else's account"%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
         messages.error(request, "Can't edit profile when you are not logged in.", extra_tags='alert alert-danger')
         return HttpResponseRedirect(reverse('loginc'))
 
