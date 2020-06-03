@@ -35,6 +35,7 @@ logger = logging.getLogger('__name__')
 @login_required
 def dashboard_view(request):
     """View function for the dashboard"""
+    print('checkpoint #01')
     try:
         employee_list = request.user.organization.employee_set.all()
         employee_count = employee_list.count()
@@ -57,13 +58,17 @@ def dashboard_view(request):
         surveys = ()
         next_survey_close = None
 
+    print('checkpoint #02')
     #get the subscription and pass that in in there
     s = None
-    if request.user.subscriber.stripe_subscription_id is not None:
-        s = retrieve_stripe_subscription(request.user.subscriber.stripe_subscription_id)
+    try:
+        if request.user.subscriber.stripe_subscription_id is not None:
+            s = retrieve_stripe_subscription(request.user.subscriber.stripe_subscription_id)
+    except Exception as err:
+        print ('Line 66 %s: %s'%(type(err), err))
 
     #get the latest completed survey results
-    survey_results = () #empty list to be passed to context if 0 surveys
+    survey_results = [] #empty list to be passed to context if 0 surveys
     latest_survey = None
     #number_of_respondents = 0 #make in case it's not set later
     if len(surveys) > 0: #if, however, there are more than 0 surveys, we want to grab the latest and get the results to display
@@ -71,7 +76,11 @@ def dashboard_view(request):
 
         ##get score per category
         #get all answers in latest survey
-        answers = IntAnswer.objects.filter(survey_instance__survey=latest_survey) #for now, all answers are IntAnswers
+        answers=None
+        try:
+            answers = IntAnswer.objects.filter(survey_instance__survey=latest_survey) #for now, all answers are IntAnswers
+        except Exception as err:
+            print ('Line 81 %s: %s'%(type(err), err))
 
         #get and average out role clarity:
         try:
@@ -159,12 +168,12 @@ def dashboard_view(request):
             {'dimension': 'peer support', 'name': 'Peer support', 'score': peer_support_avg, 'progress': (peer_support_prog)},
             {'dimension': 'manager support', 'name': 'Manager support', 'score': manager_support_avg, 'progress': (manager_support_prog)},
         )
-
+    print('checkpoint #03')
     #count respondents
     number_of_respondents = 0 #make in case it's not set later
     number_of_invited = 0
     if latest_survey is not None:
-        #print ('there was a latest_survey')
+        print ('there was a latest_survey')
         sis = SurveyInstance.objects.filter(survey=latest_survey)
         number_of_invited = len(sis)
         #print ('%s was invited to respond'%(len(sis)))
@@ -176,14 +185,19 @@ def dashboard_view(request):
 
 
     #make the est_active variable and correctly set it
+    print('checkpoint #04')
     est_active = False
-    p = Product.objects.get(name='Employee Satisfaction Tracking')
+    p=None
+    try:
+        p = Product.objects.get(name='Employee Satisfaction Tracking')
+    except Exception as err:
+        print ('Line 192 %s: %s'%(type(err), err))
 
     try:
         if p in request.user.organization.active_products.all():
             est_active = True
-    except Organization.DoesNotExist:
-        pass
+    except Organization.DoesNotExist as err:
+        print ('Line 198 %s: %s'%(type(err), err))
 
     #collect all the info that the dashboard needs (and maybe then some?)
     context = {
@@ -201,6 +215,7 @@ def dashboard_view(request):
 
 
     }
+    print('checkpoint #05')
     return render(request, 'dashboard.html', context)
 
 @login_required

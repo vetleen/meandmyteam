@@ -299,7 +299,9 @@ def create_subscription_view(request, **kwargs):
         return HttpResponseServerError()
 
     payment_method_id = stripe_customer.invoice_settings.default_payment_method
-    default_payment_method = retrieve_stripe_payment_method(payment_method_id)
+    default_payment_method = None
+    if payment_method_id != None and payment_method_id != '':
+        default_payment_method = retrieve_stripe_payment_method(payment_method_id)
     if default_payment_method == None:
         #redirect to set up PM before coming back here...
         return HttpResponseRedirect(reverse('payments-set-up-payment-method')+'?next='+reverse('payments-create-subscription', args=[subscription_id]))
