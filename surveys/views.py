@@ -216,6 +216,18 @@ def dashboard_view(request):
 
     }
     print('checkpoint #05')
+    print(context.todays_date)
+    print(context.employee_count)
+    print(context.stripe_subscription)
+    print(context.employee_list)
+    print(context.est_active)
+    print(context.surveys)
+    print(context.next_survey_close)
+    print(context.survey_results)
+    print(context.number_of_invited)
+    print(context.number_of_respondents)
+    print('checkpoint #06')
+    print(context)
     return render(request, 'dashboard.html', context)
 
 @login_required
