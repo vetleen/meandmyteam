@@ -1,14 +1,15 @@
 ##MeAndMyTeam
 
 #dev
-pricing page available to anonymous users alike
+
 logging tool
 add countries to stripe calls
 
 # more
-tests for key parts of site
+tests for payment views and the last few functions
+tests for product
+decide if need to revamp questions for product
 terms of use
-
 
 
 #Product #1
@@ -49,3 +50,5 @@ make a switch for toggeling products, and make it toggleable from dashboard.
 progress bar for question pages
 
 Add *automatic* country selection in Organization set-up: https://docs.djangoproject.com/en/3.0/ref/contrib/gis/geoip2/
+
+pricing page available to anonymous users alike

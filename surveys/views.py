@@ -23,7 +23,7 @@ from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 
 from surveys.functions import configure_product
-from payments.utils.stripe_logic import retrieve_stripe_subscription
+from payments.utils.stripe_logic import *
 # Create your views here.
 
 @login_required
@@ -298,6 +298,21 @@ def edit_coworker_view(request):
                 receives_surveys = True
             )
             e.save()
+
+            #also update stripe subscription quantity
+            elist= None
+            try:
+                elist = Employee.objects.filter(organization=request.user.organization)
+            except Exception as err:
+                print('Got an unexpected error while trying to add employees: %s.'%(request.user.username, err))
+            if elist and request.user.subscriber.stripe_subscription_id is not None and request.user.subscriber.stripe_subscription_id != '':
+                current_sub_quantity = len(elist)
+                try:
+                    s = modify_stripe_subscription(request.user.subscriber.stripe_subscription_id, quantity=current_sub_quantity)
+                except Exception as err:
+                    print('Tried to change the subscription quantity for usr %s, but got error: %s.'%(request.user.username, err))
+
+
             messages.success(request, 'You have added a coworker (%s)! You can continue to add more below.'%(form.cleaned_data['email']), extra_tags='alert alert-success')
             form = AddEmployeeForm
             context.update({'form': form})
@@ -340,6 +355,18 @@ def delete_coworker_view(request, **kwargs):
     if employee.organization.owner == request.user:
         messages.info(request, '%s was permanently deleted, and will not reveive future surveys.'%(employee.email), extra_tags='alert alert-warning')
         employee.delete()
+        #also update stripe subscription quantity
+        elist= None
+        try:
+            elist = Employee.objects.filter(organization=request.user.organization)
+        except Exception as err:
+            print('Got an unexpected error while trying to add employees: %s.'%(request.user.username, err))
+        if elist and request.user.subscriber.stripe_subscription_id is not None and request.user.subscriber.stripe_subscription_id != '':
+            current_sub_quantity = len(elist)
+            try:
+                s = modify_stripe_subscription(request.user.subscriber.stripe_subscription_id, quantity=current_sub_quantity)
+            except Exception as err:
+                print('Tried to change the subscription quantity for usr %s, but got error: %s.'%(request.user.username, err))
         return HttpResponseRedirect(request.GET.get('next', reverse('surveys-edit-coworker')))
     else:
         return HttpResponseForbidden()

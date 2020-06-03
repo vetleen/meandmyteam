@@ -28,7 +28,7 @@ def create_stripe_customer(organization):
         'line2': organization.address_line_2,
         'postal_code': organization.zip_code ,
         'city': organization.city,
-        #'country' : organization.country,
+        'country' : organization.country,
     }
 
     #Make sure there is a minimum of adress info provided

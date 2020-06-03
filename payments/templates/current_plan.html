@@ -46,7 +46,7 @@ function stripeRedirect(){
             <div class="card col-12 px-0">
               <img src="{% static 'images/basic-plan-1.svg' %}" class="card-img-top mt-2"  style="height: 20rem;" alt="{{ plan.name }} plan">
               <div class="card-body">
-                <h5 class="card-title text-center text-body">{{ stripe_subscription.plan_name }}
+                <h5 class="card-title text-center text-body">Standard {{ stripe_subscription.plan_name }}
                   {% if stripe_subscription.cancel_at_period_end == True %}
                   <span class="badge badge-warning">CANCELLED</span>
                   {% elif stripe_subscription.plan_active == True %}
@@ -55,7 +55,7 @@ function stripeRedirect(){
                   {% endif %}
                 </h5>
                 <h3 class="card-subtitle text-info text-center">${{ stripe_subscription.plan_total }} {{ stripe_subscription.plan_currency|upper }}/{{ stripe_subscription.plan_interval }}* </h3>
-                <span class="text-muted"><center><small>for  {{ stripe_subscription.quantity }} co-worker billed {{ stripe_subscription.plan_name|lower }}</small></center></span>
+                <span class="text-muted"><center><small>total for  {{ stripe_subscription.quantity }} co-worker billed {{ stripe_subscription.plan_name|lower }}</small></center></span>
                   <!--<span class="text-muted"><span class="lead">${{ stripe_subscription.plan_interval_amount }} <small></small>{{ stripe_subscription.plan_currency|upper }} / {{ stripe_subscription.plan_interval }} </span>per co-worker</span><br />-->
                 <p class="text-center">
                   <span class="text-muted lead">Subscription is <span class="text-success font-weight-bold">{{ stripe_subscription.status }}</span>
@@ -71,7 +71,7 @@ function stripeRedirect(){
                   {% endif %}
                 </p>
 
-                <p class="card-text">* The plan scales automatically to the number of surveyed co-workers, so the next invoice price may be higher or lower depending on the size of your organization at that point. </p>
+                <p class="card-text">* The plan scales automatically to the number of surveyed co-workers, and bills {{ stripe_subscription.plan_name|lower }}. </p>
                 <br />
               </div> <!-- card-body -->
               <div class="text-center card-footer">
@@ -104,7 +104,7 @@ function stripeRedirect(){
                 <div class="card col-md-6 px-0">
                   <img src="{% static 'images/basic-plan-1.svg' %}" class="card-img-top mt-2" style="height: 10rem;" alt="{{ plan.name }} plan">
                   <div class="card-body">
-                    <h5 class="card-title text-center text-body"> {{ plan.name }}</h5>
+                    <h5 class="card-title text-center text-body"> Standard {{ plan.name }}</h5>
                     <!--<span class="text-muted"><span class="lead">$3 <small>USD</small> / month </span> per {{ product.unit_label }}</span><br />-->
                     <h3 class="card-subtitle text-info text-center">${{ plan.interval_amount }} {{ plan.currency|upper }}/{{ plan.interval }} </h3>
                     <span class="text-muted"><center><small>per {{ product.unit_label }} billed {{ plan.name|lower }}</small></center></span>
