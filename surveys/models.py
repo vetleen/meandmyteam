@@ -21,7 +21,7 @@ class Product(models.Model):
         return self.name
 
 class Organization(models.Model):
-    owner = models.OneToOneField(User, blank=True, null=True, on_delete=models.PROTECT, help_text='User who owns this Organization')
+    owner = models.OneToOneField(User, blank=True, null=True, on_delete=models.CASCADE, help_text='User who owns this Organization')
     name = models.CharField(max_length=255, blank=True, null=True, help_text='Name of the Organization')
     active_products = models.ManyToManyField(Product, blank=True, help_text='Products this organization is currently using')
     address_line_1 = models.CharField(max_length=255, blank=True, null=True, help_text='Adress of the Organization')
@@ -50,7 +50,7 @@ class ProductSetting(models.Model):
     surveys_remain_open_days = models.SmallIntegerField(default = 21, help_text='How many days should surveys be open for this organization', validators=[MinValueValidator(0), MaxValueValidator(365)])
 
 class Employee(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, help_text='Organization where this Employee is employed')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, help_text='Organization where this Employee is employed')
     email = models.EmailField(max_length=254, help_text='Email of employee')
     first_name = models.CharField(max_length=255, blank=True, null=True, help_text='First name of Employee')
     last_name = models.CharField(max_length=255, blank=True, null=True, help_text='Last name of Employee')
@@ -65,7 +65,7 @@ class Employee(models.Model):
 
 class Survey(models.Model):
     product = models.ForeignKey(Product, on_delete=models.PROTECT, help_text='Questions asked in this survey')
-    owner = models.ForeignKey(Organization, on_delete=models.CASCADE, help_text='Organization that owns this survey')
+    owner = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, help_text='Organization that owns this survey')
     date_open = models.DateField(auto_now=False, auto_now_add=False, help_text='The date from which this Survey may be answered')
     date_close = models.DateField(auto_now=False, auto_now_add=False, help_text='The date until which this Survey may be answered')
     def __str__(self):
