@@ -2,14 +2,15 @@ from django.db import models
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import User
+from django.conf import settings
+from django.utils.crypto import salted_hmac
 
 import datetime
 from django_countries.fields import CountryField
 
-from django.contrib.auth.models import User
+from website.models import Organization
 
-from django.conf import settings
-from django.utils.crypto import salted_hmac
 # Create your models here.
 
 class Product(models.Model):
@@ -20,25 +21,6 @@ class Product(models.Model):
         """String for representing the Product object (in Admin site etc.)."""
         return self.name
 
-class Organization(models.Model):
-    owner = models.OneToOneField(User, blank=True, null=True, on_delete=models.CASCADE, help_text='User who owns this Organization')
-    name = models.CharField(max_length=255, blank=True, null=True, help_text='Name of the Organization')
-    active_products = models.ManyToManyField(Product, blank=True, help_text='Products this organization is currently using')
-    address_line_1 = models.CharField(max_length=255, blank=True, null=True, help_text='Adress of the Organization')
-    address_line_2 = models.CharField(max_length=255, blank=True, null=True, help_text='Address contd.')
-    zip_code =  models.CharField(max_length=255, blank=True, null=True, help_text='Zip code of the Organization')
-    city =  models.CharField(max_length=255, blank=True, null=True, help_text='City where the Organization is located')
-    country =  CountryField(blank=True, null=True, help_text='Country where the Organization is located')
-
-
-    ##Todo
-    #Add support for other Users than owner to be allowed to change organization
-    def __str__(self):
-        """String for representing the Organization object (in Admin site etc.)."""
-        if self.name != None and self.name != '':
-            return self.name
-        else:
-            return "Organization object owned by %s."%(self.owner)
 
 class ProductSetting(models.Model):
     is_active = models.BooleanField(default=True, help_text='This product is active for this organization')

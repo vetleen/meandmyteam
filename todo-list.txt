@@ -19,6 +19,9 @@ add about us explaining scientific background of test (if any...)
 more data in sign-up, incl. check "accept terms". Consider also edit profile for this.
 add a terms-accepted checkbox to sign-up
 
+
+
+
 #more
 tests for payment views and the last few functions
 tests for product
