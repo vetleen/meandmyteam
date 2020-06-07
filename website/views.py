@@ -58,6 +58,9 @@ def privacy_policy_view(request):
     ''' displays the sites privacy policy'''
     return render(request, 'privacy_policy_template.html')
 
+def terms_view(request):
+    ''' displays the sites terms and conditions'''
+    return render(request, 'terms_template.html')
 
 @login_required
 def change_password(request):

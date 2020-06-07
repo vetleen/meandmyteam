@@ -2,52 +2,37 @@
 
 #dev
 
-add countries to stripe calls
-
-# more
-tests for payment views and the last few functions
-tests for product
-decide if need to revamp questions for product
-terms of use
 
 
-#Product #1
-add report-generator (https://www.google.com/search?client=ubuntu&channel=fs&q=django+create+pdf&ie=utf-8&oe=utf-8#kpvalbx=_PDbJXo7qCNGXmwX_jbeQDQ28)
-
-
-#fun stuff
-
-add impact stories to front page, and possibly own page
-add about us explaining scientific background of test (if any...)
-about us page and link in footer
-contact us page and link in footer
-
-
-#external services
-
-chat-box
-
-SEO?
-Google ads
-Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)
-password validation for signup
-terms of use, cookie consent?
-
-#finishing touch
-more info in edit profile AND in sign up
-
-Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#customize-pages
-use standard sign-up and change-password views?
-When visiting add employees for the first time, it would be neat if user was already added
+# TODO before launch
+SEO
 
 add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages, and make option to revoke consent.
+add a terms-accepted checkbox
+more data in sign-up, incl. check "accept terms". Consider also edit profile for this.
+Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#customize-pages
+password validation for signup
+contact us page and link in footer
 
+decide if need to revamp questions for product
+add about us explaining scientific background of test (if any...)
+
+#more
+tests for payment views and the last few functions
+tests for product
+about us page and link in footer
+add report-generator (https://www.google.com/search?client=ubuntu&channel=fs&q=django+create+pdf&ie=utf-8&oe=utf-8#kpvalbx=_PDbJXo7qCNGXmwX_jbeQDQ28)
+
+#external services
+chat-box
+
+#nice-to-haves
+Blog / "science" / "research" / "knowledge"
+Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)
+When visiting add employees for the first time, it would be neat if user was already added
 When 3 surveys have been completed, a line chart may be a better way to present data
-
 make a switch for toggeling products, and make it toggleable from dashboard.
-
 progress bar for question pages
-
 Add *automatic* country selection in Organization set-up: https://docs.djangoproject.com/en/3.0/ref/contrib/gis/geoip2/
-
-pricing page available to anonymous users alike
+pricing add impact stories to front page, and possibly own page
+add impact stories to front page, and possibly own page

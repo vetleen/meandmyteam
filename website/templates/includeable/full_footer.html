@@ -8,13 +8,13 @@
 
       </div><!-- col -->
       <div class="col-sm">
-        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">Useful</h6>
+        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">Site</h6>
         <ul class="list-unstyled">
           <li>
             <a href="{% url 'sign-up'%}" style="font-size: 14px;" class="text-dark">Sign up</a>
           </li>
           <li>
-            <a href="#" style="font-size: 14px;" class="text-dark">Plans and pricing</a>
+            <a href="{% url 'loginc'%}" style="font-size: 14px;" class="text-dark">Log in</a>
           </li>
         </ul>
       </div><!-- col -->
@@ -23,6 +23,9 @@
         <ul class="list-unstyled">
           <li>
             <a href="{% url 'privacy-policy' %}" style="font-size: 14px;" class="text-dark">Privacy policy</a>
+          </li>
+          <li>
+            <a href="{% url 'terms-and-conditions' %}" style="font-size: 14px;" class="text-dark">Terms of use</a>
           </li>
         </ul>
       </div><!-- col -->
