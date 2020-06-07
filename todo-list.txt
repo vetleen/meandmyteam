@@ -7,15 +7,17 @@
 # TODO before launch
 SEO
 
-add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages, and make option to revoke consent.
-add a terms-accepted checkbox
-more data in sign-up, incl. check "accept terms". Consider also edit profile for this.
+add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages.
+
 Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#customize-pages
 password validation for signup
 contact us page and link in footer
 
 decide if need to revamp questions for product
 add about us explaining scientific background of test (if any...)
+
+more data in sign-up, incl. check "accept terms". Consider also edit profile for this.
+add a terms-accepted checkbox to sign-up
 
 #more
 tests for payment views and the last few functions
