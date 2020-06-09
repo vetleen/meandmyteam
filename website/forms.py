@@ -149,7 +149,7 @@ class EditAccountForm(forms.Form):
     #Organization
     name = forms.CharField(max_length = 255, label="Organization name", widget=forms.TextInput(attrs={}))
     phone = PhoneNumberField(max_length=30, required=False, label="Phone incl.country code (e.g. +01)", widget=forms.TextInput(attrs={'placeholder':'Example: +12125552368'}))
-    address_line_1 = forms.CharField(max_length = 255, label="Street address*", widget=forms.TextInput(attrs={}))
+    address_line_1 = forms.CharField(max_length = 255, label="Street address", widget=forms.TextInput(attrs={}))
     address_line_2 =forms.CharField(max_length = 255, label="", required=False, widget=forms.TextInput(attrs={}))
     zip_code = forms.CharField(max_length = 20, label="Zip", widget=forms.TextInput(attrs={}))
     city = forms.CharField(max_length = 255, label="City", required=False, widget=forms.TextInput(attrs={}))

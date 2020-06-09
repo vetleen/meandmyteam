@@ -12,7 +12,7 @@
   {% include "includeable/message_displayer.html" %}
   </div><!-- row -->
   <div class="row">
-    <div class="col-md-8 col-lg-6 offset-md-2 offset-lg-3">
+    <div class="col-md-8 col-lg-6 offset-md-2 offset-lg-3 mb-5">
       <form method="post">
         {% csrf_token %}
         {% for hidden_field in form.hidden_fields %}
@@ -106,7 +106,7 @@
 
 
         <hr>
-        <h5>Organization information:</h5>
+        <h5 class="mt-4">Organization information:</h5>
         <div class="form-group">
           {{ form.name.label_tag }}
           {% if form.is_bound %}
