@@ -37,9 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
     'website',
-    'surveys',
+    #'surveys',
     'payments',
     'django_countries',
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [

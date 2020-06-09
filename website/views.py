@@ -1,8 +1,8 @@
 from django.conf import settings
 
 from website.forms import ChangePasswordForm, SignUpForm, LoginForm, EditAccountForm, ChoosePlanForm, CancelPlanForm, ResetPasswordForm
-from website.models import Subscriber
-from surveys.models import Organization
+from website.models import Organization
+
 from django.views.generic.edit import CreateView, UpdateView, DeleteView #dont think this is needed anymore
 from payments.utils.stripe_logic import *
 
@@ -148,9 +148,15 @@ def sign_up(request):
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data['username'], form.cleaned_data['password'])
             user.save()
-            subscriber = Subscriber(user=user)
-            subscriber.save()
-            organization = Organization(owner=user)
+            organization = Organization(
+                owner=user,
+                name = form.cleaned_data['name'],
+                address_line_1 = form.cleaned_data['address_line_1'],
+                address_line_2 = form.cleaned_data['address_line_2'],
+                zip_code = form.cleaned_data['zip_code'],
+                city = form.cleaned_data['city'],
+                country = form.cleaned_data['country'],
+                )
             organization.save()
             messages.success(request, 'Welcome aboard. Let\'s pick a plan.', extra_tags='alert alert-success')
             send_mail(
@@ -220,7 +226,20 @@ def logout_view(request):
 def edit_account_view(request):
     """View function for editing account"""
     if request.user.is_authenticated:
-        form = EditAccountForm(initial={'username': request.user}, user=request.user)
+        form = EditAccountForm(initial={
+                #User model
+                'username': request.user,
+                # Organization model
+                'name': request.user.organization.name,
+                'phone': request.user.organization.phone,
+                'address_line_1': request.user.organization.address_line_1,
+                'address_line_2': request.user.organization.address_line_2,
+                'zip_code' : request.user.organization.zip_code,
+                'city': request.user.organization.city,
+                'country': request.user.organization.country,
+                },
+            user=request.user
+            )
         #If we receive POST data
         context = {
             'form': form,
@@ -232,12 +251,18 @@ def edit_account_view(request):
             context.update({'form': form})
             # Check if the form is valid:
             if form.is_valid():
-                #print("form was valid")
-                # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
-                new_username = form.cleaned_data['username']
-                request.user.username = new_username
-                request.user.email = new_username
+                request.user.username = form.cleaned_data['username']
+                request.user.email = form.cleaned_data['username']
+                request.user.organization.name = form.cleaned_data['name']
+                request.user.organization.phone = form.cleaned_data['phone']
+                request.user.organization.address_line_1 = form.cleaned_data['address_line_1']
+                request.user.organization.address_line_2 = form.cleaned_data['address_line_2']
+                request.user.organization.zip_code = form.cleaned_data['zip_code']
+                request.user.organization.city = form.cleaned_data['city']
+                request.user.organization.country = form.cleaned_data['country']
+
                 request.user.save()
+                request.user.organization.save()
                 messages.success(request, 'Your profile details was updated.', extra_tags='alert alert-success')
 
         return render(request, 'edit_account_form.html', context)
@@ -247,197 +272,3 @@ def edit_account_view(request):
         logger.warning("%s %s: %s tried to edit someone else's account"%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
         messages.error(request, "Can't edit profile when you are not logged in.", extra_tags='alert alert-danger')
         return HttpResponseRedirect(reverse('loginc'))
-
-
-'''
-@login_required
-def your_plan_view(request):
-    """View function for viewing and updating your plan"""
-    s=Subscriber.objects.get(user__username=request.user.username)
-    #print(s.update_plan_from_stripe_plan())
-    if request.user.subscriber.status == 'inactive':
-        messages.info(request, 'You haven\'t picked a plan yet.', extra_tags='alert alert-info')
-        return HttpResponseRedirect(reverse('choose-plan'))
-    else:
-
-        context = {
-            'plans': [request.user.subscriber.plan],
-            'show_sales_arguments': False,
-            'show_footer': True,
-        }
-        return render(request, 'current_plan.html', context)
-
-
-def choose_plan_view(request):
-    """View function for choosing a plan"""
-
-    #print('The three plans are; %s, %s and %s.'%(smb_plan, stdrd_plan, ent_plan))
-    plans = Plan.objects.filter(can_be_viewed=True).order_by('monthly_price')[:3]
-    context = {
-        'plans': plans,
-        'show_sales_arguments': True,
-        'show_footer': True,
-    }
-
-    return render(request, 'choose_plan.html', context)
-
-@login_required
-def cancel_plan_view(request):
-    """View function for choosing a plan"""
-    if request.method == 'POST':
-        form = CancelPlanForm(request.POST)
-        if form.is_valid():
-            canceled_sub=""
-            try:
-                canceled_sub = stripe.Subscription.delete(request.user.subscriber.stripe_subscription_id)
-            except:
-                messages.error(request, 'While canceling your subscription we encountered an error. Probably your subscription was already cancelled. If your subscription remains active, and the problem persists, please contact us.', extra_tags='alert alert-warning')
-            s=request.user.subscriber.sync_with_stripe_plan()
-            try:
-                if canceled_sub.status == 'canceled':
-                    messages.success(request, 'Your plan was cancelled!', extra_tags='alert alert-success')
-                else:
-                    messages.error(request, 'Oh no! We tried to cancel your subscription with our payment provider, but was unable to. Please try again later, or drop us an email to let us know this happened, and we will get right on fixing it!', extra_tags='alert alert-warning')
-            except:
-                    messages.error(request, 'Oh no! We tried to cancel your subscription with our payment provider, but was unable to. Please try to log out and in, and then try again.Drop us an email to let us know if this keeps happening.', extra_tags='alert alert-warning')
-            return HttpResponseRedirect(reverse('your-plan'))
-        else:
-            messages.error(request, 'Oh no! We were unable to verify that you confirmed to cancel. This is totally our fault. You can try again later, or contact us directly.', extra_tags='alert alert-warning')
-            return HttpResponseRedirect(reverse('your-plan'))
-    return render(request, 'cancel_plan_confirm.html')
-
-@login_required
-def change_plan_view(request):
-    """View function for choosing a plan"""
-    messages.error(request, 'We currently have no support for changing plans (as there is only one available plan). Check back later, or let us know that you are interested in a different plan by email or by clicking the link below the plan you are interested in!', extra_tags='alert alert-warning')
-    return HttpResponseRedirect(reverse('choose-plan'))
-
-@login_required
-def show_interest_in_unavailable_plan(request):
-
-    if request.method == 'POST':
-        form = ChoosePlanForm(request.POST)
-        if form.is_valid():
-            interesting_plan_name = form.cleaned_data['chosen_plan']
-            request.user.subscriber.flagged_interest_in_plan = interesting_plan_name
-            request.user.subscriber.save()
-            messages.success(request, 'Thanks. Your interest is duely noted! We will contact you once the plan becomes available.', extra_tags='alert alert-success')
-            send_mail(
-                '[www] Interest in unavailable plan from: %s'%(request.user.username),
-                '%s has indicated that they are interested in an unavialble plan: %s.'%(request.user.username, interesting_plan_name),
-                'sales@motpanel.com',
-                ['sales@motpanel.com'],
-                fail_silently=True,
-            )
-        else:
-            messages.error(request, 'Oh no! That feature doesn\'t work right now, but please check back in later!', extra_tags='alert alert-warning')
-    return HttpResponseRedirect(request.GET.get('next', reverse('choose-plan')))
-
-@login_required
-def set_up_subscription(request):
-
-    if request.method != 'POST':
-        messages.info(request, 'You must pick a plan before you can set up a subscription.', extra_tags='alert alert-warning')
-        return HttpResponseRedirect(reverse('choose-plan'))
-
-    #logic to pick the plan
-    form = ChoosePlanForm(request.POST)
-    if form.is_valid():
-        #print("ChoosePlanForm was valid")
-        #print("trying to look up: %s"%(form.cleaned_data['chosen_plan']))
-        chosen_plan = Plan.objects.get(name=form.cleaned_data['chosen_plan'])
-        chosen_plan_id = chosen_plan.stripe_monthly_plan_id #only support monthly for now
-
-    else:
-        messages.error(request, 'Oh no! We are unable to recognize the plan you chose in our back-end. This is totally our fault! We\'d really appreciate you dropping us an email letting us know this happened!', extra_tags='alert alert-warning')
-        return HttpResponseRedirect(reverse('choose-plan'))
-
-    #Make sure we have a Stripe Customer object to work with
-    s=Subscriber.objects.get(user__username=request.user.username)
-    s = s.sync_with_stripe_plan()
-    if request.user.subscriber.stripe_id is not None:
-        #This happens if users use the Update payment method or Restart buttons on plans.
-        #This currently bills the customer and starts new subsc., regardless of the old.
-        try:
-            stripe_customer = stripe.Customer.retrieve(request.user.subscriber.stripe_id)
-        except:
-            messages.error(request, 'Oh no! We were unable to retrieve your customer data from our payment provider. If the problem persists, please contact us. ', extra_tags='alert alert-warning')
-            return HttpResponseRedirect(reverse('choose-plan'))
-
-    else:
-        #user does not have a stripe customer id, and we should make one
-        try:
-            stripe_customer = stripe.Customer.create(
-                description="Test Customer from set_up_subscription_view",
-                email=request.user.email,
-                #more fields here later
-                )
-            s.stripe_id=stripe_customer.id
-            s.save()
-            s = s.sync_with_stripe_plan()
-        except:
-            messages.error(request, 'Oh no! We were unable to connect with our payment provider. This usualy lasts very shortly. ', extra_tags='alert alert-warning')
-            return HttpResponseRedirect(reverse('choose-plan'))
-    #Make a session where customer object can create a subscription and payment method object on stripe webpage
-    try:
-        stripe_session = stripe.checkout.Session.create(
-            customer=stripe_customer.id,
-            payment_method_types=['card'],
-            subscription_data={
-                'items': [{
-                'plan': chosen_plan_id,
-                }],
-              },
-              success_url=request.build_absolute_uri(reverse('set-up-subscription-success'))+'?stripe_session_id={CHECKOUT_SESSION_ID}', #'http:127.0.0.1:8000/set-up-subscription-success/?stripe_session_id={CHECKOUT_SESSION_ID}', #
-              cancel_url=request.build_absolute_uri(reverse('set-up-subscription-cancel'))#reverse('set-up-subscription-cancel') #'http:127.0.0.1:8000/set-up-subscription-cancel/',
-            )
-    except:
-            messages.error(request, 'Oh no! We were unable to connect with our payment provider. This usually doesn\'t last very long. However, if the problem persists, please contact us. ', extra_tags='alert alert-warning')
-            return HttpResponseRedirect(reverse('choose-plan'))
-
-    messages.info(request, 'You have chosen the %s plan, with monthly billing.'%(chosen_plan.name), extra_tags='alert alert-info')
-    messages.info(request, 'Use this credit card in testing: 4242424242424242', extra_tags='alert alert-info')
-
-    context = {
-        'stripe_session': stripe_session,
-        'stripe_pk': stripe_pk,
-        'plans': [chosen_plan],
-        'show_sales_arguments': False,
-        'show_footer': False,
-    }
-
-    return render(request, 'set_up_subscription.html', context) #should just redirect to stripe?
-
-@login_required
-def set_up_subscription_success(request):
-    "a view for receiving success message from stripe"
-    # GET stripes session-id and retrieve the session,
-    stripe_session_id = request.GET['stripe_session_id']
-    try:
-        completed_stripe_session = stripe.checkout.Session.retrieve(stripe_session_id)
-    except:
-        messages.error(request, 'Oh no! Your payment was successful, but then we were unable to connect to our payment provider to sync your settings on our side. Our people have been alerted, and will do it manually!', extra_tags='alert alert-warning')
-        return HttpResponseRedirect(reverse('your-plan'))
-    # Update the Subscriber object with the proper plan
-    s=Subscriber.objects.get(user__username=request.user.username)
-    s.stripe_subscription_id = completed_stripe_session.subscription
-    s.save()
-    s = s.sync_with_stripe_plan()
-    #print('in the view we have a Subscriber: %s, with a stripe_subscription_id: %s.name'%(s.user.username, s.stripe_subscription_id))
-    #Check that the subscription is now active or trialing
-    status = request.user.subscriber.status
-    #print('in the view we call status and get: %s'%(status))
-    if (status == 'active') or (status == 'trialing'): #Possible values are incomplete, trialing, active, expired, 'unable to charge'
-        messages.success(request, 'You have succesfully set up a plan! The next step to get started is shown belown!', extra_tags='alert alert-success')
-        return HttpResponseRedirect(reverse('surveys-dashboard'))
-    else:
-        messages.error(request, 'Oh no. This rarely (never?) happens. Our payment provider sent you to this page because you completed subscription setup, but when we check your subscription status, the status-message, which we expected to be "active" or "trialing" is "%s" instead. We\'ve alerted ourselves though, and are working to fix the problem asap.'%(status), extra_tags='alert alert-warning')
-        return HttpResponseRedirect(reverse('your-plan'))
-
-@login_required
-def set_up_subscription_cancel(request):
-    "a view for receiving error message from stripe"
-
-    messages.error(request, 'The subscription setup process was cancelled. Try again?', extra_tags='alert alert-danger')
-    return HttpResponseRedirect(reverse('choose-plan'))
-'''

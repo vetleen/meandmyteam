@@ -1,13 +1,39 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.validators import validate_email
-
 from django.contrib import messages
 
+from website.models import Organization
+
+from django_countries.widgets import CountrySelectWidget
+from django_countries.fields import CountryField
+from phonenumber_field.formfields import PhoneNumberField
+
 class SignUpForm(forms.Form):
+    #User
     username = forms.EmailField(max_length = 150, label="Email address", widget=forms.TextInput(attrs={'type':'input'}))
     password = forms.CharField(max_length = 20, label="Choose a password", widget=forms.PasswordInput(attrs={'type':'password'}))
     confirm_password = forms.CharField(max_length = 20, label="Confirm password", widget=forms.PasswordInput(attrs={'type':'password'}))
+
+    #Organization
+    name = forms.CharField(max_length = 255, label="Organization name*", widget=forms.TextInput(attrs={}))
+    phone = PhoneNumberField(max_length=30, required=False, label="Phone incl.country code (e.g. +01)", widget=forms.TextInput(attrs={'placeholder':'Example: +12125552368'}))
+    address_line_1 = forms.CharField(max_length = 255, label="Street address*", widget=forms.TextInput(attrs={}))
+    address_line_2 =forms.CharField(max_length = 255, label="", required=False, widget=forms.TextInput(attrs={}))
+    zip_code = forms.CharField(max_length = 20, label="Zip*", widget=forms.TextInput(attrs={}))
+    city = forms.CharField(max_length = 255, label="City", required=False, widget=forms.TextInput(attrs={}))
+    country = CountryField(blank_label='(Select country)').formfield(label="Country*")
+
+    def clean_name(self):
+        if User.objects.filter(organization__name=self.cleaned_data['name']).exists():
+            if not User.objects.get(organization__name=self.cleaned_data['name']).owner == self.user:
+                print ('Compared %s with %s'%(User.objects.get(organization__name=self.cleaned_data['name']).owner, self.user))
+                raise forms.ValidationError(
+                    "An organization with that name already exists (%(taken_name)s).",
+                    code='invalid',
+                    params={'taken_name': self.cleaned_data['name']}
+                )
+        return self.cleaned_data['name']
 
     def clean_username(self):
         if User.objects.filter(username=self.cleaned_data['username']).exists():
@@ -117,18 +143,36 @@ class EditAccountForm(forms.Form):
     def __init__(self, *args, **kwargs):
          self.user = kwargs.pop('user',None)
          super(EditAccountForm, self).__init__(*args, **kwargs)
-
+    #User
     username = forms.EmailField(max_length = 150, label="Email address", help_text="Your email is also your username.", widget=forms.TextInput(attrs={'type':'email'}))
 
+    #Organization
+    name = forms.CharField(max_length = 255, label="Organization name", widget=forms.TextInput(attrs={}))
+    phone = PhoneNumberField(max_length=30, required=False, label="Phone incl.country code (e.g. +01)", widget=forms.TextInput(attrs={'placeholder':'Example: +12125552368'}))
+    address_line_1 = forms.CharField(max_length = 255, label="Street address*", widget=forms.TextInput(attrs={}))
+    address_line_2 =forms.CharField(max_length = 255, label="", required=False, widget=forms.TextInput(attrs={}))
+    zip_code = forms.CharField(max_length = 20, label="Zip", widget=forms.TextInput(attrs={}))
+    city = forms.CharField(max_length = 255, label="City", required=False, widget=forms.TextInput(attrs={}))
+    country = CountryField(blank_label='(Select country)').formfield(label="Country")
+
+    def clean_name(self):
+        pre_existing_org = None
+        try:
+            pre_existing_org = Organization.objects.get(name=self.cleaned_data['name'])
+        except Organization.DoesNotExist as err:
+            pass
+        if pre_existing_org is not None:
+            if pre_existing_org.owner != self.user:
+                #print ('Compared %s with %s'%(pre_existing_org.owner, self.user))
+                raise forms.ValidationError(
+                    "An organization with that name already exists (%(taken_name)s).",
+                    code='invalid',
+                    params={'taken_name': self.cleaned_data['name']}
+                )
+        return self.cleaned_data['name']
+
     def clean_username(self):
-        #once i figure out how to check User object from here i will also add a separate validation error for trying to change to ones own existing.
-        if self.cleaned_data['username'] == self.user.username:
-            raise forms.ValidationError(
-                "Your email is already set to %(existing_email)s.", #user-friendlyness outweights potential security concern
-                code='invalid',
-                params={'existing_email': self.cleaned_data['username']}
-            )
-        if User.objects.filter(username=self.cleaned_data['username']).exists():
+        if User.objects.filter(username=self.cleaned_data['username']).exists() and self.cleaned_data['username'] != self.user.username:
             raise forms.ValidationError(
                 "A user with the email already exist (%(taken_email)s).", #user-friendlyness outweights potential security concern
                 code='invalid',

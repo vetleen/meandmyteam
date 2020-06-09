@@ -1,13 +1,11 @@
 from django.conf import settings
-from surveys.models import Organization
+from website.models import Organization
 
 #open connection to stripe
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe_pk = settings.STRIPE_PUBLISHABLE_KEY
 stripe_sk = settings.STRIPE_SECRET_KEY
-
-
 
 ##create Customer & save connection to User in db
 def create_stripe_customer(organization):
@@ -41,7 +39,7 @@ def create_stripe_customer(organization):
             shipping={
                 'address': address,
                 'name': organization.name,
-                #'phone': None,
+                'phone': organization.owner.phone,
             }
         )
     except Exception as err:

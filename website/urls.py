@@ -31,4 +31,8 @@ urlpatterns = [
     path('cancel-plan/', RedirectView.as_view(url=reverse_lazy('payments_current_plan'), permanent=True)),
     path('show-interest-in-unavailable-plan/', RedirectView.as_view(url=reverse_lazy('payments_current_plan'), permanent=True)),
 
+
+    #Temporary
+    path('dashboard/', views.edit_account_view, name='surveys-dashboard'),
+
 ]

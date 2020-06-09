@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect, HttpResponseServerError, HttpRespo
 
 from django.urls import reverse
 from django.contrib import messages
-from surveys.models import Employee
+#from surveys.models import Employee
 
 from payments.utils.stripe_logic import *
 from operator import itemgetter
@@ -24,9 +24,9 @@ def current_plan_view(request):
 
     ## what do we know about this user?
     #get the customer object id from DB
-    stripe_id = request.user.subscriber.stripe_id
+    stripe_id = request.user.organization.stripe_id
     #get the subscription object id from DB
-    stripe_subscription_id = request.user.subscriber.stripe_subscription_id
+    stripe_subscription_id = request.user.organization.stripe_subscription_id
 
     #get the customer object from Stripe, if any, or make one
     stripe_customer = None
@@ -41,8 +41,8 @@ def current_plan_view(request):
             return HttpResponseServerError()
         #if it WAS made, save it, so we can retrieve it later
         stripe_id = stripe_customer.id
-        request.user.subscriber.stripe_id = stripe_id
-        request.user.subscriber.save()
+        request.user.organization.stripe_id = stripe_id
+        request.user.organization.save()
 
     ##SUBSCRIPTION
     #if there is a sub_id, get the subscription object from Stripe,
@@ -158,9 +158,9 @@ def current_plan_view(request):
 def set_up_payment_view(request):
     """View function for ..."""
     #get the customer object id from DB, if any
-    stripe_id = request.user.subscriber.stripe_id
+    stripe_id = request.user.organization.stripe_id
     #get the subscription object id from DB, if any
-    stripe_subscription_id = request.user.subscriber.stripe_subscription_id
+    stripe_subscription_id = request.user.organization.stripe_subscription_id
 
     #Make sure we have a customer object, either retrive or create:
     stripe_customer = retrieve_stripe_customer(stripe_id)
@@ -174,8 +174,8 @@ def set_up_payment_view(request):
             return HttpResponseServerError()
         #if it was made, save it in DB, so we can use it later
         stripe_id = stripe_customer.id
-        request.user.subscriber.stripe_id = stripe_id
-        request.user.subscriber.save()
+        request.user.organization.stripe_id = stripe_id
+        request.user.organization.save()
 
     #catch cases where we have subscription id, but are not able to get the Subscriber object from stripe
     if stripe_subscription_id is not None and stripe_subscription_id is not '':
@@ -236,7 +236,7 @@ def set_up_payment_method_success(request):
     #get the new payment method, and set it to default
     pm = completed_stripe_session.setup_intent.payment_method
     invoice_settings = {'default_payment_method': pm}
-    c = stripe.Customer.modify(request.user.subscriber.stripe_id, invoice_settings=invoice_settings)
+    c = stripe.Customer.modify(request.user.organization.stripe_id, invoice_settings=invoice_settings)
 
     #declare success and return to overview
     messages.success(request, 'Payment method set up successfully!', extra_tags='alert alert-success')
@@ -247,7 +247,7 @@ def use_payment_method_view(request, **kwargs):
     """View function for ..."""
     payment_method_id = kwargs.get('payment_method_id', None)
     try:
-        stripe_id = request.user.subscriber.stripe_id
+        stripe_id = request.user.organization.stripe_id
         stripe_customer = retrieve_stripe_customer(stripe_id)
         pm = retrieve_stripe_payment_method(payment_method_id)
         if stripe_id == pm.customer:
@@ -269,7 +269,7 @@ def delete_payment_method_view(request, **kwargs):
     """View function for ..."""
     payment_method_id = kwargs.get('payment_method_id', None)
     try:
-        stripe_user = retrieve_stripe_customer(request.user.subscriber.stripe_id)
+        stripe_user = retrieve_stripe_customer(request.user.organization.stripe_id)
         pm = retrieve_stripe_payment_method(payment_method_id)
         if stripe_user.id == pm.customer:
             dpm = delete_stripe_payment_method(payment_method_id)
@@ -293,9 +293,9 @@ def create_subscription_view(request, **kwargs):
     subscription_id = kwargs.get('subscription_id', None)
 
     #get the default payment method if any, and assign to variable
-    stripe_customer = retrieve_stripe_customer(request.user.subscriber.stripe_id)
+    stripe_customer = retrieve_stripe_customer(request.user.organization.stripe_id)
     if stripe_customer == None:
-        logger.error("%s %s: create_subscription_view: Tried to retrieve stripe Subscriber object for user %s, with ID %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'ERROR: ', request.user, request.user.subscriber.stripe_id))
+        logger.error("%s %s: create_subscription_view: Tried to retrieve stripe Subscriber object for user %s, with ID %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'ERROR: ', request.user, request.user.organization.stripe_id))
         return HttpResponseServerError()
 
     payment_method_id = stripe_customer.invoice_settings.default_payment_method
@@ -307,17 +307,14 @@ def create_subscription_view(request, **kwargs):
         return HttpResponseRedirect(reverse('payments-set-up-payment-method')+'?next='+reverse('payments-create-subscription', args=[subscription_id]))
 
     try:
-        #Get the number of co-workers to charge for:
-        quantity=1 #minimum number
-        elist = Employee.objects.filter(organization=request.user.organization)
-        print(len(elist))
-        if len(elist) > quantity:
-            quantity = len(elist)
+        #Update and retrieve the number of co-workers to charge
+        quantity=request.user.organization.update_stripe_subscription_quantity()
+
         #get the Customer object ID
-        stripe_id = request.user.subscriber.stripe_id
+        stripe_id = request.user.organization.stripe_id
         s = create_stripe_subscription(stripe_id, subscription_id, trial_from_plan=True, quantity=quantity)
-        request.user.subscriber.stripe_subscription_id=s.id
-        request.user.subscriber.save()
+        request.user.organization.stripe_subscription_id=s.id
+        request.user.organization.save()
         if s is not None:
             messages.success(request, 'Your subscription was started!', extra_tags='alert alert-success')
         else:
@@ -335,7 +332,7 @@ def cancel_subscription_view(request, **kwargs):
     """View function for ..."""
     subscription_id = kwargs.get('subscription_id', None)
     try:
-        if subscription_id == request.user.subscriber.stripe_subscription_id:
+        if subscription_id == request.user.organization.stripe_subscription_id:
             cs = cancel_stripe_subscription(subscription_id)
             if cs is not None:
                 messages.success(request, 'Your subscription was cancelled, it will not renew next billing cycle.', extra_tags='alert alert-success')
@@ -354,7 +351,7 @@ def restart_cancelled_subscription_view(request, **kwargs):
     """View function for ..."""
     subscription_id = kwargs.get('subscription_id', None)
     try:
-        if subscription_id == request.user.subscriber.stripe_subscription_id:
+        if subscription_id == request.user.organization.stripe_subscription_id:
             rs = restart_cancelled_stripe_subscription(subscription_id)
             if rs is not None:
                 messages.success(request, 'Your subscription was restarted!', extra_tags='alert alert-success')
@@ -373,7 +370,7 @@ def change_subscription_price_view(request, **kwargs):
     """View function for ..."""
     price_id = kwargs.get('price_id', None)
     try:
-        s = change_stripe_subscription_price(request.user.subscriber.stripe_subscription_id, price_id)
+        s = change_stripe_subscription_price(request.user.organization.stripe_subscription_id, price_id)
         if s is not None:
             messages.success(request, 'Your subscription was updated with the chosen plan!', extra_tags='alert alert-success')
         else:

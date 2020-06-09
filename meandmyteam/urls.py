@@ -18,16 +18,17 @@ from django.urls import path
 from django.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
-from surveys import views as survey_views
+#from surveys import views as survey_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('products/', include('surveys.urls')),
-    path('dashboard/', include('surveys.urls')),
+    #path('products/', include('surveys.urls')),
+    
+    #path('dashboard/', include('surveys.urls')),
     path('', include('website.urls')),
-    path('answer-survey/<token>/', survey_views.answer_survey_view, name='surveys-answer-survey'),
-    path('answer-survey/<token>/<page>/', survey_views.answer_survey_view, name='surveys-answer-survey-pages'),
+    #path('answer-survey/<token>/', survey_views.answer_survey_view, name='surveys-answer-survey'),
+    #path('answer-survey/<token>/<page>/', survey_views.answer_survey_view, name='surveys-answer-survey-pages'),
     path('payments/', include('payments.urls')),
 
 ]

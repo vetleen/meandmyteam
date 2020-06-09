@@ -1,4 +1,5 @@
 {% extends "base_generic.html" %}
+{% load widget_tweaks %}
 
 {% block content %}
 <div class="container">
@@ -11,8 +12,245 @@
   {% include "includeable/message_displayer.html" %}
   </div><!-- row -->
   <div class="row">
-    <div class="col-lg-6">
-{% include "includeable/form_renderer.html" %}
+    <div class="col-md-8 col-lg-6 offset-md-2 offset-lg-3">
+      <form method="post">
+        {% csrf_token %}
+        {% for hidden_field in form.hidden_fields %}
+          {{ hidden_field }}
+        {% endfor %}
+        <h5>User information:</h5>
+
+        <div class="form-group">
+          {{ form.username.label_tag }}
+          {% if form.is_bound %}
+            {% if form.username.errors %}
+              {% render_field form.username class="form-control is-invalid" %}
+              {% for error in form.username.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.username class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.username class="form-control" %}
+          {% endif %}
+          {% if username.help_text %}
+            <small class="form-text text-muted">{{ form.username.help_text }}</small>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          {{ form.phone.label_tag }}
+          {% if form.is_bound %}
+            {% if form.phone.errors %}
+              {% render_field form.phone class="form-control is-invalid" %}
+              {% for error in form.phone.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.phone class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.phone class="form-control" %}
+          {% endif %}
+          {% if phone.help_text %}
+            <small class="form-text text-muted">{{ form.phone.help_text }}</small>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          {{ form.password.label_tag }}
+          {% if form.is_bound %}
+            {% if form.password.errors %}
+              {% render_field form.password class="form-control is-invalid" %}
+              {% for error in form.password.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.password class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.password class="form-control" %}
+          {% endif %}
+          {% if password.help_text %}
+            <small class="form-text text-muted">{{ form.password.help_text }}</small>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          {{ form.confirm_password.label_tag }}
+          {% if form.is_bound %}
+            {% if form.confirm_password.errors %}
+              {% render_field form.confirm_password class="form-control is-invalid" %}
+              {% for error in form.confirm_password.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.confirm_password class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.confirm_password class="form-control" %}
+          {% endif %}
+          {% if confirm_password.help_text %}
+            <small class="form-text text-muted">{{ form.confirm_password.help_text }}</small>
+          {% endif %}
+        </div>
+
+
+        <hr>
+        <h5>Organization information:</h5>
+        <div class="form-group">
+          {{ form.name.label_tag }}
+          {% if form.is_bound %}
+            {% if form.name.errors %}
+              {% render_field form.name class="form-control is-invalid" %}
+              {% for error in form.name.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.name class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.name class="form-control" %}
+          {% endif %}
+          {% if name.help_text %}
+            <small class="form-text text-muted">{{ form.name.help_text }}</small>
+          {% endif %}
+        </div>
+
+
+
+
+        <div class="form-group">
+          {{ form.address_line_1.label_tag }}
+          {% if form.is_bound %}
+            {% if form.address_line_1.errors %}
+              {% render_field form.address_line_1 class="form-control is-invalid" %}
+              {% for error in form.address_line_1.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.address_line_1 class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.address_line_1 class="form-control" %}
+          {% endif %}
+          {% if address_line_1.help_text %}
+            <small class="form-text text-muted">{{ form.address_line_1.help_text }}</small>
+          {% endif %}
+        </div>
+
+
+
+        <div class="form-group">
+          {{ form.address_line_2.label_tag }}
+          {% if form.is_bound %}
+            {% if form.address_line_2.errors %}
+              {% render_field form.address_line_2 class="form-control is-invalid" %}
+              {% for error in form.address_line_2.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.address_line_2 class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.address_line_2 class="form-control" %}
+          {% endif %}
+          {% if address_line_2.help_text %}
+            <small class="form-text text-muted">{{ form.address_line_2.help_text }}</small>
+          {% endif %}
+        </div>
+
+
+
+
+        <div class="form-row">
+        <div class="col-sm-4">
+          {{ form.zip_code.label_tag }}
+          {% if form.is_bound %}
+            {% if form.zip_code.errors %}
+              {% render_field form.zip_code class="form-control is-invalid" %}
+              {% for error in form.zip_code.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.zip_code class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.zip_code class="form-control" %}
+          {% endif %}
+          {% if zip_code.help_text %}
+            <small class="form-text text-muted">{{ form.zip_code.help_text }}</small>
+          {% endif %}
+        </div>
+        <div class="col-sm-8">
+          {{ form.city.label_tag }}
+          {% if form.is_bound %}
+            {% if form.city.errors %}
+              {% render_field form.city class="form-control is-invalid" %}
+              {% for error in form.city.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.city class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.city class="form-control" %}
+          {% endif %}
+          {% if city.help_text %}
+            <small class="form-text text-muted">{{ form.city.help_text }}</small>
+          {% endif %}
+        </div>
+        </div><!-- form row -->
+
+
+
+
+        <div class="form-group mt-3">
+          {{ form.country.label_tag }}
+          {% if form.is_bound %}
+            {% if form.country.errors %}
+              {% render_field form.country class="form-control is-invalid" %}
+              {% for error in form.country.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.country class="form-control is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.country class="form-control" %}
+          {% endif %}
+          {% if country.help_text %}
+            <small class="form-text text-muted">{{ form.country.help_text }}</small>
+          {% endif %}
+        </div>
+
+
+
+
+        <button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button>
+      </form>
+
     </div><!-- col -->
   </div> <!-- row -->
 </div><!-- container -->
