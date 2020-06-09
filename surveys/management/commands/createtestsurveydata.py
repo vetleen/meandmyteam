@@ -12,15 +12,15 @@ class Command(BaseCommand):
     help = 'Creates a few surveys and so on so ...'
 
     def handle(*args, **kwargs):
-        orgname="TestOrganization03"
-        username="testorg03@aa.aa"
+        orgname="TestOrganization01"
+        username="testorg01@aa.aa"
         password="jjj43skjma@67#"
 
         print('creating test data, Organization and Employees')
         try:
             u = User.objects.create_user(username=username, email=username, password=password)
             u.save()
-            o = Organization(owner=u, name=orgname)
+            o = Organization(owner=u, name=orgname, address_line_1="Calle Espana 345")
             o.save()
             s = Subscriber(user=u)
             s.save()
@@ -28,7 +28,7 @@ class Command(BaseCommand):
             print('the user was already created, let\'s retreive it...')
             u=User.objects.get(username=username)
         try:
-            o = Organization(owner=u, name=orgname)
+            o = Organization(owner=u, name=orgname, address_line_1="Calle Espana 345")
             o.save()
         except IntegrityError as err:
             print('the organization was already created, let\'s retreive it...')

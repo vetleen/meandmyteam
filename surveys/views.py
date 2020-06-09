@@ -173,7 +173,7 @@ def dashboard_view(request):
     number_of_respondents = 0 #make in case it's not set later
     number_of_invited = 0
     if latest_survey is not None:
-        print ('there was a latest_survey')
+        #print ('there was a latest_survey')
         sis = SurveyInstance.objects.filter(survey=latest_survey)
         number_of_invited = len(sis)
         #print ('%s was invited to respond'%(len(sis)))
@@ -185,7 +185,7 @@ def dashboard_view(request):
 
 
     #make the est_active variable and correctly set it
-    
+
     est_active = False
     p=None
     try:
@@ -599,9 +599,9 @@ def answer_survey_view(request, **kwargs):
 def co_worker_satisfaction_data_view(request, **kwargs):
     #get the survey with the specified date provided by the url
     date_close=kwargs.get('date_close', None)
-    print('got date close from url: %s.'%(date_close))
-    date_close = datetime.strptime(date_close, "%Y-%m-%d").date()
-    print('turned it into: %s.'%(date_close))
+    #print('got date close from url: %s.'%(date_close))
+    date_close = datetime.datetime.strptime(date_close, "%Y-%m-%d").date()
+    #print('turned it into: %s.'%(date_close))
 
     #get the organization's surveys, sorted by closing date, and only the ones up until the date specified in the url
     surveys = Survey.objects.filter(
@@ -609,7 +609,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
         owner=request.user.organization,
         date_close__lte=date_close
     ).order_by('date_close') #the last item is the requested survey (with the should_be_impossible_exception that more surveys end this date)
-    print ('Found %s closed surveys'%(len(surveys)))
+    #print ('Found %s closed surveys'%(len(surveys)))
 
     #turn queryset into list, and remove any surveys that are not closed yet
     surveys = [s for s in surveys if s.date_close < date.today()]
@@ -619,13 +619,13 @@ def co_worker_satisfaction_data_view(request, **kwargs):
         this_survey = surveys.pop()
     else:
         this_survey = None
-    print ('This survey is: %s'%(this_survey))
+    #print ('This survey is: %s'%(this_survey))
     #get the second last survey and bind to variable, if any
     if len(surveys) > 0:
         previous_survey = surveys.pop()
     else:
         previous_survey = None
-    print ('Previous survey is: %s'%(previous_survey))
+    #print ('Previous survey is: %s'%(previous_survey))
     ##get score per category
     #get all answers in latest survey
     survey_results = () #empty list if there is no latest survey
@@ -639,12 +639,12 @@ def co_worker_satisfaction_data_view(request, **kwargs):
 
     if this_survey is not None:
         answers = IntAnswer.objects.filter(survey_instance__survey=this_survey) #for now, all answers are IntAnswers
-        print('found %s answers for this survey'%(len(answers)))
+        #print('found %s answers for this survey'%(len(answers)))
 
         #get and average out role clarity:
         role_clarity_avg = 0
         try:
-            print("trying to retrieve answers for role clarity and average them")
+            #print("trying to retrieve answers for role clarity and average them")
             role_clarity_answers = [a for a in answers if a.question.dimension == 'role']
             role_clarity_total = 0
             for a in role_clarity_answers:
@@ -769,7 +769,7 @@ def co_worker_satisfaction_data_view(request, **kwargs):
             #also decide the size of the bars to display
             prole_clarity_avg = 0
             try:
-                print('Trying to get role clarity averaghe for PREVIOUS survey')
+                #print('Trying to get role clarity averaghe for PREVIOUS survey')
                 role_clarity_answers = [a for a in panswers if a.question.dimension == 'role']
                 role_clarity_total = 0
                 for a in role_clarity_answers:
@@ -1008,15 +1008,15 @@ def co_worker_satisfaction_data_view(request, **kwargs):
                         'red_bar': red_bar,
                         'green_bar': green_bar,
                    })
-            print("comparing: %s, %s..." %(manager_support_avg, pmanager_support_avg))
+            #print("comparing: %s, %s..." %(manager_support_avg, pmanager_support_avg))
     #get questions for the product to display under each category
     questions = Question.objects.filter(product__name='Employee Satisfaction Tracking')
-    print('found %s questions'%(len(questions)))
+    #print('found %s questions'%(len(questions)))
     #get all answers for this survey, so we can show scores with the questions
     #find the average score for each, and also calculate the progress bar length to display - pass both into a list questions
-    print("are there any answers?")
+    #print("are there any answers?")
     if answers:
-        print("YES!")
+        #print("YES!")
         answers_avgs = []
         for q in questions:
             relevant_answers = [a for a in answers if a.question == q]
@@ -1053,39 +1053,39 @@ def co_worker_satisfaction_data_view(request, **kwargs):
     highest_score = highest_score[0]
     lowest_score = lowest_score[0]
 
-    print("Higest score: %s, lowest score: %s."%(highest_score, lowest_score))
+    #print("Higest score: %s, lowest score: %s."%(highest_score, lowest_score))
 
     #count respondents
     number_of_respondents = 0 #make in case it's not set later
     number_of_invited = 0
-    print("is there a this_survey?")
+    #print("is there a this_survey?")
     if this_survey:
-        print("YES!")
+        #print("YES!")
 
         sis = SurveyInstance.objects.filter(survey=this_survey)
         number_of_invited = len(sis)
         #print ('%s was invited to respond'%(len(sis)))
         for si in sis:
-            print("in for loop!")
+            #print("in for loop!")
             if si.completed:
                 number_of_respondents += 1
         #print ('%s responded'%(number_of_respondents))
 
     number_of_respondents_previous = 0 #make in case it's not set later
     number_of_invited_previous = 0
-    print("is there a prev_survey?")
+    #print("is there a prev_survey?")
     if previous_survey:
-        print("YES!")
+        #print("YES!")
 
         sis = SurveyInstance.objects.filter(survey=previous_survey)
         number_of_invited_previous = len(sis)
         #print ('%s was invited to respond'%(len(sis)))
         for si in sis:
-            print("in another for loop!")
+            #print("in another for loop!")
             if si.completed:
                 number_of_respondents_previous += 1
         #print ('%s responded'%(number_of_respondents))
-    print("About to make the context var")
+    #print("About to make the context var")
     context={
         'survey_results': survey_results,
         'number_of_respondents': number_of_respondents,
