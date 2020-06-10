@@ -4,7 +4,7 @@ from website.forms import ChangePasswordForm, SignUpForm, LoginForm, EditAccount
 from website.models import Organization
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView #dont think this is needed anymore
-from payments.utils.stripe_logic import *
+from payments.tools.stripe_logic import *
 
 from operator import itemgetter
 import datetime

@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.contrib import messages
 #from surveys.models import Employee
 
-from payments.utils.stripe_logic import *
+from payments.tools.stripe_logic import *
 from operator import itemgetter
 import datetime
 

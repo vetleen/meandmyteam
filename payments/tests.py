@@ -3,8 +3,8 @@ from django.test import TestCase, SimpleTestCase
 
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib import auth
-from payments.utils.stripe_logic import *
-from surveys.models import Organization, Employee, Survey, SurveyInstance, IntAnswer, TextAnswer, Question, Product, ProductSetting
+from payments.tools.stripe_logic import *
+#from surveys.models import Organization, Employee, Survey, SurveyInstance, IntAnswer, TextAnswer, Question, Product, ProductSetting
 
 from datetime import date, timedelta
 

@@ -22,14 +22,6 @@ class Product(models.Model):
         """String for representing the Product object (in Admin site etc.)."""
         return self.name
 
-    ##Todo
-    #Add support for other Users than owner to be allowed to change organization
-    def __str__(self):
-        """String for representing the Organization object (in Admin site etc.)."""
-        if self.name != None and self.name != '':
-            return self.name
-        else:
-            return "Organization object owned by %s."%(self.owner)
 
 class ProductSetting(models.Model):
     is_active = models.BooleanField(default=True, help_text='This product is active for this organization')
