@@ -55,7 +55,9 @@
               {% render_field form.phone class="form-control is-valid" %}
             {% endif %}
           {% else %}
+
             {% render_field form.phone class="form-control" %}
+
           {% endif %}
           {% if phone.help_text %}
             <small class="form-text text-muted">{{ form.phone.help_text }}</small>

@@ -231,7 +231,7 @@ def edit_account_view(request):
                 'username': request.user,
                 # Organization model
                 'name': request.user.organization.name,
-                'phone': request.user.organization.phone,
+                'phone': request.user.organization.phone.as_e164 ,
                 'address_line_1': request.user.organization.address_line_1,
                 'address_line_2': request.user.organization.address_line_2,
                 'zip_code' : request.user.organization.zip_code,
