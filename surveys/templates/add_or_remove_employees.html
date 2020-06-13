@@ -1,5 +1,5 @@
 {% extends "base_generic.html" %}
-{% load widget_tweaks %}
+
 {% block content %}
 <div class="container">
   <div class="row pt-4">
@@ -17,14 +17,14 @@
   <div class="row">
     <div class="col-sm-6">
       <h4>Register employees</h4>
-        {% include "includeable/render_edit_employee_form.html" %}
+        {% include "includeable/render_add_or_remove_employee_form.html" %}
       <div class="w-100"></div>
       <a href="{% url 'surveys-dashboard' %}">I'm done adding employees</a>
     </div><!-- col -->
     <div class="col-sm-6">
       {% if employee_list %}
         <h4>Registered employees</h4>
-        {% include "includeable/employee_list_renderer.html" %}
+        {% include "includeable/employee_list_displayer.html" %}
       {% else %}
 
       {% endif %}

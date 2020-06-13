@@ -101,6 +101,20 @@ class Organization(models.Model):
     stripe_subscription_quantity = models.PositiveSmallIntegerField(default=0, help_text='Current number of users/employees that are billed for', validators=[MinValueValidator(0), MaxValueValidator(2000000)])
 
     def update_stripe_subscription_quantity(self):
+        ''' #stolen for leagcy_view of surveys
+        elist= None
+        try:
+            elist = Employee.objects.filter(organization=request.user.organization)
+        except Exception as err:
+            print('Got an unexpected error while trying to add employees: %s.'%(request.user.username, err))
+            logger.exception("%s %s: edit_coworker_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
+        if elist is not None and request.user.organization.stripe_subscription_id is not None and request.user.organization.stripe_subscription_id != '':
+            current_sub_quantity = len(elist)
+            try:
+                s = modify_stripe_subscription(request.user.subscriber.stripe_subscription_id, quantity=current_sub_quantity)
+            except Exception as err:
+                logger.exception("%s %s: edit_coworker_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
+        '''
         #elist = Employee.objects.filter(organization=self)
         #self.stripe_subscription_quantity = len(elist)
         self.stripe_subscription_quantity = 1

@@ -57,7 +57,7 @@ class Dimension:
 
 
 class Item:
-    def __init__(self, formulation, instruction_string='', active=True, options=[1, 2, 3, 4, 5]):
+    def __init__(self, formulation, instruction_string='', active=True, options=[1, 2, 3, 4, 5], inverted=False):
         #Check that proper input has been given
         assert isinstance(formulation, str), 'The formulation of the Item object must be a string, got %s.'%(type(formulation))
         assert isinstance(instruction_string, str), 'The instruction_string of the Item object must be a string, got %s.'%(type(instruction_string))

@@ -4,8 +4,8 @@
     <div class="d-flex justify-content-between">
       <div>{{ employee.email|truncatechars:20 }}</div>
       <div>
-      <a href="{% url 'surveys-delete-coworker' employee.uidb64 %}" class="badge badge-danger align-self-end">Delete</a>
-      <a href="{% url 'edit-individual-coworker' employee.uidb64 %}" class="badge badge-success align-self-end">Edit</a>
+      <a href="{% url 'surveys-delete-employee' employee.uidb64 %}" class="badge badge-danger align-self-end">Delete</a>
+      <a href="{% url 'surveys-edit-employee' employee.uidb64 %}" class="badge badge-success align-self-end">Edit</a>
       </div>
     </div>
   </li>
