@@ -1,19 +1,108 @@
-from django.db import models
+from django.db import models, IntegrityError
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 
 
+#third party
+from polymorphic.models import PolymorphicModel #https://django-polymorphic.readthedocs.io/en/latest/quickstart.html
 
+#my stuff
 from website.models import Organization
 
 
 # Create your models here.
+
+#Product components (Scale(s), Instrument, Dimension, Item)
+class Scale(PolymorphicModel):
+    '''
+    The base class for scales. There can be many scales, such as a yes/no scale,
+    or a 1-5 scale. This class handles all the commonalities, and then specific
+    scales, such as RatioScale, will inherit from this to implement its
+    peculiarities.
+    '''
+    name = models.CharField(max_length=255, help_text='')
+    instruction = models.CharField(max_length=255, blank=True, null=True, help_text='')
+    opt_out = models.BooleanField(default=True, help_text='')
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise IntegrityError("You may not edit an existing %s object, because existing Surveys may use it. Instead make a new one and attach that for future use" % self._meta.model_name)
+        super(Scale, self).save(*args, **kwargs)
+
+class RatioScale(Scale):
+    '''
+    A scale or numbers where it makes sense to look at ratios, such as a 1-5
+    scale of level of agreement. Averages makes sense and so on.
+    '''
+    min_value = models.SmallIntegerField(default=0, help_text='')
+    max_value = models.SmallIntegerField(default=0, help_text='')
+    min_value_description = models.CharField(max_length=255, blank=True, null=True, help_text='')
+    max_value_description = models.CharField(max_length=255, blank=True, null=True, help_text='')
+
+class Instrument(models.Model):
+    '''
+    Represents a scientific instrument to measure a particular object of
+    interest, for example Employee Engagement. Instruments are the base products
+    that customers choose to activate.
+    '''
+    name = models.CharField(max_length=255, unique=True, help_text='')
+    description = models.CharField(max_length=255, blank=True, null=True, help_text='')
+
+    def get_items(self):
+        items = []
+        for d in self.dimension_set.all():
+            for i in d.item_set.all():
+                i.dimension = d
+                items.append(i)
+        return items
+
+class Dimension(models.Model):
+    '''
+    A Dimension of a phonomenon of interest, measured by an Instrument. For
+    example, the Employee Engagement Instrument may have the dimensions Vigor,
+    Absorption and Dedication.
+    '''
+    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE, help_text='') #enables instrument.dimension_set.all()
+    name = models.CharField(max_length=255, help_text='')
+    description = models.CharField(max_length=255, blank=True, null=True, help_text='')
+
+    #to make FK to Scale work, since there are different kinds of Scales
+    content_type = models.ForeignKey(ContentType, blank=True, null=True, default=None, on_delete=models.PROTECT)
+    object_id = models.PositiveIntegerField( blank=True, null=True, default=None)
+    scale = GenericForeignKey('content_type', 'object_id')
+
+    def save(self, *args, **kwargs):
+        #Ensure no one changes an existing diumension, that would ruin old SUrveys
+        if self.pk:
+            raise IntegrityError("You may not edit an existing %s object, because existing Surveys may use it. Instead make a new one and attach that for future use" % self._meta.model_name)
+        #Ensure the GenericForeignKey for scale received a Scale or subclass thereof
+        if not isinstance(self.scale, Scale):
+            raise ValidationError(
+                "The parameter 'scale' for a new Dimension must be an instance of Scale or one of it's subclasses, got (%(wrong_type)s).",
+                code='invalid',
+                params={'wrong_type': type(self.scale)}
+            )
+        super(Dimension, self).save(*args, **kwargs)
+
+class Item(models.Model):
+    '''
+    A concrete question or statement for Respondents to react to by scoring it.
+    '''
+    dimension = models.ForeignKey(Dimension, on_delete=models.CASCADE, help_text='')
+    formulation = models.CharField(max_length=255, help_text='')
+    active = models.BooleanField(default=True, help_text='')
+    inverted = models.BooleanField(default=False, help_text='')
+
+#Someone to fil in the surveys
 class Respondent(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, help_text='Organization where this Respondent is employed')
     first_name = models.CharField(max_length=255, blank=True, null=True, help_text='First name of Employee')
-    email = models.EmailField(max_length=254, help_text='Email of Respondent')
     last_name = models.CharField(max_length=255, blank=True, null=True, help_text='Last name of Respondent')
+    email = models.EmailField(max_length=254, help_text='Email of Respondent')
     receives_surveys = models.BooleanField(default=True, help_text='This Respondent should receive surveys from the Organization')
 
     def uidb64(self):
@@ -22,3 +111,68 @@ class Respondent(models.Model):
     def __str__(self):
         """String for representing the Respondent object (in Admin site etc.)."""
         return self.email
+
+#SURVEY COMPONENTS (Survey, )
+class Survey(models.Model):
+    '''
+    A Survey object is created for an Organization based on a Product blueprint,
+    and  Survey Instances are created for each Respondent the organization has
+    set up to receive the Survey. At the end of a Survey, Survey Instances are
+    closed for editing and final results are calculated. These results should be
+    available to the Organization in the future.
+    '''
+    owner = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, help_text='Organization that owns this survey')
+    date_open = models.DateField(auto_now=False, auto_now_add=False, help_text='The date from which this Survey may be answered')
+    date_close = models.DateField(auto_now=False, auto_now_add=False, help_text='The date until which this Survey may be answered')
+    n_invited = models.IntegerField(default=0, help_text='Number of respondents')
+    n_completed = models.IntegerField(default=0, help_text='Number of respondents')
+    n_incomplete = models.IntegerField(default=0, help_text='Number of respondents')
+
+    def __str__(self):
+        """String for representing the Survey object (in Admin site etc.)."""
+        return 'Survey: ' + self.product.name
+
+class SurveyItem(PolymorphicModel):
+    '''
+    A SurveyItem is a question as it was (or should be) asked in a concrete
+    Survey. It should be possible to interpret a SI even after the product is
+    deleted.
+
+    A SUBCLASS SHOULD ALWAYS BE USED!
+    '''
+    #for all kinds of SurveyItems
+    survey = models.ForeignKey(Survey, on_delete=models.PROTECT, null=True, help_text='Organization that owns this survey') #enables survey.surveyitem_set.all(), hopefully this incldes subcalsses? I bet not... probably survey.ratiosurveyitem_set.all() works
+    item_formulation = models.CharField(max_length=255, blank=True, null=True,  help_text='A question or statement to confront Respondents with')
+    item_inverted = models.BooleanField(default=False, help_text='')
+    item_dimension = models.ForeignKey(Dimension, blank=True, null=True, on_delete=models.PROTECT, help_text='')
+    n_answered = models.IntegerField(default=0, help_text='Number of respondents')
+
+class RatioSurveyItem(SurveyItem):
+    '''
+    SurveyItems on a ratio scale, e.g. 1-7 or 1-100. These parameters allow
+    interpretation and back tracking, even if scales where changed right after
+    the survey was created.
+    '''
+    #Specific to ratio scaled SurveyItems
+    average = models.FloatField(default=None, blank=True, null=True, help_text='Average of scores for this item in this survey')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
