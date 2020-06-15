@@ -97,8 +97,12 @@ class Item(models.Model):
     active = models.BooleanField(default=True, help_text='')
     inverted = models.BooleanField(default=False, help_text='')
 
-#Someone to fil in the surveys
+#Someone to fill in the surveys
 class Respondent(models.Model):
+    '''
+    A Respondent that has been added by the organization.owner, presumably  to
+    fill out Surveys.
+    '''
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, help_text='Organization where this Respondent is employed')
     first_name = models.CharField(max_length=255, blank=True, null=True, help_text='First name of Employee')
     last_name = models.CharField(max_length=255, blank=True, null=True, help_text='Last name of Respondent')
@@ -112,7 +116,7 @@ class Respondent(models.Model):
         """String for representing the Respondent object (in Admin site etc.)."""
         return self.email
 
-#SURVEY COMPONENTS (Survey, )
+#SURVEY COMPONENTS (Survey, SurveyItem(s))
 class Survey(models.Model):
     '''
     A Survey object is created for an Organization based on a Product blueprint,
@@ -140,12 +144,18 @@ class SurveyItem(PolymorphicModel):
 
     A SUBCLASS SHOULD ALWAYS BE USED!
     '''
-    #for all kinds of SurveyItems
+    #common to all kinds of SurveyItems
     survey = models.ForeignKey(Survey, on_delete=models.PROTECT, null=True, help_text='Organization that owns this survey') #enables survey.surveyitem_set.all(), hopefully this incldes subcalsses? I bet not... probably survey.ratiosurveyitem_set.all() works
     item_formulation = models.CharField(max_length=255, blank=True, null=True,  help_text='A question or statement to confront Respondents with')
     item_inverted = models.BooleanField(default=False, help_text='')
     item_dimension = models.ForeignKey(Dimension, blank=True, null=True, on_delete=models.PROTECT, help_text='')
     n_answered = models.IntegerField(default=0, help_text='Number of respondents')
+
+    def n_invited(self):
+        return self.survey.n_invited
+
+    def scale(self):
+        return self.item_dimension.scale
 
 class RatioSurveyItem(SurveyItem):
     '''
@@ -156,6 +166,39 @@ class RatioSurveyItem(SurveyItem):
     #Specific to ratio scaled SurveyItems
     average = models.FloatField(default=None, blank=True, null=True, help_text='Average of scores for this item in this survey')
 
+#SURVEY INSTANCE COMPONENTS (SurveyInstance, SurveyInstanceItem(s))
+class SurveyInstance(models.Model):
+    respondent = models.ForeignKey(Respondent, blank=True, null=True, on_delete=models.SET_NULL, help_text='')
+    survey = models.ForeignKey(Survey, on_delete=models.PROTECT, help_text='')
+
+    def items(self):
+        '''
+        As different kinds of items are implemented, just update this, and
+        si.items() will always return all items of all kinds.
+        '''
+        ratio_items = RatioSurveyInstanceItem.objects.filter(survey_instance=self)
+        return [i for i in ratio_items]
+
+
+class SurveyInstanceItem(PolymorphicModel):
+    survey_instance = models.ForeignKey(SurveyInstance, on_delete=models.PROTECT, help_text='')
+
+    def survey(self):
+        return self.survey_instance.survey
+
+    def respondent(self):
+        return self.survey_instance.respondent
+
+
+class RatioSurveyInstanceItem(SurveyInstanceItem):
+    survey_item = models.ForeignKey(RatioSurveyItem, on_delete=models.PROTECT, help_text='')
+    answer =  models.SmallIntegerField(default=None, blank=True, null=True, help_text='Number of respondents')
+
+    def formulation(self):
+        return self.survey_item.item_formulation
+
+    def dimension(self):
+        return self.survey_item.item_dimension
 
 
 

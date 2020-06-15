@@ -75,35 +75,36 @@ class ModelsTest(TestCase):
         test_vigor_item_01 = Item(
                 formulation="When I get up in the morning, I feel like going to work.",
                 dimension=test_vigor
-            ).save()
-        '''
-        test_vigor_item_02 = Item(
-                formulation="At my work, I feel bursting with energy.",
-                dimension=test_vigor
-            ).save()
-        test_dedication_item_01 = Item(
-                formulation="To me, my job is challenging.",
-                dimension=test_dedication
-            ).save()
-        test_dedication_item_02 = Item(
-                formulation="My job inspires me.",
-                dimension=test_dedication
-            ).save()
-        test_absorption_item_01 = Item(
-                formulation="When I am working, I forget everything else around me.",
-                dimension=test_dedication
-            ).save()
-        test_absorption_item_02 = Item(
-                formulation="Time flies when I am working.",
-                dimension=test_dedication
-            ).save()
-        '''
-        s = Survey(
+            )
+        test_vigor_item_01.save()
+
+
+
+        sur = Survey(
         owner=o,
         date_open=date.today(),
         date_close =date.today() + timedelta(days=10)
         )
-        s.save()
+        sur.save()
+
+        rsi = RatioSurveyItem(
+            survey = sur,
+            item_formulation = test_vigor_item_01.formulation,
+            item_inverted = test_vigor_item_01.inverted,
+            item_dimension = test_vigor_item_01.dimension,
+            n_answered = 0,
+            average = None
+
+        )
+        rsi.save()
+
+        sinst = SurveyInstance(respondent=r, survey=sur)
+        sinst.save()
+        rsii = RatioSurveyInstanceItem(
+                survey_instance = sinst,
+                survey_item = rsi
+        )
+        rsii.save()
 
     def test_RatioScale_(self):
         #Test RatioScale
@@ -191,16 +192,7 @@ class ModelsTest(TestCase):
     def test_SurveyItems(self):
         su = Survey.objects.get(id=1)
         i = Item.objects.get(id=1)
-
-        si = RatioSurveyItem(
-            survey = su,
-            item_formulation = i.formulation,
-            item_inverted = i.inverted,
-            item_dimension = i.dimension,
-            n_answered = 0,
-            average = None
-
-        )
+        si = RatioSurveyItem.objects.get(id=1)
         d = Dimension.objects.get(id=1)
         rs = RatioScale.objects.get(id=1)
         self.assertIsInstance(si, RatioSurveyItem)
@@ -212,3 +204,31 @@ class ModelsTest(TestCase):
         self.assertEqual(si.item_dimension, d)
         self.assertEqual(si.n_answered, 0)
         self.assertEqual(si.average, None)
+        self.assertEqual(si.scale(), d.scale)
+        self.assertEqual(si.n_invited(), 0)
+
+    def test_SurveyInstance(self):
+        su = Survey.objects.get(id=1)
+        r = Respondent.objects.get(id=1)
+        si = SurveyInstance.objects.get(id=1)
+
+        self.assertIsInstance(si, SurveyInstance)
+        self.assertEqual(si.respondent, r)
+        self.assertEqual(si.survey, su)
+        self.assertEqual(len(si.items()), 1)
+
+
+    def test_RatioSurveyInstanceItem(self):
+        sinst = SurveyInstance.objects.get(id=1)
+        sitem = RatioSurveyItem.objects.get(id=1)
+        rsii = RatioSurveyInstanceItem.objects.get(id=1)
+        self.assertIsInstance(rsii, RatioSurveyInstanceItem)
+        self.assertEqual(rsii.survey_instance, sinst)
+        self.assertEqual(rsii.survey_item, sitem)
+
+        su = Survey.objects.get(id=1)
+        r = Respondent.objects.get(id=1)
+        self.assertEqual(rsii.survey(), su)
+        self.assertEqual(rsii.respondent(), r)
+        self.assertEqual(rsii.formulation(), sitem.item_formulation)
+        self.assertEqual(rsii.dimension(), sitem.item_dimension)
