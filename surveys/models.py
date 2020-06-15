@@ -49,6 +49,7 @@ class Instrument(models.Model):
     interest, for example Employee Engagement. Instruments are the base products
     that customers choose to activate.
     '''
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True, help_text='')
     description = models.CharField(max_length=255, blank=True, null=True, help_text='')
 
@@ -56,7 +57,6 @@ class Instrument(models.Model):
         items = []
         for d in self.dimension_set.all():
             for i in d.item_set.all():
-                i.dimension = d
                 items.append(i)
         return items
 
@@ -66,7 +66,7 @@ class Dimension(models.Model):
     example, the Employee Engagement Instrument may have the dimensions Vigor,
     Absorption and Dedication.
     '''
-    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE, help_text='') #enables instrument.dimension_set.all()
+    instrument = models.ForeignKey(Instrument, blank=True, null=True, on_delete=models.SET_NULL, help_text='') #enables instrument.dimension_set.all()
     name = models.CharField(max_length=255, help_text='')
     description = models.CharField(max_length=255, blank=True, null=True, help_text='')
 
@@ -76,9 +76,18 @@ class Dimension(models.Model):
     scale = GenericForeignKey('content_type', 'object_id')
 
     def save(self, *args, **kwargs):
-        #Ensure no one changes an existing diumension, that would ruin old SUrveys
+        ##Ensure some parameters cannot be changed
         if self.pk:
-            raise IntegrityError("You may not edit an existing %s object, because existing Surveys may use it. Instead make a new one and attach that for future use" % self._meta.model_name)
+            original_self=Dimension.objects.get(id=self.id)
+            if original_self.scale != self.scale:
+                raise IntegrityError(
+                   "You may not change the scale of an existing %s object, because existing SurveyItems may be using it."%(self._meta.model_name)
+               )
+            if original_self.name != self.name:
+                raise IntegrityError(
+                   "You may not change the name of an existing %s object, because self.name is used together with self.scale and self.instrument in product_configuration to see if a new Dimension needs to be made and attached to Instrument."%(self._meta.model_name)
+               )
+
         #Ensure the GenericForeignKey for scale received a Scale or subclass thereof
         if not isinstance(self.scale, Scale):
             raise ValidationError(
@@ -86,6 +95,16 @@ class Dimension(models.Model):
                 code='invalid',
                 params={'wrong_type': type(self.scale)}
             )
+        #Ensure dimension names are unique per instrument
+        if not self.pk:
+            try:
+                existing_d = Dimension.objects.get(instrument=self.instrument, name=self.name)
+            except Dimension.DoesNotExist:
+                existing_d = None
+            if existing_d is not None:
+                raise IntegrityError(
+                   "You may not create a %s object called %s for the instrument %s. It already exists!"%(self._meta.model_name, self.name, self.instrument)
+               )
         super(Dimension, self).save(*args, **kwargs)
 
 class Item(models.Model):
@@ -189,7 +208,6 @@ class SurveyInstanceItem(PolymorphicModel):
     def respondent(self):
         return self.survey_instance.respondent
 
-
 class RatioSurveyInstanceItem(SurveyInstanceItem):
     survey_item = models.ForeignKey(RatioSurveyItem, on_delete=models.PROTECT, help_text='')
     answer =  models.SmallIntegerField(default=None, blank=True, null=True, help_text='Number of respondents')
@@ -199,23 +217,3 @@ class RatioSurveyInstanceItem(SurveyInstanceItem):
 
     def dimension(self):
         return self.survey_item.item_dimension
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#

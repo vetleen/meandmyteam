@@ -54,9 +54,20 @@ class ModelsTest(TestCase):
                 max_value_description="Agree"
             )
         test_ratio_scale.save()
+        test_ratio_scale2 = RatioScale(
+                name="testscale_2222222222onetofive",
+                instruction="Indicate on22222222222 a scale form 1 to five ...",
+                opt_out=False,
+                min_value=1,
+                max_value=2,
+                min_value_description="Don't agree 2",
+                max_value_description="Agree 2"
+            )
+        test_ratio_scale2.save()
 
         #TEST-INSTRUMENT
         test_employee_engagement_instrument = Instrument(
+                id = 1,
                 name = "test_Employee Engagement",
                 description = "a test instrument for EE",
             )
@@ -70,6 +81,7 @@ class ModelsTest(TestCase):
                 scale=test_ratio_scale
             )
         test_vigor.save()
+
 
         #TEST-ITEMS
         test_vigor_item_01 = Item(
@@ -155,11 +167,23 @@ class ModelsTest(TestCase):
         ds = Dimension.objects.all()
         self.assertEqual(len(ds), 1)
         def try_save_dimension_item():
-            d.description="A nEW description??"
-            d.save() #OH NO! Someone forgot that Dimensions should not be changed after they are made! MADNESS!
+            d.scale=Scale.objects.get(id=2) #Oh no! Someome forgote SCALES should not be changed!
+            d.save()
         self.assertRaises(IntegrityError, try_save_dimension_item)
+        def try_save_dimension_item2():
+            d.name="A New Name" #OH NO! With a new name, who will I be?
+            d.save()
+        self.assertRaises(IntegrityError, try_save_dimension_item2)
         d = Dimension.objects.get(id=1)
-        self.assertEqual(d.description, "vigor: a dimension of EE")
+        def create_duplicate_dimension():
+            d2 = Dimension(
+                instrument = d.instrument,
+                name = d.name,
+                description = "a mad attempt at making a dimension with same name and instrument as an exsiting one",
+                scale = d.scale
+            )
+            d2.save()
+        self.assertRaises(IntegrityError, create_duplicate_dimension)
 
     def test_Item(self):
         #test that it works as expected
