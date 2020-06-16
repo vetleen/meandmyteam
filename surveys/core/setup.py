@@ -1,6 +1,11 @@
 from surveys.models import *
 
 def setup_instrument(raw_instrument):
+    #assertions
+
+    #assert that the instrument provided with each dimensions is the same as the instrument supplied
+    for d in raw_instrument['dimensions']:
+        assert raw_instrument['instrument']['id'] == d['instrument_id'], "Make sure all dimensions' ['instrument_id'] is the same as the ['instrument']['id']"
 
     ###############
     #INSTRUMENT:
@@ -18,7 +23,6 @@ def setup_instrument(raw_instrument):
 
     finally:
         instrument.save()
-
 
     ############
     #SCALE:
@@ -110,38 +114,47 @@ def setup_instrument(raw_instrument):
 
     dimensions = Dimension.objects.filter(instrument=instrument)
     assert len(dimensions) == len(raw_instrument['dimensions']), "Somehow we have ended up with %s dimensions for %s-instrument, while trying to have %s."%(len(dimensions), instrument.name, len(raw_instrument['dimensions']))
-'''
+
     ######
     #ITEMS
+    #add dimension paramter to items from dimension_location
+
+    for i in raw_instrument['items']:
+        real_dimension = dimensions[i['dimension_location']]
+        i.update({'dimension': real_dimension})
+
     #make a list with DB Item objects for all Items in raw_items
     items=[]
-    for ri in raw_items:
+    for ritem in raw_instrument['items']:
+        real_dimension = dimensions[ritem['dimension_location']]
+
         try:
             i = Item.objects.get(
-                dimension=ri.dimension,
-                formulation=ri.formulation,
-                active=ri.active,
-                inverted=ri.inverted
+                dimension=ritem['dimension'],
+                formulation=ritem['formulation'],
+                active=ritem['active'],
+                inverted=ritem['inverted']
             )
         except Item.DoesNotExist:
             i = Item(
-                dimension=ri.dimension,
-                formulation=ri.formulation,
-                active=ri.active,
-                inverted=ri.inverted
+                dimension=ritem['dimension'],
+                formulation=ritem['formulation'],
+                active=ritem['active'],
+                inverted=ritem['inverted']
             )
             i.save()
+
         finally:
             items.append(i)
 
     #Make sure there are no extra Items claiming to beloing to our dimensions (let's say a change was made, the old Item will stil be here)
     all_items = instrument.get_items()
 
-    if len(all_items) != len(raw_items):
+    if len(all_items) != len(raw_instrument['items']):
         for i in all_items:
             if i not in items:
                 i.dimension=None
+                i.save()
                 i.delete()
     items = instrument.get_items()
-    assert len(items) == len(raw_items), "Somehow we have ended up with %s items for %s-instrument, while trying to have %s."%(len(items), instrument.name, len(raw_items))
-    '''
+    assert len(items) == len(raw_instrument['items']), "Somehow we have ended up with %s items for %s-instrument, while trying to have %s."%(len(items), instrument.name, len(raw_instrument['items']))
