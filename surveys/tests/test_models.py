@@ -167,7 +167,7 @@ class ModelsTest(TestCase):
         ds = Dimension.objects.all()
         self.assertEqual(len(ds), 1)
         def try_save_dimension_item():
-            d.scale=Scale.objects.get(id=2) #Oh no! Someome forgote SCALES should not be changed!
+            d.scale=Scale.objects.get(id=2) #Oh no! but what about the items whee thsi scale already is in use?
             d.save()
         self.assertRaises(IntegrityError, try_save_dimension_item)
         def try_save_dimension_item2():
@@ -184,6 +184,11 @@ class ModelsTest(TestCase):
             )
             d2.save()
         self.assertRaises(IntegrityError, create_duplicate_dimension)
+        d.instrument=None #OH NO! With a new name, who will I be?
+        d.save()
+        d = Dimension.objects.get(id=1)
+        self.assertEqual(d.instrument, None)
+
 
     def test_Item(self):
         #test that it works as expected

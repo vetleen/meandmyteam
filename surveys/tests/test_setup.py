@@ -323,3 +323,235 @@ class SetupInstrumentTest(TestCase):
             rti2['instrument'].update({'id': 3, 'name': "a new name"})
             test_instrument = setup.setup_instrument(raw_instrument=rti2)
         self.assertRaises(AssertionError, try_different_instrument_ids)
+
+    def test_setup_instrument_and_then_try_change_scale(self):
+        #check that all is calm
+        self.assertEqual(len (Instrument.objects.all()), 0)
+        self.assertEqual(len (Scale.objects.all()), 0)
+        self.assertEqual(len (Dimension.objects.all()), 0)
+        self.assertEqual(len (Item.objects.all()), 0)
+
+        #do the thing
+        rti = create_test_data(1)
+        test_instrument = setup.setup_instrument(raw_instrument=rti)
+
+        #check totals
+        self.assertEqual(len (Instrument.objects.all()), 1)
+        self.assertEqual(len (Scale.objects.all()), 1)
+        self.assertEqual(len (Dimension.objects.all()), 3)
+        self.assertEqual(len (Item.objects.all()), 6)
+
+        #Try change the scale -> this should detach the dimension, and create a new dimension with the new scale, and also new items
+        rti2 = create_test_data(1)
+        scale002 = {
+            'type': "RatioScale",
+            'name':"How often? Scale of One to Six",
+            'instruction':"Please indicate how frequently the following occurs on a scale from one (Never) to six (always) the following:",
+            'opt_out': True,
+            'min_value': 1,
+            'max_value': 6,
+            'min_value_description':"never",
+            'max_value_description':"always",
+        }
+        self.assertNotEqual(rti2['scales'][0], scale002)
+        rti2['scales'][0] = scale002
+        self.assertEqual(rti2['scales'][0], scale002)
+
+        setup.setup_instrument(raw_instrument=rti2)
+        i = Instrument.objects.get(id=1)
+        self.assertEqual(i.id, 1)
+        ds = i.dimension_set.all()
+        self.assertEqual(len(ds), 3)
+        for d in ds:
+            self.assertEqual(d.scale.max_value, scale002['max_value'])
+            self.assertEqual(d.scale.instruction, scale002['instruction'])
+            self.assertEqual(d.scale.name, scale002['name'])
+
+        allds = Dimension.objects.all()
+        self.assertEqual(len(allds), 6)
+        for d in allds:
+            if d not in ds:
+                self.assertEqual(d.instrument, None)
+
+        #check totals
+        self.assertEqual(len (Instrument.objects.all()), 1)
+        self.assertEqual(len (Scale.objects.all()), 2)
+        self.assertEqual(len (Dimension.objects.all()), 6)
+        self.assertEqual(len (Item.objects.all()), 12)
+
+    def test_setup_instrument_and_then_try_change_dimensions(self):
+        #check that all is calm
+        self.assertEqual(len (Instrument.objects.all()), 0)
+        self.assertEqual(len (Scale.objects.all()), 0)
+        self.assertEqual(len (Dimension.objects.all()), 0)
+        self.assertEqual(len (Item.objects.all()), 0)
+
+        #make a product
+        rti = create_test_data(1)
+        test_instrument = setup.setup_instrument(raw_instrument=rti)
+
+        #check that it worked
+        self.assertEqual(len (Instrument.objects.all()), 1)
+        self.assertEqual(len (Scale.objects.all()), 1)
+        self.assertEqual(len (Dimension.objects.all()), 3)
+        self.assertEqual(len (Item.objects.all()), 6)
+
+        #Try change the dimension in varying ways:
+
+        #change name and description, this should work
+        rti2 = create_test_data(1)
+        td_vigor = {
+            'instrument_id': 1,
+            'name': "Vigor 2",
+            'description': "Vigor 2 is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
+            'scale_location': 0
+        }
+
+        self.assertNotEqual(rti2['dimensions'][0], td_vigor)
+        rti2['dimensions'][0] = td_vigor
+        self.assertEqual(rti2['dimensions'][0], td_vigor)
+        test_instrument = setup.setup_instrument(raw_instrument=rti2)
+
+        #change instrument - should give assertion error, since it will be different form the id supplied in rti['instrument']['id']
+        rti3 = create_test_data(1)
+        td_vigor = {
+            'instrument_id': 2,
+            'name': "Vigor 2",
+            'description': "Vigor 2 is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
+            'scale_location': 0
+        }
+
+        self.assertNotEqual(rti3['dimensions'][0], td_vigor)
+        rti3['dimensions'][0] = td_vigor
+        self.assertEqual(rti3['dimensions'][0], td_vigor)
+        def try_change_instrument_id():
+            test_instrument = setup.setup_instrument(raw_instrument=rti3)
+        self.assertRaises(AssertionError, try_change_instrument_id)
+
+        #change scale -
+        rti4 = create_test_data(1)
+        #TEST DATA scale
+        td_scale001 = {
+            'type': "RatioScale",
+            'name':"How often? Scale of One to Five",
+            'instruction':"Please indicate how frequently the following occurs on a scale from one (Never) to five (always) the following:",
+            'opt_out': True,
+            'min_value': 1,
+            'max_value': 5,
+            'min_value_description':"never",
+            'max_value_description':"always",
+        }
+        td_scale002 = {
+            'type': "RatioScale",
+            'name':"How often? Scale of One to 2",
+            'instruction':"One or Two??",
+            'opt_out': True,
+            'min_value': 1,
+            'max_value': 2,
+            'min_value_description':"1 - One",
+            'max_value_description':"2 - Two",
+        }
+        td_scale003 = {
+            'type': "RatioScale",
+            'name':"How often? Scale of One to Five (no opt out)",
+            'instruction':"Please indicate how frequently the following occurs on a scale from one (Never) to five (always) the following:",
+            'opt_out': False,
+            'min_value': 1,
+            'max_value': 5,
+            'min_value_description':"never",
+            'max_value_description':"always",
+        }
+        td_scales = [td_scale001, td_scale002, td_scale003]
+
+        #TEST DATA Dimensions
+        td_vigor = {
+            'instrument_id': 1,
+            'name': "Vigor",
+            'description': "Vigor is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
+            'scale_location': 0 #index of the scales-variable (list) where the scale is located
+        }
+
+        td_dedication = {
+            'instrument_id': 1,
+            'name': "Dedication",
+            'description': "Dedication is characterized by a sense of significance, enthusiasm, inspiration, pride, and challenge, and is sometimes also called \"Involvement\".",
+            'scale_location': 1 #index of the scales-variable (list) where the scale is located
+        }
+        td_absorption = {
+            'instrument_id': 1,
+            'name': "Absorption",
+            'description': "Absorption, is characterized by being fully concentrated and deeply engrossed in one’s work, whereby time passes quickly and one has difficulties with detaching oneself from work. Being fully absorbed in one’s work comes close to what has been called ‘flow’, a state of optimal experience that is characterized by focused attention, clear mind, mind and body unison, effortless concentration, complete control, loss of self-consciousness, distortion of time, and intrinsic enjoyment.",
+            'scale_location': 2 #index of the scales-variable (list) where the scale is located
+        }
+        td_dimensions = [td_vigor, td_dedication, td_absorption]
+
+        self.assertNotEqual(rti4['scales'], td_scales)
+        self.assertNotEqual(rti4['dimensions'], td_dimensions)
+        rti4['dimensions'] = td_dimensions
+        rti4['scales'] = td_scales
+        self.assertEqual(rti4['scales'], td_scales)
+        self.assertEqual(rti4['dimensions'], td_dimensions)
+
+        test_instrument = setup.setup_instrument(raw_instrument=rti4)
+
+        ss = Scale.objects.all()
+
+        #check that it worked
+        self.assertEqual(len (Instrument.objects.all()), 1)
+        self.assertEqual(len (Scale.objects.all()), 3)
+        self.assertEqual(len (Dimension.objects.all()), 7)
+        self.assertEqual(len (Item.objects.all()), 14)
+
+        #final one where we try to supply a out of range scale:
+        rti5 = create_test_data(1)
+        td_vigor = {
+            'instrument_id': 1,
+            'name': "Vigor",
+            'description': "Vigor is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
+            'scale_location': 5, #index of the scales-variable (list) where the scale is located
+        }
+        self.assertNotEqual(rti5['dimensions'][0], td_vigor)
+        rti5['dimensions'][0] = td_vigor
+        self.assertEqual(rti5['dimensions'][0], td_vigor)
+
+        def set_unviable_scale():
+            test_instrument = setup.setup_instrument(raw_instrument=rti5)
+        self.assertRaises(AssertionError, set_unviable_scale)
+
+    def test_setup_instrument_with_faulty_data(self):
+        #check that all is calm
+        self.assertEqual(len (Instrument.objects.all()), 0)
+        self.assertEqual(len (Scale.objects.all()), 0)
+        self.assertEqual(len (Dimension.objects.all()), 0)
+        self.assertEqual(len (Item.objects.all()), 0)
+
+        #No instrument? No problem:
+        def try_missing_instrument():
+            rti = create_test_data(1)
+            missing_instrument = rti.pop('instrument')
+            test_instrument = setup.setup_instrument(raw_instrument=rti)
+        self.assertRaises(AssertionError, try_missing_instrument)
+        #No scales? No problem:
+        def try_missing_scales():
+            rti = create_test_data(1)
+            missing_scales = rti.pop('scales')
+            test_scales = setup.setup_instrument(raw_instrument=rti)
+        self.assertRaises(AssertionError, try_missing_scales)
+        #No dimensions? No problem:
+        def try_missing_dimensions():
+            rti = create_test_data(1)
+            missing_dimensions = rti.pop('dimensions')
+            test_dimensions = setup.setup_instrument(raw_instrument=rti)
+        self.assertRaises(AssertionError, try_missing_dimensions)
+        #No items? No problem:
+        def try_missing_items():
+            rti = create_test_data(1)
+            missing_items = rti.pop('items')
+            test_items = setup.setup_instrument(raw_instrument=rti)
+        self.assertRaises(AssertionError, try_missing_items)
+
+        #check that nothing was made
+        self.assertEqual(len (Instrument.objects.all()), 0)
+        self.assertEqual(len (Scale.objects.all()), 0)
+        self.assertEqual(len (Dimension.objects.all()), 0)
+        self.assertEqual(len (Item.objects.all()), 0)
