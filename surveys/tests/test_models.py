@@ -7,6 +7,7 @@ from django.db import IntegrityError
 #my stuff
 from website.models import Organization
 from surveys.models import *
+from surveys.core import survey_logic
 
 #third party
 from datetime import date, timedelta
@@ -240,12 +241,23 @@ class ModelsTest(TestCase):
         su = Survey.objects.get(id=1)
         r = Respondent.objects.get(id=1)
         si = SurveyInstance.objects.get(id=1)
+        rsii = RatioSurveyInstanceItem.objects.get(id=1)
 
         self.assertIsInstance(si, SurveyInstance)
         self.assertEqual(si.respondent, r)
         self.assertEqual(si.survey, su)
-        self.assertEqual(len(si.items()), 1)
+        self.assertEqual(len(si.get_items()), 1)
 
+        #check_completed
+        self.assertEqual(si.check_completed(), False)
+        self.assertEqual(si.completed, False)
+
+        self.assertEqual(si.check_completed(), False)
+        self.assertEqual(si.completed, False)
+        survey_logic.answer_item(rsii, 2)
+        survey_logic.close_survey(su)
+        self.assertEqual(si.check_completed(), True)
+        self.assertEqual(si.completed, True)
 
     def test_RatioSurveyInstanceItem(self):
         sinst = SurveyInstance.objects.get(id=1)
@@ -261,3 +273,6 @@ class ModelsTest(TestCase):
         self.assertEqual(rsii.respondent(), r)
         self.assertEqual(rsii.formulation(), sitem.item_formulation)
         self.assertEqual(rsii.dimension(), sitem.item_dimension)
+
+        rsii.answer = 3
+        rsii.save()

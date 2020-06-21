@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 #third party
 from polymorphic.models import PolymorphicModel #https://django-polymorphic.readthedocs.io/en/latest/quickstart.html
@@ -32,6 +32,10 @@ class Scale(PolymorphicModel):
         if self.pk:
             raise IntegrityError("You may not edit an existing %s object, because existing Surveys may use it. Instead make a new one and attach that for future use" % self._meta.model_name)
         super(Scale, self).save(*args, **kwargs)
+
+    def __str__(self):
+        """String for representing the Survey object (in Admin site etc.)."""
+        return 'Scale: (' + self.name + ')'
 
 class RatioScale(Scale):
     '''
@@ -60,6 +64,10 @@ class Instrument(models.Model):
                 items.append(i)
         return items
 
+    def __str__(self):
+        """String for representing the Survey object (in Admin site etc.)."""
+        return 'Instrument: (' + self.name + ')'
+
 class Dimension(models.Model):
     '''
     A Dimension of a phonomenon of interest, measured by an Instrument. For
@@ -87,7 +95,10 @@ class Dimension(models.Model):
                 raise IntegrityError(
                    "You may not change the name of an existing %s object, because self.name is used together with self.scale and self.instrument in product_configuration to see if a new Dimension needs to be made and attached to Instrument."%(self._meta.model_name)
                )
-
+            if original_self.instrument != self.instrument and self.instrument != None:
+                raise IntegrityError(
+                   "You may only change the instrument of an %s object to None, but you tried to set it to %s."%(self._meta.model_name, self.instrument)
+               )
         #Ensure the GenericForeignKey for scale received a Scale or subclass thereof
         if not isinstance(self.scale, Scale):
             raise ValidationError(
@@ -107,6 +118,10 @@ class Dimension(models.Model):
                )
         super(Dimension, self).save(*args, **kwargs)
 
+    def __str__(self):
+        """String for representing the Survey object (in Admin site etc.)."""
+        return 'Dimension: (' + self.name + ' in ' + self.instrument.name + ')'
+
 class Item(models.Model):
     '''
     A concrete question or statement for Respondents to react to by scoring it.
@@ -116,6 +131,43 @@ class Item(models.Model):
     active = models.BooleanField(default=True, help_text='')
     inverted = models.BooleanField(default=False, help_text='')
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise IntegrityError("You may not edit an existing %s object. Instead make a new one and attach that for future use" % self._meta.model_name)
+        super(Item, self).save(*args, **kwargs)
+
+    def __str__(self):
+        """String for representing the Survey object (in Admin site etc.)."""
+
+        return '%s: %s.'%(self.dimension.name, self.formulation)
+
+#Settings for surveys for a particular Organization
+class SurveySetting(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, help_text='Organization this setting applies to')
+    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE, help_text='Instruments this organization is using')
+    is_active = models.BooleanField(default=False, help_text='This instrument is active for this organization')
+    survey_interval = models.SmallIntegerField(default=90, help_text='How many days between each survey', validators=[MinValueValidator(0), MaxValueValidator(730)])
+    surveys_remain_open_days = models.SmallIntegerField(default=10, help_text='How many days should surveys be open for this organization', validators=[MinValueValidator(0), MaxValueValidator(365)])
+    last_survey_open = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last opening date of survey with this product/prganization combo')
+    last_survey_close = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last closing date of survey with this product/prganization combo')
+
+    def __str__(self):
+        """String for representing the SurveySetting object (in Admin site etc.)."""
+        return 'SurveySetting: (' + self.organization + ' - ' + self.instrument + ')'
+
+    def save(self, *args, **kwargs):
+        #Ensure SS is unique per organization and instrument
+        if not self.pk:
+            try:
+                existing_ss = SurveySetting.objects.get(instrument=self.instrument, organization=self.organization)
+            except SurveySetting.DoesNotExist:
+                existing_ss = None
+            if existing_ss is not None:
+                raise IntegrityError(
+                   "You may not create a %s object for the instrument %s, and organization %s. It already exists!"
+                   %(self._meta.model_name, self.instrument, self.organization)
+               )
+        super(SurveySetting, self).save(*args, **kwargs)
 #Someone to fill in the surveys
 class Respondent(models.Model):
     '''
@@ -133,7 +185,7 @@ class Respondent(models.Model):
 
     def __str__(self):
         """String for representing the Respondent object (in Admin site etc.)."""
-        return self.email
+        return 'Respondent: ' + self.email
 
 #SURVEY COMPONENTS (Survey, SurveyItem(s))
 class Survey(models.Model):
@@ -145,15 +197,26 @@ class Survey(models.Model):
     available to the Organization in the future.
     '''
     owner = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, help_text='Organization that owns this survey')
+    #instrument =  models.ManyToManyField(Instrument, on_delete=Protect) #dont need this, we just need to know when we make it!
     date_open = models.DateField(auto_now=False, auto_now_add=False, help_text='The date from which this Survey may be answered')
     date_close = models.DateField(auto_now=False, auto_now_add=False, help_text='The date until which this Survey may be answered')
     n_invited = models.IntegerField(default=0, help_text='Number of respondents')
-    n_completed = models.IntegerField(default=0, help_text='Number of respondents')
-    n_incomplete = models.IntegerField(default=0, help_text='Number of respondents')
+    n_completed = models.IntegerField(default=0, help_text='')
+    n_incomplete = models.IntegerField(default=0, help_text='')
+    n_not_started = models.IntegerField(default=0, help_text='')
+    is_closed = models.BooleanField(default=False, help_text='This survey is finished forever')
+
+    def get_items(self):
+        '''
+        As different kinds of items are implemented, just update this, and
+        si.items() will always return all items of all kinds.
+        '''
+        ratio_items = RatioSurveyItem.objects.filter(survey=self)
+        return [i for i in ratio_items]
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
-        return 'Survey: ' + self.product.name
+        return 'Survey: (' + self.owner.name + ')'
 
 class SurveyItem(PolymorphicModel):
     '''
@@ -176,6 +239,15 @@ class SurveyItem(PolymorphicModel):
     def scale(self):
         return self.item_dimension.scale
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise IntegrityError("You may not edit an existing %s object." % self._meta.model_name)
+        super(SurveyItem, self).save(*args, **kwargs)
+
+    def __str__(self):
+        """String for representing the Survey object (in Admin site etc.)."""
+        return 'SurveyItem: ((' + self.survey + '): (This is a base class instance, which shouldn\'t be used))'
+
 class RatioSurveyItem(SurveyItem):
     '''
     SurveyItems on a ratio scale, e.g. 1-7 or 1-100. These parameters allow
@@ -185,12 +257,18 @@ class RatioSurveyItem(SurveyItem):
     #Specific to ratio scaled SurveyItems
     average = models.FloatField(default=None, blank=True, null=True, help_text='Average of scores for this item in this survey')
 
+    def __str__(self):
+        """String for representing the Survey object (in Admin site etc.)."""
+        return 'SurveyItem: ((' + self.survey + '): ' + self.item_formulation + ')'
+
 #SURVEY INSTANCE COMPONENTS (SurveyInstance, SurveyInstanceItem(s))
 class SurveyInstance(models.Model):
     respondent = models.ForeignKey(Respondent, blank=True, null=True, on_delete=models.SET_NULL, help_text='')
     survey = models.ForeignKey(Survey, on_delete=models.PROTECT, help_text='')
+    completed = models.BooleanField(default=False, help_text='')
+    started = models.BooleanField(default=False, help_text='')
 
-    def items(self):
+    def get_items(self):
         '''
         As different kinds of items are implemented, just update this, and
         si.items() will always return all items of all kinds.
@@ -198,15 +276,65 @@ class SurveyInstance(models.Model):
         ratio_items = RatioSurveyInstanceItem.objects.filter(survey_instance=self)
         return [i for i in ratio_items]
 
+    def check_completed(self):
+        #was this already settled?
+        if self.completed == True:
+            return True
+
+        #calculate if we must
+        items = self.get_items()
+        was_completed = True
+        for item in items:
+            if item.answered == False:
+                was_completed = False
+                break
+
+        self.completed = was_completed
+        self.save()
+
+        #return answer
+        return was_completed
+
+    def save(self, *args, **kwargs):
+        ##Ensure some parameters cannot be changed
+        if self.pk:
+            original_self = SurveyInstance.objects.get(id=self.id)
+            if original_self.respondent != self.respondent:
+                raise IntegrityError(
+                   "You may not change the 'respondent' of an existing %s object."%(self._meta.model_name)
+               )
+            if original_self.survey != self.survey:
+                raise IntegrityError(
+                   "You may not change the 'survey' of an existing %s object."%(self._meta.model_name)
+               )
+            if original_self.completed != self.completed and original_self.completed == True:
+                print(self.completed)
+                raise IntegrityError(
+                   "You may not change the 'completed' attribute of an existing %s object back to False."%(self._meta.model_name)
+               )
+        super(SurveyInstance, self).save(*args, **kwargs)
+
 
 class SurveyInstanceItem(PolymorphicModel):
     survey_instance = models.ForeignKey(SurveyInstance, on_delete=models.PROTECT, help_text='')
+    answered = models.BooleanField(default=False, help_text='')
 
     def survey(self):
         return self.survey_instance.survey
 
     def respondent(self):
         return self.survey_instance.respondent
+
+    def save(self, *args, **kwargs):
+        ##Ensure some parameters cannot be changed
+        if self.pk:
+            original_self = SurveyInstanceItem.objects.get(id=self.id)
+            if original_self.survey_instance != self.survey_instance:
+                raise IntegrityError(
+                   "You may not change the 'survey_instances' to which an existing an%s object belongs."%(self._meta.model_name)
+               )
+        super(SurveyInstanceItem, self).save(*args, **kwargs)
+
 
 class RatioSurveyInstanceItem(SurveyInstanceItem):
     survey_item = models.ForeignKey(RatioSurveyItem, on_delete=models.PROTECT, help_text='')
@@ -217,3 +345,13 @@ class RatioSurveyInstanceItem(SurveyInstanceItem):
 
     def dimension(self):
         return self.survey_item.item_dimension
+
+    def save(self, *args, **kwargs):
+        ##Ensure some parameters cannot be changed
+        if self.pk:
+            original_self = RatioSurveyInstanceItem.objects.get(id=self.id)
+            if original_self.survey_item != self.survey_item:
+                raise IntegrityError(
+                   "You may not change the 'survey_item' of an existing %s object."%(self._meta.model_name)
+               )
+        super(RatioSurveyInstanceItem, self).save(*args, **kwargs)

@@ -7,7 +7,7 @@ from django.db import IntegrityError
 #my stuff
 from website.models import Organization
 from surveys.models import *
-from surveys.core import setup
+from surveys.core import setup_instrument
 
 #third party
 from datetime import date, timedelta
@@ -51,7 +51,7 @@ class SetupInstrumentTest(TestCase):
         self.assertEqual(len (Item.objects.all()), 0)
 
         #do the thing
-        setup.setup_instrument(raw_instrument=employee_engagement_instrument.employee_engagement_instrument)
+        setup_instrument.setup_instrument(raw_instrument=employee_engagement_instrument.employee_engagement_instrument)
 
         #check that it worked
         self.assertEqual(len (Instrument.objects.all()), 1)
@@ -61,7 +61,7 @@ class SetupInstrumentTest(TestCase):
 
         #do it again
         for i in range(10):
-            setup.setup_instrument(raw_instrument=employee_engagement_instrument.employee_engagement_instrument)
+            setup_instrument.setup_instrument(raw_instrument=employee_engagement_instrument.employee_engagement_instrument)
 
         #check that it didnt get created more times
         self.assertEqual(len (Instrument.objects.all()), 1)
@@ -73,7 +73,7 @@ class SetupInstrumentTest(TestCase):
 class EmployeeEngagementTest(TestCase):
     ''' TESTS THAT ... '''
     def setUp(self):
-        setup.setup_instrument(raw_instrument=employee_engagement_instrument.employee_engagement_instrument)
+        setup_instrument.setup_instrument(raw_instrument=employee_engagement_instrument.employee_engagement_instrument)
 
 
     def test_emplyee_engagement_instrument(self):

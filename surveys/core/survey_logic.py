@@ -1,0 +1,277 @@
+from surveys.models import *
+import datetime
+
+#set up logging
+import logging
+logger = logging.getLogger('__name__')
+
+def configure_survey_setting(organization, instrument, **kwargs):
+    #Assert that we received valid input
+    if not isinstance(organization, Organization):
+        raise TypeError(
+            "configure_survey_setting() takes an argument 'organization' that must be an instance of models.Organziation, but was %s"\
+            %(type(organization))
+        )
+    if not isinstance(instrument, Instrument):
+        raise TypeError(
+            "configure_survey_setting() takes an argument 'instrument' that must be an instance of models.Instrument, but was %s"\
+            %(type(instrument))
+        )
+
+    #make sure we have a SurveySetting object to work with:
+    try:
+        ss = SurveySetting.objects.get(organization=organization, instrument=instrument)
+    except SurveySetting.DoesNotExist as err:
+        ss = SurveySetting(organization=organization, instrument=instrument)
+        ss.save()
+
+    #look for kwargs and update accordingly
+    if 'is_active' in kwargs:
+        new_is_active = kwargs.get('is_active', None)
+        assert isinstance(new_is_active, bool)
+        ss.is_active = new_is_active
+
+    if 'survey_interval' in kwargs:
+        new_survey_interval = kwargs.get('survey_interval', None)
+        assert isinstance(new_survey_interval, int)
+        ss.survey_interval = new_survey_interval
+
+    if 'surveys_remain_open_days' in kwargs:
+        new_surveys_remain_open_days = kwargs.get('surveys_remain_open_days', None)
+        assert isinstance(new_surveys_remain_open_days, int)
+        ss.surveys_remain_open_days = new_surveys_remain_open_days
+
+    if 'last_survey_open' in kwargs:
+        new_last_survey_open = kwargs.get('last_survey_open', None)
+        assert isinstance(new_last_survey_open, datetime.date) and not isinstance(new_last_survey_open, datetime.datetime)
+        ss.last_survey_open = new_last_survey_open
+
+    if 'last_survey_close' in kwargs:
+        new_last_survey_close = kwargs.get('last_survey_close', None)
+        assert isinstance(new_last_survey_close, datetime.date) and not isinstance(new_last_survey_close, datetime.datetime)
+        ss.last_survey_close = new_last_survey_close
+
+    #save all changes
+    ss.save()
+    return ss
+
+#create a new survey
+def create_survey(owner, instrument_list, **kwargs):
+    #assert that correct inputs were given
+    ##check required inputs
+    assert isinstance(owner, Organization), \
+        "'owner' must be an Organization object, but was %s"%(type(owner))
+    assert isinstance(instrument_list, list), \
+        "'instrument_list' must be a list, but was %s"%(type(instrument_list))
+    assert len(instrument_list)>0, \
+        "'instrument_list' must have items in it, but was empty"
+    for instrument in instrument_list:
+        assert isinstance(instrument, Instrument), \
+            "items in 'instrument_list' must be Instrument objects, but was %s"%(type(instrument))
+
+    ##check optional input (and make sure we have date_open and _close variables)
+    date_open = None
+    date_close = None
+    if 'date_open' in kwargs:
+        assert isinstance(date_open, datetime.date), \
+            "'date_open' must be datetime object, was %s"%(type(date_open))
+        date_close = kwargs.get('date_open', None)
+
+    if 'date_close' in kwargs:
+        assert isinstance(date_close, datetime.date), \
+            "'date_close' must be datetime object, was %s"%(type(date_close))
+        date_close = kwargs.get('date_close', None)
+
+    #other assertions
+    ##Check that there are no open surveys for the same organization already
+    open_surveys = Survey.objects.filter(owner=owner, is_closed=False)
+    assert len(open_surveys) < 1, \
+        "Could not create_survey() because one or more surveys are already open for this organization"
+
+    ##Check settings for * is_active * time since last * grab survey interval to use
+    survey_remain_open_days = 0
+    for instrument in instrument_list:
+        #grab settings
+        survey_setting = configure_survey_setting(owner, instrument)
+
+        #Check that instrument is active for this Org
+        assert survey_setting.is_active == True, \
+            "Could not create_survey() because an instrument in the instrument_list (%s) provided was not an active instrument for this organization (%s)"\
+            %(instrument, owner)
+
+        #check that enough time has elapsed since last survey was initiated
+        if survey_setting.last_survey_open is not None:
+            assert (survey_setting.last_survey_open+datetime.timedelta(days=survey_setting.survey_interval)) < datetime.date.today(), \
+                "Could not create_survey() because it is too little time since we last surveyed %s with %s." \
+                %(owner, instrument)
+
+        #find the longest remain_open_time of all their instruments and use that
+        if survey_remain_open_days < survey_setting.surveys_remain_open_days:
+            survey_remain_open_days = survey_setting.surveys_remain_open_days
+
+
+    #if date_open and date_close was not provided, make sure they are set
+    if date_open is None:
+        date_open = datetime.date.today()
+    if date_close is None:
+        date_close = date_open + datetime.timedelta(days=survey_remain_open_days)
+
+    #create the survey object
+    s = Survey(
+        owner=owner,
+        date_open=date_open,
+        date_close=date_close
+    )
+    s.save()
+
+    #ensure we update the last_survey_open- and last_survey_close dates in settings for all instruments
+    for instrument in instrument_list:
+        survey_setting = configure_survey_setting(owner, instrument, last_survey_open=date_open, last_survey_close=date_close)
+
+    #create the SurveyItems that go with this object
+    for instrument in instrument_list:
+        for i in instrument.get_items():
+
+            #Create RatioSurveyItem when RatioScale is in use
+            if isinstance(i.dimension.scale, RatioScale):
+                rsi = RatioSurveyItem(
+                    survey=s,
+                    item_formulation=i.formulation,
+                    item_inverted=i.inverted,
+                    item_dimension=i.dimension
+                )
+                rsi.save()
+            #Create other scale types as they are implemented....
+            #elif isinstance (i.dimension.scale...
+            else:
+                logger.warning(
+                    "%s %s: %s: tried to make SurveyItems for a new survey, but one of the Items (\"%s\") in the supplied Instrument has a self.dimension.scale that is faulty: %s."\
+                    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, i, i.dimension.scale)
+                )
+    return s
+
+
+
+#create the SurveyInstances
+def survey_instances_from_survey(survey):
+    #assert that valid inputs were given
+    assert isinstance(survey, Survey), \
+        "'survey' must be a Survey object, but was %s"%(type(survey))
+
+    #check that it IS an open survey
+    if survey.is_closed == True:
+        logger.warning(
+            "%s %s: %s: tried to make survey_instances from survey, but it was already closed. (%s with id: %s)"\
+            %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey, survey.id)
+        )
+        return
+
+    #make survey instances for all employee's that doesn't already have one
+
+    respondent_list = Respondent.objects.filter(organization=survey.owner)
+    for r in respondent_list:
+        try:
+            #check if we already have a surveyinstance
+            si = SurveyInstance.objects.get(survey=survey, respondent=r)
+        except SurveyInstance.DoesNotExist as err:
+            #if we don't already have one, make one
+            si = SurveyInstance(survey=survey, respondent=r)
+            si.save()
+            #add items
+            survey_items = survey.get_items()
+            for i in survey_items:
+                #Create RatioSurveyInstanceItems when RatioScale is in use
+                if isinstance(i, RatioSurveyItem):
+                    rsii = RatioSurveyInstanceItem(
+                        survey_instance=si,
+                        survey_item=i,
+                    )
+                    rsii.save()
+                #elif
+                    #create other items....:
+                else:
+                    #catchall, if some items were'nt processed by any of the above categories
+                    logger.warning(
+                        "%s %s: %s: tried to make SurveyInstanceItems for a new surveyInstance, but one of the Items (\"%s\") in the supplied Survey has a 'self.item_dimension.scale' that is faulty: %s."\
+                        %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, i, i.item_dimension.scale)
+                    )
+    #update number of invited for survey
+    si_list = SurveyInstance.objects.filter(survey=survey)
+    survey.n_invited = len(si_list)
+
+def answer_item(survey_instance_item, answer):
+    #validate input
+    assert isinstance(survey_instance_item, SurveyInstanceItem), \
+        "'survey_instance_item' must be a SurveyInstanceItem object, but was %s"%(type(survey_instance_item))
+    if isinstance(survey_instance_item, RatioSurveyInstanceItem):
+        assert isinstance(answer, int), \
+            "'answer' to a RatioSurveyInstanceItem must be an int, but was %s"%(type(answer))
+
+    #answer the item
+    survey_instance_item.answer = answer
+    survey_instance_item.answered = True
+    survey_instance_item.save()
+
+    #make sure the survey instance is marked as started
+    if survey_instance_item.survey_instance.started==False:
+        survey_instance_item.survey_instance.started=True
+        survey_instance_item.survey_instance.save()
+
+    #return it for future use
+    return survey_instance_item
+
+def close_survey(survey):
+    #validate input
+    assert isinstance(survey, Survey), \
+        "'survey' must be a Survey object, but was %s"%(type(survey_instance_item))
+
+    #set surveys date_close to be at the latest yesterday
+    if survey.date_close >= datetime.date.today(): #if it was set in the future
+        survey.date_close = datetime.date.today()+datetime.timedelta(days=-1)
+
+    #mark as closed
+    survey.is_closed = True
+
+    #grab survey instances for this survey
+    si_list = SurveyInstance.objects.filter(survey=survey)
+
+    #check for complete and incomplete SIs
+    n_completed = 0
+    n_incomplete = 0
+    n_not_started = 0
+    #go through every SI and assertain final status
+    for si in si_list:
+        sii_list = si.get_items()
+        was_began = False
+        was_completed = True
+        for sii in sii_list:
+            if sii.answered == True:
+                was_began=True
+            else:
+                was_completed=False
+        #update SI in db, and count completed, started and not-eve-started
+        if was_completed == True:
+            si.completed = True
+            si.started = True
+            n_completed += 1
+        elif was_began == True:
+            si.completed = False
+            si.started = True
+            n_incomplete += 1
+        else:
+            si.completed = False
+            si.started = False
+            n_incomplete += 1
+        #save survey_instance
+        si.save()
+
+    #add the data to the survey object
+    survey.n_completed = n_completed
+    survey.n_incomplete = n_incomplete
+    survey.n_not_started = n_not_started
+
+    #save the survey
+    survey.save()
+
+    #return survey for future use
+    return survey
