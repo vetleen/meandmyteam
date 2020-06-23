@@ -136,6 +136,13 @@ class SurveyLogicTest(TestCase):
         self.assertEqual(ss.last_survey_open, datetime.date.today())
         self.assertEqual(ss.last_survey_close, datetime.date.today()+datetime.timedelta(days=ss.surveys_remain_open_days))
 
+        rsdr_list = RatioScaleDimensionResult.objects.all()
+        dimension_list = Dimension.objects.all()
+        for rsdr in rsdr_list:
+            self.assertEqual(rsdr.survey, survey)
+            self.assertIsInstance(rsdr.dimension, Dimension)
+            self.assertEqual(len(dimension_list), len(rsdr_list))
+
     def test_survey_instances_from_survey(self):
         o=Organization.objects.get(id=1)
         o.save()

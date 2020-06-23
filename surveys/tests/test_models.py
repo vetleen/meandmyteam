@@ -37,6 +37,7 @@ class ModelsTest(TestCase):
                 country='NO'
             )
         o.save()
+
         r = Respondent(
                 organization=o,
                 first_name=None,
@@ -45,6 +46,7 @@ class ModelsTest(TestCase):
                 receives_surveys=True
             )
         r.save()
+
         test_ratio_scale = RatioScale(
                 name="testscale_onetofive",
                 instruction="Indicate on a scale form 1 to five ...",
@@ -55,6 +57,7 @@ class ModelsTest(TestCase):
                 max_value_description="Agree"
             )
         test_ratio_scale.save()
+
         test_ratio_scale2 = RatioScale(
                 name="testscale_2222222222onetofive",
                 instruction="Indicate on22222222222 a scale form 1 to five ...",
@@ -65,6 +68,7 @@ class ModelsTest(TestCase):
                 max_value_description="Agree 2"
             )
         test_ratio_scale2.save()
+
 
         #TEST-INSTRUMENT
         test_employee_engagement_instrument = Instrument(
@@ -84,21 +88,24 @@ class ModelsTest(TestCase):
         test_vigor.save()
 
 
+
         #TEST-ITEMS
         test_vigor_item_01 = Item(
-                formulation="When I get up in the morning, I feel like going to work.",
-                dimension=test_vigor
-            )
+            formulation="When I get up in the morning, I feel like going to work.",
+            dimension=test_vigor
+        )
         test_vigor_item_01.save()
 
 
 
+
         sur = Survey(
-        owner=o,
-        date_open=date.today(),
-        date_close =date.today() + timedelta(days=10)
+            owner=o,
+            date_open=date.today(),
+            date_close =date.today() + timedelta(days=10)
         )
         sur.save()
+
 
         rsi = RatioSurveyItem(
             survey = sur,
@@ -111,13 +118,24 @@ class ModelsTest(TestCase):
         )
         rsi.save()
 
+
         sinst = SurveyInstance(respondent=r, survey=sur)
         sinst.save()
         rsii = RatioSurveyInstanceItem(
-                survey_instance = sinst,
-                survey_item = rsi
+            survey_instance = sinst,
+            survey_item = rsi
         )
         rsii.save()
+
+
+        rsdr = RatioScaleDimensionResult(
+            survey=sur,
+            dimension=test_vigor,
+            n_completed=5,
+            average=3.14
+        )
+        rsdr.save()
+
 
     def test_RatioScale_(self):
         #Test RatioScale
@@ -276,3 +294,33 @@ class ModelsTest(TestCase):
 
         rsii.answer = 3
         rsii.save()
+
+        rdim = rsii.dimension()
+        self.assertEqual(rdim, sitem.item_dimension)
+
+    def test_RatioScaleDimensionResult(self):
+        su = Survey.objects.get(id=1)
+        d = Dimension.objects.get(id=1)
+        rsdr = RatioScaleDimensionResult.objects.get(id=1)
+
+        self.assertEqual(rsdr.survey, su)
+        self.assertEqual(rsdr.dimension, d)
+        self.assertEqual(rsdr.n_completed, 5)
+        self.assertEqual(rsdr.average, 3.14)
+
+        def try_change_survey():
+            rsdr.survey = None
+            rsdr.save()
+        self.assertRaises(IntegrityError, try_change_survey)
+
+        def try_change_dimension():
+            rsdr.dimension = None
+            rsdr.save()
+        self.assertRaises(IntegrityError, try_change_dimension)
+
+        rsdr = RatioScaleDimensionResult.objects.get(id=1)
+        rsdr.average = 2.34
+        rsdr.n_completed = 6
+        rsdr.save()
+        self.assertEqual(rsdr.n_completed, 6)
+        self.assertEqual(rsdr.average, 2.34)

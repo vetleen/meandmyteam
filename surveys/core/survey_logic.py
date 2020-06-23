@@ -148,6 +148,19 @@ def create_survey(owner, instrument_list, **kwargs):
                     "%s %s: %s: tried to make SurveyItems for a new survey, but one of the Items (\"%s\") in the supplied Instrument has a self.dimension.scale that is faulty: %s."\
                     %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, i, i.dimension.scale)
                 )
+    #create the dimensionresult objects, that will be used to store results when the survey is closed
+    for instrument in instrument_list:
+        for dimension in instrument.dimension_set.all():
+            if isinstance(dimension.scale, RatioScale):
+                rsdr = RatioScaleDimensionResult(survey=s, dimension=dimension)
+                rsdr.save()
+            #elif isinstance (dimension.scale...
+            else:
+                logger.warning(
+                    "%s %s: %s: tried to make RatioScaleDimensionResult for a new survey, but one of the Dimensions (\"%s\") in the supplied Instrument has a self.scale that is faulty: %s."\
+                    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, dimension, dimension.dimension.scale)
+                )
+
     return s
 
 
@@ -235,13 +248,17 @@ def close_survey(survey):
     #grab survey instances for this survey
     si_list = SurveyInstance.objects.filter(survey=survey)
 
-    #check for complete and incomplete SIs
+    #prepare to count complete and incomplete SIs
     n_completed = 0
     n_incomplete = 0
     n_not_started = 0
-    #go through every SI and assertain final status
+
+    #go through every SI to 1) make averages and 2) determine if it was started and/or completed
     for si in si_list:
+        #get items for SurveyInstance
         sii_list = si.get_items()
+
+        #make up status of entire SurveyInstance, to be counted further down...
         was_began = False
         was_completed = True
         for sii in sii_list:
@@ -249,7 +266,8 @@ def close_survey(survey):
                 was_began=True
             else:
                 was_completed=False
-        #update SI in db, and count completed, started and not-eve-started
+
+        #count completed and update SI in db
         if was_completed == True:
             si.completed = True
             si.started = True
@@ -272,6 +290,96 @@ def close_survey(survey):
 
     #save the survey
     survey.save()
+
+    #Time to summarize each SurveyItem and DimensionResult
+
+    #go through each dimension in the survey to calculate and store results of survey
+    sdr_list = survey.dimensionresult_set.all()
+    for dr in sdr_list:
+
+        #if this is a RatioScaled dimension:
+        if isinstance(dr, RatioScaleDimensionResult):
+
+            #Calculate averages and completed-states for each SurveyItem
+            rsitem_list = RatioSurveyItem.objects.filter(item_dimension=dr.dimension)
+            for rsitem in rsitem_list:
+                #get all SurveyInstanceItems for this SurveyItem
+                sii_list = RatioSurveyInstanceItem.objects.filter(survey_item=rsitem)
+                #initiate counters
+                rsitem_total = 0
+                rsitem_n = 0
+                rsitem_avg = 0
+                #go through and grab the numbers needed to close the item
+                for sii in sii_list:
+                    if sii.answered==True:
+                        #only count answered
+                        rsitem_total += sii.answer
+                        rsitem_n += 1
+                #find the average for the SurveyItem
+                if rsitem_n > 0:
+                    rsitem_avg = (rsitem_total/rsitem_n)
+                #save the average if this SurveyItem to the db
+                rsitem.average = rsitem_avg
+                rsitem.n_answered = rsitem_n
+                rsitem.save()
+
+            #Calculate avergaes and completed-states for each dimension
+            #initiate counters
+            rsdr_total = 0
+            rsdr_n = 0
+            rsdr_avg = 0
+
+            #look at every surveyinstance to see if the dimension was completed
+            sinstance_list = SurveyInstance.objects.filter(survey=survey)
+
+            for sinstance in sinstance_list:
+                #set defaults be changed when proven oherwise
+                sinstance_dimension_total = 0
+                sinstance_dimension_n = 0
+                dimension_completed = True
+                #go through each question for the survey instance and see if they completed:
+                rsii_list = RatioSurveyInstanceItem.objects.filter(survey_instance=sinstance)
+                for rsii in rsii_list:
+                    #print(rsii.dimension())
+                    #print(dr.dimension)
+                    if rsii.dimension() == dr.dimension:
+                        if rsii.answered == True:
+                            sinstance_dimension_total += rsii.answer
+                            sinstance_dimension_n += 1
+                        else:
+                            dimension_completed = False
+                            break
+
+                #if the dimension was completed for this survey, add the results to the dimension-totals
+                if dimension_completed == True:
+                    rsdr_total += sinstance_dimension_total
+                    rsdr_n += sinstance_dimension_n
+
+            #now we can calculate the total avg
+            if rsdr_n > 0:
+                rsdr_avg = (rsdr_total/rsdr_n)
+
+            #save average for this DimensionResult to DB
+            dr.average=rsdr_avg
+            dr.n_completed=rsdr_n
+            dr.save()
+
+
+
+
+        #elif isinstance(dr,
+            #do things to other scaled dimensions
+        else:
+            #catchall, if a DimensionResult wasn't processed by any of the above categories
+            logger.warning(
+                "%s %s: %s: tried to make SurveyInstanceItems for a new surveyInstance, but one of the Items (\"%s\") in the supplied Survey has a 'self.item_dimension.scale' that is faulty: %s."\
+                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, i, i.item_dimension.scale)
+            )
+
+
+
+
+
 
     #return survey for future use
     return survey

@@ -216,7 +216,7 @@ class Survey(models.Model):
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
-        return 'Survey: (' + self.owner.name + ')'
+        return 'Survey: %s (%s to %s)'%(self.owner.name, self.date_open, self.date_close)
 
 class SurveyItem(PolymorphicModel):
     '''
@@ -241,7 +241,23 @@ class SurveyItem(PolymorphicModel):
 
     def save(self, *args, **kwargs):
         if self.pk:
-            raise IntegrityError("You may not edit an existing %s object." % self._meta.model_name)
+            original_self = SurveyItem.objects.get(id=self.id)
+            if original_self.survey != self.survey:
+                raise IntegrityError(
+                   "You may not change the 'survey' of an existing %s object."%(self._meta.model_name)
+               )
+            if original_self.item_formulation != self.item_formulation:
+                raise IntegrityError(
+                   "You may not change the 'item_formulation' of an existing %s object."%(self._meta.model_name)
+               )
+            if original_self.item_inverted != self.item_inverted:
+                raise IntegrityError(
+                   "You may not change the 'item_inverted' of an existing %s object."%(self._meta.model_name)
+               )
+            if original_self.item_dimension != self.item_dimension:
+                raise IntegrityError(
+                   "You may not change the 'item_dimension' of an existing %s object."%(self._meta.model_name)
+               )
         super(SurveyItem, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -259,7 +275,34 @@ class RatioSurveyItem(SurveyItem):
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
-        return 'SurveyItem: ((' + self.survey + '): ' + self.item_formulation + ')'
+        return 'SurveyItem: (%s): %s)'%(self.survey, self.item_formulation)
+
+class DimensionResult(PolymorphicModel):
+    survey = models.ForeignKey(Survey, on_delete=models.PROTECT, null=True, help_text='Organization that owns this survey')
+    dimension = models.ForeignKey(Dimension, on_delete=models.PROTECT, help_text='')
+    n_completed = models.IntegerField(default=0, help_text='')
+
+    def __str__(self):
+        """String for representing the Survey object (in Admin site etc.)."""
+        return 'DimensionResult for %s in %s'%(self.dimension, self.survey)
+
+    def save(self, *args, **kwargs):
+        ##Ensure some parameters cannot be changed
+        if self.pk:
+            original_self = DimensionResult.objects.get(id=self.id)
+            if original_self.survey != self.survey:
+                raise IntegrityError(
+                   "You may not change the 'survey' of an existing %s object."%(self._meta.model_name)
+               )
+            if original_self.dimension != self.dimension:
+                raise IntegrityError(
+                   "You may not change the 'dimension' of an existing %s object."%(self._meta.model_name)
+               )
+        super(DimensionResult, self).save(*args, **kwargs)
+
+class RatioScaleDimensionResult(DimensionResult):
+    average = models.FloatField(default=None, blank=True, null=True, help_text='Average of scores for this dimension in this survey')
+
 
 #SURVEY INSTANCE COMPONENTS (SurveyInstance, SurveyInstanceItem(s))
 class SurveyInstance(models.Model):
@@ -338,7 +381,7 @@ class SurveyInstanceItem(PolymorphicModel):
 
 class RatioSurveyInstanceItem(SurveyInstanceItem):
     survey_item = models.ForeignKey(RatioSurveyItem, on_delete=models.PROTECT, help_text='')
-    answer =  models.SmallIntegerField(default=None, blank=True, null=True, help_text='Number of respondents')
+    answer =  models.SmallIntegerField(default=None, blank=True, null=True, help_text='')
 
     def formulation(self):
         return self.survey_item.item_formulation
