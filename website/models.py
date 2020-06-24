@@ -88,7 +88,6 @@ class Organization(models.Model):
     owner = models.OneToOneField(User, blank=True, null=True, on_delete=models.SET_NULL, help_text='User who owns this Organization')
     name = models.CharField(max_length=255, blank=True, null=True, help_text='Name of the Organization')
     phone = PhoneNumberField(null=True, blank=True, unique=True) #o.phone.as_e164
-    #active_products = models.ManyToManyField(Product, blank=True, help_text='Products this organization is currently using')
     address_line_1 = models.CharField(max_length=255, blank=True, null=True, help_text='Adress of the Organization')
     address_line_2 = models.CharField(max_length=255, blank=True, null=True, help_text='Address contd.')
     zip_code =  models.CharField(max_length=255, blank=True, null=True, help_text='Zip code of the Organization')

@@ -153,7 +153,7 @@ class SurveySetting(models.Model):
 
     def __str__(self):
         """String for representing the SurveySetting object (in Admin site etc.)."""
-        return 'SurveySetting: (' + self.organization + ' - ' + self.instrument + ')'
+        return 'SurveySetting: (%s - %s)'%(self.organization, self.instrument)
 
     def save(self, *args, **kwargs):
         #Ensure SS is unique per organization and instrument

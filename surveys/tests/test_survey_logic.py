@@ -266,7 +266,7 @@ class SurveyLogicTest(TestCase):
             for i in items:
                 self.assertEqual(i.answer, None)
                 self.assertEqual(i.answered, False)
-                survey_logic.answer_item(i, 4)
+                survey_logic.answer_item(i, 3)
 
         #check that it worked
         survey_instances = SurveyInstance.objects.all()
@@ -275,14 +275,15 @@ class SurveyLogicTest(TestCase):
             self.assertEqual(si.completed, False)
             items = si.get_items()
             for i in items:
-                self.assertEqual(i.answer, 4)
+                self.assertEqual(i.answer, 3)
                 self.assertEqual(i.answered, True)
 
         #close survey
+
         survey = survey_logic.close_survey(survey)
 
-        #check things
-        survey_instances = SurveyInstance.objects.all()
+
+        #check that the survey was closed
         self.assertEqual(survey.date_open, datetime.date.today())
         self.assertEqual(survey.date_close, datetime.date.today()+datetime.timedelta(days=-1))
         self.assertEqual(survey.n_invited, 2)
@@ -291,6 +292,20 @@ class SurveyLogicTest(TestCase):
         self.assertEqual(survey.n_not_started, 0)
         self.assertEqual(survey.is_closed, True)
 
-        for si in survey_instances:
-            self.assertEqual(si.started, True)
-            self.assertEqual(si.completed, True)
+        #check thaty the dimensions were closed
+        i = Instrument.objects.get(id=1)
+        dimension_list=[d for d in i.dimension_set.all()]
+        dr_list = survey.dimensionresult_set.all()
+        for dr in dr_list:
+            self.assertIsInstance(dr, RatioScaleDimensionResult)
+            self.assertEqual(dr.survey, survey)
+            self.assertIn(dr.dimension, dimension_list)
+            self.assertEqual(dr.n_completed, 2)
+            self.assertEqual(dr.average, 3)
+
+
+        #check that the items were closed
+        si_list = survey.surveyitem_set.all()
+        for si in si_list:
+            self.assertEqual(si.n_answered, 2)
+            self.assertEqual(si.average, 3)

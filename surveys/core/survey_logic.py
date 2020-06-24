@@ -211,6 +211,7 @@ def survey_instances_from_survey(survey):
     #update number of invited for survey
     si_list = SurveyInstance.objects.filter(survey=survey)
     survey.n_invited = len(si_list)
+    return si_list
 
 def answer_item(survey_instance_item, answer):
     #validate input
@@ -296,7 +297,6 @@ def close_survey(survey):
     #go through each dimension in the survey to calculate and store results of survey
     sdr_list = survey.dimensionresult_set.all()
     for dr in sdr_list:
-
         #if this is a RatioScaled dimension:
         if isinstance(dr, RatioScaleDimensionResult):
 
@@ -324,14 +324,14 @@ def close_survey(survey):
                 rsitem.save()
 
             #Calculate avergaes and completed-states for each dimension
+
             #initiate counters
             rsdr_total = 0
             rsdr_n = 0
+            rsdr_n_items = 0
             rsdr_avg = 0
-
             #look at every surveyinstance to see if the dimension was completed
             sinstance_list = SurveyInstance.objects.filter(survey=survey)
-
             for sinstance in sinstance_list:
                 #set defaults be changed when proven oherwise
                 sinstance_dimension_total = 0
@@ -340,8 +340,6 @@ def close_survey(survey):
                 #go through each question for the survey instance and see if they completed:
                 rsii_list = RatioSurveyInstanceItem.objects.filter(survey_instance=sinstance)
                 for rsii in rsii_list:
-                    #print(rsii.dimension())
-                    #print(dr.dimension)
                     if rsii.dimension() == dr.dimension:
                         if rsii.answered == True:
                             sinstance_dimension_total += rsii.answer
@@ -349,37 +347,26 @@ def close_survey(survey):
                         else:
                             dimension_completed = False
                             break
-
                 #if the dimension was completed for this survey, add the results to the dimension-totals
                 if dimension_completed == True:
                     rsdr_total += sinstance_dimension_total
-                    rsdr_n += sinstance_dimension_n
-
+                    rsdr_n_items += sinstance_dimension_n
+                    rsdr_n += 1
             #now we can calculate the total avg
-            if rsdr_n > 0:
-                rsdr_avg = (rsdr_total/rsdr_n)
-
+            if rsdr_n_items > 0:
+                rsdr_avg = (rsdr_total/rsdr_n_items)
             #save average for this DimensionResult to DB
             dr.average=rsdr_avg
             dr.n_completed=rsdr_n
             dr.save()
-
-
-
 
         #elif isinstance(dr,
             #do things to other scaled dimensions
         else:
             #catchall, if a DimensionResult wasn't processed by any of the above categories
             logger.warning(
-                "%s %s: %s: tried to make SurveyInstanceItems for a new surveyInstance, but one of the Items (\"%s\") in the supplied Survey has a 'self.item_dimension.scale' that is faulty: %s."\
-                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, i, i.item_dimension.scale)
+                "%s %s: %s: tried to close a SurveyDimension (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
+                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, dr, type(dr))
             )
-
-
-
-
-
-
     #return survey for future use
     return survey
