@@ -3,6 +3,8 @@ from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.core.management import call_command
+from io import StringIO
 
 #my stuff
 from website.models import Organization
@@ -309,3 +311,27 @@ class SurveyLogicTest(TestCase):
         for si in si_list:
             self.assertEqual(si.n_answered, 2)
             self.assertEqual(si.average, 3)
+
+    def test_get_results_from_survey(self):
+
+        #check startconditions
+        self.assertEqual(len(Instrument.objects.all()), 1) #Note, a new instrument WILL NOT be created by the createtestsurveydata-command!
+        self.assertEqual(len(Dimension.objects.all()), 3)
+        self.assertEqual(len(Survey.objects.all()), 0)
+
+        #create, answer and close survey
+        out = StringIO()
+        call_command('createtestsurveydata', stdout=out)
+
+        #Check that it worked as excpected
+        self.assertEqual(len(Survey.objects.all()), 1)
+
+        #test get_results_from_survey()
+        tsurvey = Survey.objects.get(id=1)
+        data = survey_logic.get_results_from_survey(tsurvey)
+
+        self.assertIn('dimension_results', data)
+        self.assertIn('item_results', data)
+        self.assertEqual(len(data['dimension_results']), 3)
+        self.assertEqual(len(data['item_results']), 6)
+        

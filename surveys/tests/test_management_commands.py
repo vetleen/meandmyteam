@@ -28,8 +28,9 @@ class SurveyLogicTest(TestCase):
     def setUp(self):
         pass
 
-    def test_createtestsurveydata(self):
-        out = StringIO()
-        call_command('createtestsurveydata', stdout=out)
-        #self.assertIn('Expected output', out.getvalue())
-        print(out.getvalue())
+    #def test_createtestsurveydata(self):
+    #    out = StringIO()
+        #call_command('createtestsurveydata', stdout=out)
+        #self.assertIn("Creating someone to test on...", out.getvalue())
+
+        #print(out.getvalue())

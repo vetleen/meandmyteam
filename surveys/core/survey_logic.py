@@ -370,3 +370,58 @@ def close_survey(survey):
             )
     #return survey for future use
     return survey
+
+def get_results_from_survey(survey):
+    #validate input
+    assert isinstance(survey, Survey), \
+        "'survey' must be a Survey object, but was %s"%(type(survey_instance_item))
+    assert survey.is_closed == True, \
+        "'survey' must be closed before results may be viewed"
+
+    #instantiate data dict to be returned
+    data = {}
+
+    #get results from dimensions
+    dimension_results = []
+    dr_list = survey.dimensionresult_set.all()
+    for dr in dr_list:
+        if isinstance(dr, RatioScaleDimensionResult):
+            dr_data = {
+                'dimension': dr.dimension,
+                'scale': dr.dimension.scale,
+                'n_completed': dr.n_completed,
+                'average': dr.average
+            }
+            dimension_results.append(dr_data)
+        else:
+            logger.warning(
+                "%s %s: %s: tried to get results from a DimensionResults (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
+                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, dr, type(dr))
+            )
+    #add results to data
+    data.update({'dimension_results': dimension_results})
+
+    #get data from items
+    item_results = []
+    item_list = survey.get_items()
+    for i in item_list:
+        if isinstance(i, RatioSurveyItem):
+            i_data = {
+                'formulation': i.item_formulation,
+                'dimension': i.item_dimension,
+                'scale': i.item_dimension.scale,
+                'item_inverted': i.item_inverted,
+                'n_answered': i.n_answered,
+                'average': i.average
+            }
+            item_results.append(i_data)
+        else:
+            logger.warning(
+                "%s %s: %s: tried to get results from a SurveyItem (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
+                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, i, type(i))
+            )
+    #add results to data
+    data.update({'item_results': item_results})
+
+    #deliver data
+    return data
