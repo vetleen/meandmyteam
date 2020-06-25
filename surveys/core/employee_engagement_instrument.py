@@ -57,6 +57,34 @@ i002 = {
     'inverted': False,
 }
 
+i003 = {
+    'dimension_location': 0, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "At my work I always persevere, even when things do not go well.",
+    'active': True,
+    'inverted': False,
+}
+
+i004 = {
+    'dimension_location': 0, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "I can continue working for very long periods at a time.",
+    'active': True,
+    'inverted': False,
+}
+
+i005 = {
+    'dimension_location': 0, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "At my job, I am very resilient, mentally.",
+    'active': True,
+    'inverted': False,
+}
+
+i006 = {
+    'dimension_location': 0, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "At my job I feel strong and vigorous.",
+    'active': True,
+    'inverted': False,
+}
+
 i007 = {
     'dimension_location': 1, #index of dimensions-variable(list) where the dimension is located
     'formulation': "To me, my job is challenging.",
@@ -67,6 +95,27 @@ i007 = {
 i008 = {
     'dimension_location': 1, #index of dimensions-variable(list) where the dimension is located
     'formulation': "My job inspires me.",
+    'active': True,
+    'inverted': False,
+}
+
+i009 = {
+    'dimension_location': 1, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "I am enthusiastic about my job.",
+    'active': True,
+    'inverted': False,
+}
+
+i010 = {
+    'dimension_location': 1, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "I am proud on the work that I do.",
+    'active': True,
+    'inverted': False,
+}
+
+i011 = {
+    'dimension_location': 1, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "I find the work that I do full of meaning and purpose.",
     'active': True,
     'inverted': False,
 }
@@ -85,7 +134,40 @@ i013 = {
     'inverted': False,
 }
 
-items = [i001, i002, i007, i008, i012, i013]
+i014 = {
+    'dimension_location': 2, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "I get carried away when I am working.",
+    'active': True,
+    'inverted': False,
+}
+
+i015 = {
+    'dimension_location': 2, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "It is difficult to detach myself from my job.",
+    'active': True,
+    'inverted': False,
+}
+
+i016 = {
+    'dimension_location': 2, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "I am immersed in my work.",
+    'active': True,
+    'inverted': False,
+}
+
+i017 = {
+    'dimension_location': 2, #index of dimensions-variable(list) where the dimension is located
+    'formulation': "I feel happy when I am working intensely.",
+    'active': True,
+    'inverted': False,
+}
+items = [
+    i001, i002, i003, i004,
+    i005, i006, i007, i008,
+    i009, i010, i011, i012,
+    i013, i014, i015, i016,
+    i017
+    ]
 
 employee_engagement_instrument = {
     'instrument': instrument,

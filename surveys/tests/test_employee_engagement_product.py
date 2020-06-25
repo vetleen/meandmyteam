@@ -57,7 +57,7 @@ class SetupInstrumentTest(TestCase):
         self.assertEqual(len (Instrument.objects.all()), 1)
         self.assertEqual(len (Scale.objects.all()), 1)
         self.assertEqual(len (Dimension.objects.all()), 3)
-        self.assertEqual(len (Item.objects.all()), 6)
+        self.assertEqual(len (Item.objects.all()), 17)
 
         #do it again
         for i in range(10):
@@ -67,7 +67,7 @@ class SetupInstrumentTest(TestCase):
         self.assertEqual(len (Instrument.objects.all()), 1)
         self.assertEqual(len (Scale.objects.all()), 1)
         self.assertEqual(len (Dimension.objects.all()), 3)
-        self.assertEqual(len (Item.objects.all()), 6)
+        self.assertEqual(len (Item.objects.all()), 17)
 
 
 class EmployeeEngagementTest(TestCase):
@@ -82,4 +82,4 @@ class EmployeeEngagementTest(TestCase):
         self.assertEqual(len (Instrument.objects.all()), 1)
         self.assertEqual(len (Scale.objects.all()), 1)
         self.assertEqual(len (Dimension.objects.all()), 3)
-        self.assertEqual(len (Item.objects.all()), 6)
+        self.assertEqual(len (Item.objects.all()), 17)
