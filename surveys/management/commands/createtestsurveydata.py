@@ -34,7 +34,7 @@ class Command(BaseCommand):
         torganization = Organization(
             owner=tuser,
             name="Test Organization #1",
-            phone="004791234567",
+            phone=None,
             address_line_1="Test street",
             address_line_2="",
             zip_code="9999",

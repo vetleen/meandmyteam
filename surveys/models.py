@@ -35,7 +35,7 @@ class Scale(PolymorphicModel):
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
-        return 'Scale: (' + self.name + ')'
+        return self.name
 
 class RatioScale(Scale):
     '''
@@ -66,7 +66,7 @@ class Instrument(models.Model):
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
-        return 'Instrument: (' + self.name + ')'
+        return '(' + self.name + ')'
 
 class Dimension(models.Model):
     '''
@@ -120,7 +120,7 @@ class Dimension(models.Model):
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
-        return 'Dimension: (' + self.name + ' in ' + self.instrument.name + ')'
+        return '(' + self.name + ' in ' + self.instrument.name + ')'
 
 class Item(models.Model):
     '''
@@ -153,7 +153,7 @@ class SurveySetting(models.Model):
 
     def __str__(self):
         """String for representing the SurveySetting object (in Admin site etc.)."""
-        return 'SurveySetting: (%s - %s)'%(self.organization, self.instrument)
+        return '(%s - %s)'%(self.organization, self.instrument)
 
     def save(self, *args, **kwargs):
         #Ensure SS is unique per organization and instrument
@@ -185,7 +185,7 @@ class Respondent(models.Model):
 
     def __str__(self):
         """String for representing the Respondent object (in Admin site etc.)."""
-        return 'Respondent: ' + self.email
+        return self.email
 
 #SURVEY COMPONENTS (Survey, SurveyItem(s))
 class Survey(models.Model):
@@ -216,7 +216,7 @@ class Survey(models.Model):
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
-        return 'Survey: %s (%s to %s)'%(self.owner.name, self.date_open, self.date_close)
+        return '%s (%s to %s)'%(self.owner.name, self.date_open, self.date_close)
 
 class SurveyItem(PolymorphicModel):
     '''
@@ -262,7 +262,7 @@ class SurveyItem(PolymorphicModel):
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
-        return 'SurveyItem: ((' + self.survey + '): (This is a base class instance, which shouldn\'t be used))'
+        return '((%s): (This is an instance of the SurveyItem base class, which shouldn\'t be used))'%(self.survey)
 
 class RatioSurveyItem(SurveyItem):
     '''
@@ -275,7 +275,7 @@ class RatioSurveyItem(SurveyItem):
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
-        return 'SurveyItem: (%s): %s)'%(self.survey, self.item_formulation)
+        return '(%s): %s)'%(self.survey, self.item_formulation)
 
 class DimensionResult(PolymorphicModel):
     survey = models.ForeignKey(Survey, on_delete=models.PROTECT, null=True, help_text='Organization that owns this survey')
@@ -284,7 +284,7 @@ class DimensionResult(PolymorphicModel):
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
-        return 'DimensionResult for %s in %s'%(self.dimension, self.survey)
+        return 'Result of %s in %s'%(self.dimension, self.survey)
 
     def save(self, *args, **kwargs):
         ##Ensure some parameters cannot be changed

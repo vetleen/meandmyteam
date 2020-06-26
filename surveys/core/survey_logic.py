@@ -378,50 +378,61 @@ def get_results_from_survey(survey):
     assert survey.is_closed == True, \
         "'survey' must be closed before results may be viewed"
 
-    #instantiate data dict to be returned
-    data = {}
+    #instantiate list of results to be returned
+    instrument_results_list=[]
 
-    #get results from dimensions
-    dimension_results = []
-    dr_list = survey.dimensionresult_set.all()
-    for dr in dr_list:
-        if isinstance(dr, RatioScaleDimensionResult):
-            dr_data = {
-                'dimension': dr.dimension,
-                'scale': dr.dimension.scale,
-                'n_completed': dr.n_completed,
-                'average': dr.average
-            }
-            dimension_results.append(dr_data)
-        else:
-            logger.warning(
-                "%s %s: %s: tried to get results from a DimensionResults (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
-                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, dr, type(dr))
-            )
-    #add results to data
-    data.update({'dimension_results': dimension_results})
+    #get instruments, so we can sort data by instrument for display, in case several instruments were used
+    instruments = Instrument.objects.all()
+    for instrument in instruments:
+        #instantiate dict for this instrument
+        instrument_data = {
+            'instrument': instrument,
+            'dimension_results': [],
+            'item_results': [],
+        }
+        #get results from dimensions and add to our instrument_data
+        dr_list = survey.dimensionresult_set.all()
+        instrument_dimensions = [d for d in instrument.dimension_set.all()]
+        for dr in dr_list:
+            if dr.dimension in instrument_dimensions:
+                if isinstance(dr, RatioScaleDimensionResult):
+                    dr_data = {
+                        'dimension': dr.dimension,
+                        'scale': dr.dimension.scale,
+                        'n_completed': dr.n_completed,
+                        'average': dr.average
+                    }
 
-    #get data from items
-    item_results = []
-    item_list = survey.get_items()
-    for i in item_list:
-        if isinstance(i, RatioSurveyItem):
-            i_data = {
-                'formulation': i.item_formulation,
-                'dimension': i.item_dimension,
-                'scale': i.item_dimension.scale,
-                'item_inverted': i.item_inverted,
-                'n_answered': i.n_answered,
-                'average': i.average
-            }
-            item_results.append(i_data)
-        else:
-            logger.warning(
-                "%s %s: %s: tried to get results from a SurveyItem (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
-                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, i, type(i))
-            )
-    #add results to data
-    data.update({'item_results': item_results})
+                    instrument_data['dimension_results'].append(dr_data)
+                else:
+                    logger.warning(
+                        "%s %s: %s: tried to get results from a DimensionResults (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
+                        %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, dr, type(dr))
+                    )
+
+        #get data from items and add to our data
+        item_list = survey.get_items()
+        #item_data_list = []
+        for i in item_list:
+            if i.item_dimension in instrument_dimensions:
+                if isinstance(i, RatioSurveyItem):
+                    i_data = {
+                        'formulation': i.item_formulation,
+                        'dimension': i.item_dimension,
+                        'scale': i.item_dimension.scale,
+                        'inverted': i.item_inverted,
+                        'n_answered': i.n_answered,
+                        'average': i.average
+                    }
+                    instrument_data['item_results'].append(i_data)
+                    #item_data_list.append(i_data)
+                else:
+                    logger.warning(
+                        "%s %s: %s: tried to get results from a SurveyItem (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
+                        %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, i, type(i))
+                    )
+        instrument_results_list.append(instrument_data)
+    #print(instrument_results_list)
 
     #deliver data
-    return data
+    return instrument_results_list

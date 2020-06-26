@@ -1,0 +1,211 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="row pt-4">
+    <div class="col-sm-12">
+      <h3> Dashboard </h3>
+    </div>
+  </div> <!-- row -->
+  <div class="row justify-content-center pt-2">
+  {% include "includeable/message_displayer.html" %}
+  </div><!-- row -->
+  <div class="row">
+    <div class="col-12">
+
+
+      {% if not request.user.organization or not request.user.organization.name %}
+      <div class="card">
+        <div class="card-header">
+          Your next step to get started
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Enter your organization details</h5>
+          <p class="card-text">We don't know who you are yet. Help us out by giving us a little more info on your organization.</p>
+          <a href="#" class="btn btn-info">Set up organization</a>
+        </div>
+      </div>
+
+      {% elif employee_count == 0 %}
+      <div class="card">
+        <div class="card-header">
+          Your next step to get started
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Add some coworkers to track</h5>
+          <p class="card-text">Where are we going to send surveys? You can add coworkers manually, or email us a list (e.g. an excel sheet), and we'll add them for you!</p>
+          <a href="{% url 'surveys-add-or-remove-employees' %}" class="btn btn-info">Add coworkers</a>
+        </div>
+      </div>
+
+      {% elif stripe_subscription.status != 'active' and stripe_subscription.status != 'trialing' %}
+      <div class="card">
+        <div class="card-header">
+          Your next step to get started
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Set up a plan </h5>
+          <p class="card-text">To get started with our employee engagement software, you first need to pick a plan. Don't worry though, the first month is free for all plans!</p>
+          <a href="{% url 'payments_current_plan' %}" class="btn btn-info">Set up a plan</a>
+        </div>
+      </div>
+      {% else %}
+      <div class="row">
+        <div class="col-md-6">
+
+        {% if active_instrument_list %}
+          {% for instrument in active_instrument_list %}
+          <div class="card">
+            <div class="card-header text-center">
+
+              {{ instrument.name }}
+
+            </div>
+            <div class="card-body">
+              {% if latest_survey %}
+              <h5 class="card-title text-left">Latest measurements</h5>
+              <p class="text-muted">
+
+                {% for instrument_result in latest_survey %}
+                  {% if instrument_result.instrument == instrument %}
+                    {% for dr in instrument_result.dimension_results %}
+                      {{ dr.dimension.name }}: {{ dr.average|floatformat }}<br />
+                    {% endfor %}
+
+                  {% else %}
+                  Sit back and relax! We will now collect data from your co-workers, and once data is in we will let you know, and we will display it here.
+                  {% endif %}
+                {% endfor %}
+
+              </p>
+              {% else %}
+              <h5 class="card-title text-center">You are all set!</h5>
+              {% endif %}
+              <p class="card-text text-center">
+
+              {% if not latest_survey %}
+                Sit back and relax! We will now collect data from your co-workers, and once data is in we will let you know, and we will display it here. <br />
+              {% endif %}
+              {% if open_survey is not None %}
+                We are currently collecting data, which will be available once the survey closes, {{ open_survey.date_close }}.
+              {% endif %}
+              </p>
+              {% if surveys and number_of_respondents > 0 %}
+              <center>
+              <a href="#" class="btn btn-info">View details</a>
+              </center>
+              <h5 class="card-title text-left mt-4">Co-worker satisfaction tracking settings</h5>
+              {% endif %}
+              <center>
+              <a href="#" class="btn btn-info">Review settings</a>
+              </center>
+              <p class="card-text">
+              {% if surveys %}
+              <h5 class="card-title text-left mt-4">Your organization's surveys</h5>
+              <ul>
+                {% for survey in surveys %}
+                  <li><a href="{% url 'surveys-co-worker-satisfaction-data' survey.date_close %}">{{ survey.date_close }}</a>{% if forloop.counter == 1 %} (latest){% endif %}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+              </p>
+
+            </div>
+            <div class="card-footer text-muted  text-center">
+              <p class="card-text">
+                <small class="text-muted">{{ instrument.name }} Tracking is currently <b>active</b></small>
+              </p>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="card text-center">
+            <div class="card-header">
+              Your next step to get started
+            </div>
+            <div class="card-body">
+
+            <h5 class="card-title">You are ready!</h5>
+            <p class="card-text">Don't worry, you can always add more coworkers to track later.</p>
+            <a href="#" class="btn btn-lg btn-success">Start tracking!</a>
+            </div>
+            <div class="card-footer text-muted">
+              <p class="card-text">
+                <small class="text-muted"> ### is currently <b>not activated</b></small>
+              </p>
+            </div>
+          </div>
+        {% endif %}
+
+
+
+
+
+
+
+
+        </div><!-- col -->
+        <div class="col-sm-6">
+          <div class="card">
+            <div class="card-header text-center">
+              Organization
+            </div>
+            <center><h3 class="card-title mt-2">{{ request.user.organization.name }}</h3></center>
+
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item"><div class="d-flex justify-content-between"><span>Number of co-workers: </span> <span>{{ employee_count }}</span></div></li>
+
+                  <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                      <div>Coworker satisfaction tracking:</div>
+                      <div>
+                      {% if est_active == True %}
+                      <a href="#" class="badge badge-success align-self-end">ON</a>
+                      {% else %}
+                      <a href="#" class="badge badge-warning align-self-end">OFF</a>
+                      {% endif %}
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+            <div class="card-body">
+              <center><a href="#" class="btn btn-info">Edit organization details</a></center>
+
+            </div><!-- card-body -->
+            <div class="card-footer text-muted text-center">
+              <p class="card-text"><small class="text-muted">&nbsp;</small></p>
+            </div>
+          </div> <!-- card -->
+
+          <div class="card my-4">
+            <div class="card-header text-center">
+              Employees
+            </div>
+            <div class="card-body">
+              <center><h3 class="card-title">Co-workers at {{ request.user.organization.name }}</h3></center>
+            </div><!-- card-body -->
+
+                {% include "includeable/employee_list_displayer.html" %}
+
+            <div class="card-body">
+              <center><a href="{% url 'surveys-add-or-remove-employees' %}" class="btn btn-info">Add co-workers</a></center>
+            </div><!-- card-body -->
+            <div class="card-footer text-muted text-center">
+              <p class="card-text"><small class="text-muted">&nbsp;</small></p>
+            </div>
+          </div> <!-- card -->
+
+
+
+
+
+        </div><!-- col -->
+      </div><!-- row -->
+
+      {% endif %}
+    </div><!-- col -->
+
+  </div> <!-- row -->
+</div><!-- container -->
+
+{% endblock %}

@@ -33,6 +33,6 @@ urlpatterns = [
 
 
     #Temporary
-    path('dashboard/', views.edit_account_view, name='surveys-dashboard'),
+    
 
 ]

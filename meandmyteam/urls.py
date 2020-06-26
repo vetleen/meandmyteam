@@ -25,7 +25,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('surveys/', include('surveys.urls')),
 
-    #path('dashboard/', include('surveys.urls')),
+    path('dashboard/', include('surveys.urls')),
     path('', include('website.urls')),
     #path('answer-survey/<token>/', survey_views.answer_survey_view, name='surveys-answer-survey'),
     #path('answer-survey/<token>/<page>/', survey_views.answer_survey_view, name='surveys-answer-survey-pages'),

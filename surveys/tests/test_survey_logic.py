@@ -330,8 +330,22 @@ class SurveyLogicTest(TestCase):
         tsurvey = Survey.objects.get(id=1)
         data = survey_logic.get_results_from_survey(tsurvey)
 
-        self.assertIn('dimension_results', data)
-        self.assertIn('item_results', data)
-        self.assertEqual(len(data['dimension_results']), 3)
-        self.assertEqual(len(data['item_results']), 6)
-        
+        instruments = Instrument.objects.all()
+        self.assertEqual(len(instruments), len(data))
+
+        for inst in data:
+            self.assertIn(inst['instrument'], instruments)
+            self.assertIn('dimension_results', inst)
+            self.assertIn('item_results', inst)
+            for dr in inst['dimension_results']:
+                self.assertIn('dimension', dr)
+                self.assertIn('scale', dr)
+                self.assertIn('n_completed', dr)
+                self.assertIn('average', dr)
+            for ir in inst['item_results']:
+                self.assertIn('formulation', ir)
+                self.assertIn('dimension', ir)
+                self.assertIn('scale', ir)
+                self.assertIn('n_answered', ir)
+                self.assertIn('average', ir)
+                self.assertIn('inverted', ir)

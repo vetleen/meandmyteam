@@ -13,13 +13,6 @@ def create_stripe_customer(organization):
     assert isinstance(organization, Organization)
     if organization.address_line_1 == '':
         raise ValueError('The %s has not provided an address line 1 in it\'s profile, but this is required by Stripe to do payments. Add a full address, and try again.'%(organization))
-    #address should be a dictionary with the following keys:
-        #line1 (required)
-        #city (optional)
-        #country (optional) (must be a two-letter country code, as per "https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2")
-        #line2 (optional)
-        #postal_code (optional)
-        #state (optional) (may also be a country, province or region)
 
     address = {
         'line1': organization.address_line_1,
@@ -39,7 +32,7 @@ def create_stripe_customer(organization):
             shipping={
                 'address': address,
                 'name': organization.name,
-                'phone': organization.owner.phone,
+                'phone': organization.phone,
             }
         )
     except Exception as err:
