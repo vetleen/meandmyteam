@@ -141,33 +141,6 @@ class Item(models.Model):
 
         return '%s: %s.'%(self.dimension.name, self.formulation)
 
-#Settings for surveys for a particular Organization
-class SurveySetting(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, help_text='Organization this setting applies to')
-    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE, help_text='Instruments this organization is using')
-    is_active = models.BooleanField(default=False, help_text='This instrument is active for this organization')
-    survey_interval = models.SmallIntegerField(default=90, help_text='How many days between each survey', validators=[MinValueValidator(0), MaxValueValidator(730)])
-    surveys_remain_open_days = models.SmallIntegerField(default=10, help_text='How many days should surveys be open for this organization', validators=[MinValueValidator(0), MaxValueValidator(365)])
-    last_survey_open = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last opening date of survey with this product/prganization combo')
-    last_survey_close = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last closing date of survey with this product/prganization combo')
-
-    def __str__(self):
-        """String for representing the SurveySetting object (in Admin site etc.)."""
-        return '(%s - %s)'%(self.organization, self.instrument)
-
-    def save(self, *args, **kwargs):
-        #Ensure SS is unique per organization and instrument
-        if not self.pk:
-            try:
-                existing_ss = SurveySetting.objects.get(instrument=self.instrument, organization=self.organization)
-            except SurveySetting.DoesNotExist:
-                existing_ss = None
-            if existing_ss is not None:
-                raise IntegrityError(
-                   "You may not create a %s object for the instrument %s, and organization %s. It already exists!"
-                   %(self._meta.model_name, self.instrument, self.organization)
-               )
-        super(SurveySetting, self).save(*args, **kwargs)
 #Someone to fill in the surveys
 class Respondent(models.Model):
     '''
@@ -217,6 +190,35 @@ class Survey(models.Model):
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""
         return '%s (%s to %s)'%(self.owner.name, self.date_open, self.date_close)
+
+#Settings for surveys for a particular Organization
+class SurveySetting(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, help_text='Organization this setting applies to')
+    instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE, help_text='Instruments this organization is using')
+    is_active = models.BooleanField(default=False, help_text='This instrument is active for this organization')
+    survey_interval = models.SmallIntegerField(default=90, help_text='How many days between each survey', validators=[MinValueValidator(0), MaxValueValidator(730)])
+    surveys_remain_open_days = models.SmallIntegerField(default=7, help_text='How many days should surveys be open for this organization', validators=[MinValueValidator(0), MaxValueValidator(365)])
+    last_survey_open = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last opening date of survey with this product/prganization combo')
+    last_survey_close = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last closing date of survey with this product/prganization combo')
+    surveys =  models.ManyToManyField(Survey, blank=True, help_text='')
+
+    def __str__(self):
+        """String for representing the SurveySetting object (in Admin site etc.)."""
+        return '(%s - %s)'%(self.organization, self.instrument)
+
+    def save(self, *args, **kwargs):
+        #Ensure SS is unique per organization and instrument
+        if not self.pk:
+            try:
+                existing_ss = SurveySetting.objects.get(instrument=self.instrument, organization=self.organization)
+            except SurveySetting.DoesNotExist:
+                existing_ss = None
+            if existing_ss is not None:
+                raise IntegrityError(
+                   "You may not create a %s object for the instrument %s, and organization %s. It already exists!"
+                   %(self._meta.model_name, self.instrument, self.organization)
+               )
+        super(SurveySetting, self).save(*args, **kwargs)
 
 class SurveyItem(PolymorphicModel):
     '''

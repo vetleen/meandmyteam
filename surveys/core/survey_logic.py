@@ -68,6 +68,11 @@ def create_survey(owner, instrument_list, **kwargs):
     for instrument in instrument_list:
         assert isinstance(instrument, Instrument), \
             "items in 'instrument_list' must be Instrument objects, but was %s"%(type(instrument))
+        try:
+            ss = SurveySetting.objects.get(organization=owner, instrument=instrument)
+        except SurveySetting.DoesNotExist as err:
+            raise AssertionError(
+                "'instrument' %s is not configured for 'organization' %s"%(instrument, organization))
 
     ##check optional input (and make sure we have date_open and _close variables)
     date_open = None
@@ -88,7 +93,7 @@ def create_survey(owner, instrument_list, **kwargs):
     assert len(open_surveys) < 1, \
         "Could not create_survey() because one or more surveys are already open for this organization"
 
-    ##Check settings for * is_active * time since last * grab survey interval to use
+    ##Check settings for is_active and time since last, and grab survey interval to use
     survey_remain_open_days = 0
     for instrument in instrument_list:
         #grab settings
@@ -117,16 +122,20 @@ def create_survey(owner, instrument_list, **kwargs):
         date_close = date_open + datetime.timedelta(days=survey_remain_open_days)
 
     #create the survey object
-    s = Survey(
+    survey = Survey(
         owner=owner,
         date_open=date_open,
         date_close=date_close
     )
-    s.save()
+    survey.save()
 
-    #ensure we update the last_survey_open- and last_survey_close dates in settings for all instruments
+    #Update settings with new data
     for instrument in instrument_list:
+        #update the last_survey_open- and last_survey_close dates
         survey_setting = configure_survey_setting(owner, instrument, last_survey_open=date_open, last_survey_close=date_close)
+
+        #add survey to instrument.surveys (m2m-list)
+        survey_setting.surveys.add(survey)
 
     #create the SurveyItems that go with this object
     for instrument in instrument_list:
@@ -135,7 +144,7 @@ def create_survey(owner, instrument_list, **kwargs):
             #Create RatioSurveyItem when RatioScale is in use
             if isinstance(i.dimension.scale, RatioScale):
                 rsi = RatioSurveyItem(
-                    survey=s,
+                    survey=survey,
                     item_formulation=i.formulation,
                     item_inverted=i.inverted,
                     item_dimension=i.dimension
@@ -152,7 +161,7 @@ def create_survey(owner, instrument_list, **kwargs):
     for instrument in instrument_list:
         for dimension in instrument.dimension_set.all():
             if isinstance(dimension.scale, RatioScale):
-                rsdr = RatioScaleDimensionResult(survey=s, dimension=dimension)
+                rsdr = RatioScaleDimensionResult(survey=survey, dimension=dimension)
                 rsdr.save()
             #elif isinstance (dimension.scale...
             else:
@@ -161,7 +170,7 @@ def create_survey(owner, instrument_list, **kwargs):
                     %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, dimension, dimension.dimension.scale)
                 )
 
-    return s
+    return survey
 
 
 
@@ -371,68 +380,179 @@ def close_survey(survey):
     #return survey for future use
     return survey
 
-def get_results_from_survey(survey):
+def get_results_from_survey(survey, instrument):
     #validate input
     assert isinstance(survey, Survey), \
-        "'survey' must be a Survey object, but was %s"%(type(survey_instance_item))
-    assert survey.is_closed == True, \
-        "'survey' must be closed before results may be viewed"
+        "'survey' must be a Survey object, but was %s"%(type(survey))
+    assert isinstance(instrument, Instrument), \
+        "'instrument' must be a Instrument object, but was %s"%(type(instrument))
+
 
     #instantiate list of results to be returned
-    instrument_results_list=[]
+    #instrument_results_list=[]
 
-    #get instruments, so we can sort data by instrument for display, in case several instruments were used
-    instruments = Instrument.objects.all()
-    for instrument in instruments:
-        #instantiate dict for this instrument
-        instrument_data = {
-            'instrument': instrument,
-            'dimension_results': [],
-            'item_results': [],
-        }
-        #get results from dimensions and add to our instrument_data
-        dr_list = survey.dimensionresult_set.all()
-        instrument_dimensions = [d for d in instrument.dimension_set.all()]
-        for dr in dr_list:
-            if dr.dimension in instrument_dimensions:
-                if isinstance(dr, RatioScaleDimensionResult):
+    #instantiate dict to be returned
+    data = {
+        'instrument': instrument,
+        'survey': survey,
+        'dimension_results': [],
+        'item_results': []
+    }
+    if survey.is_closed == False:
+        return data
+
+    #get results from dimensions and add to our instrument_data
+    dr_list = survey.dimensionresult_set.all()
+    instrument_dimensions = [d for d in instrument.dimension_set.all()]
+
+    #prep search for highest/lowest RSDR
+    highest_average_rsdr = None
+    highest_average_rsdr_value = 0
+    lowest_average_rsdr = None
+    lowest_average_rsdr_value = None
+
+    #go through DR and add to data if DR belongs to instrument
+    for dr in dr_list:
+        if dr.dimension in instrument_dimensions:
+            if isinstance(dr, RatioScaleDimensionResult):
+                #determine the lowest and highest RSDR, to be included in data below, after for loop
+                if dr.average > highest_average_rsdr_value:
+                    highest_average_rsdr = dr
+                    highest_average_rsdr_value = dr.average
+
+                if lowest_average_rsdr_value is None:
+                    lowest_average_rsdr = dr
+                    lowest_average_rsdr_value = dr.average
+                else:
+                    if dr.average < lowest_average_rsdr_value:
+                        lowest_average_rsdr = dr
+                        lowest_average_rsdr_value = dr.average
+                #print("Highest: %s (%s)"%(highest_average_rsdr_value, highest_average_rsdr))
+                #print("Lowest: %s (%s)"%(lowest_average_rsdr_value, lowest_average_rsdr))
+                #give full data if enough respondents
+                if dr.n_completed > 3:
                     dr_data = {
                         'dimension': dr.dimension,
                         'scale': dr.dimension.scale,
                         'n_completed': dr.n_completed,
-                        'average': dr.average
+                        'average': dr.average,
+                        'percent_of_max': (((dr.average-dr.dimension.scale.min_value)/(dr.dimension.scale.max_value-dr.dimension.scale.min_value)))*100,
+                        'highest_average': None,
+                        'lowest_average': None
+                    }
+                #give limited data if NOT enough respondents
+                else:
+                    dr_data = {
+                        'dimension': dr.dimension,
+                        'scale': dr.dimension.scale,
+                        'n_completed': dr.n_completed,
+                        'average': None,
+                        'highest_average': None,
+                        'lowest_average': None
+
                     }
 
-                    instrument_data['dimension_results'].append(dr_data)
-                else:
-                    logger.warning(
-                        "%s %s: %s: tried to get results from a DimensionResults (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
-                        %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, dr, type(dr))
-                    )
+                data['dimension_results'].append(dr_data)
+            #elif.... other DR types than RatioScale
+            else:
+                logger.warning(
+                    "%s %s: %s: tried to get results from a DimensionResults (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
+                    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, dr, type(dr))
+                )
+    #Now that we know the best and worst score, add that into the DR
+    if highest_average_rsdr != None and lowest_average_rsdr != None: #We should always have both or neither
+        for dr in data['dimension_results']:
+            if dr['dimension'] == highest_average_rsdr.dimension:
+                dr['highest_average'] = True
+            else:
+                dr['highest_average'] = False
+            if dr['dimension'] == lowest_average_rsdr.dimension:
+                dr['lowest_average'] = True
+            else:
+                dr['lowest_average'] = False
 
-        #get data from items and add to our data
-        item_list = survey.get_items()
-        #item_data_list = []
-        for i in item_list:
-            if i.item_dimension in instrument_dimensions:
-                if isinstance(i, RatioSurveyItem):
+    #get data from items and add to our data, if item belongs to our instrument
+    item_list = survey.get_items()
+    for i in item_list:
+        if i.item_dimension in instrument_dimensions:
+            if isinstance(i, RatioSurveyItem):
+                #give full data if enough respondents
+                if i.n_answered > 3:
                     i_data = {
                         'formulation': i.item_formulation,
                         'dimension': i.item_dimension,
                         'scale': i.item_dimension.scale,
                         'inverted': i.item_inverted,
                         'n_answered': i.n_answered,
+                        'percent_of_max': (((i.average-i.item_dimension.scale.min_value)/(i.item_dimension.scale.max_value-i.item_dimension.scale.min_value)))*100,
                         'average': i.average
                     }
-                    instrument_data['item_results'].append(i_data)
-                    #item_data_list.append(i_data)
+                    #print(i_data)
+                #give limited data if NOT enough respondents
                 else:
-                    logger.warning(
-                        "%s %s: %s: tried to get results from a SurveyItem (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
-                        %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, i, type(i))
-                    )
-        instrument_results_list.append(instrument_data)
-    #print(instrument_results_list)
+                    i_data = {
+                        'formulation': i.item_formulation,
+                        'dimension': i.item_dimension,
+                        'scale': i.item_dimension.scale,
+                        'inverted': i.item_inverted,
+                        'n_answered': i.n_answered,
+                        'percent_of_max': None,
+                        'average': None
+                    }
+                data['item_results'].append(i_data)
+                #item_data_list.append(i_data)
+            else:
+                logger.warning(
+                    "%s %s: %s: tried to get results from a SurveyItem (\"%s\") in the supplied Survey, but its subclass was not recognized: %s."\
+                    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, i, type(i))
+                )
 
     #deliver data
-    return instrument_results_list
+    return data
+
+def get_results_from_instrument(instrument, organization, depth):
+    #validate input
+    assert isinstance(instrument, Instrument), \
+        "'instrument' must be an Instrument object, but was %s"%(type(instrument))
+    assert isinstance(organization, Organization), \
+        "'organization' must be an Organization object, but was %s"%(type(organization))
+    assert isinstance(depth, int), \
+        "'depth' must be an integer, but was %s"%(type(depth))
+
+    #get survey_setting
+    try:
+        survey_setting = SurveySetting.objects.get(instrument=instrument, organization=organization)
+    except SurveySetting.DoesNotExist as err:
+        #if there is no survey_setting, there is no surveys
+        #print("error: %s"%(err))
+        return None
+
+    #check if any open surveys, and if so add 1 to depth
+    open_surveys_list = survey_setting.surveys.filter(is_closed=False)
+    if len(open_surveys_list) > 0:
+        depth += len(open_surveys_list)
+
+    #get surveys from survey_settings, sorted by date and cut off at depth
+    surveys = survey_setting.surveys.all().order_by('-date_close')[:depth] #the first item is the latest survey
+
+    #return None if no surveys
+    if len(surveys) < 1:
+        return None
+
+    #instantiate dict to be returned
+    data = {
+        'instrument': instrument,
+        'surveys': []
+    }
+
+    #get data from surveys and add to data
+    for survey in surveys:
+        survey_results = get_results_from_survey(survey, instrument)
+        data['surveys'].append(survey_results)
+
+    #deliver data
+    return data
+
+
+
+    #return dicts

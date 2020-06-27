@@ -24,11 +24,11 @@ class SalesArgumentAdmin(admin.ModelAdmin):
 class OrganizationInline(admin.StackedInline): #for use in UserAdmin
     model = Organization
     can_delete = False
-    
+
 
 class UserAdmin(BaseUserAdmin):
     inlines = (OrganizationInline,)
-# Re-register UserAdmin
 
+# Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)

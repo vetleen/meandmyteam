@@ -111,6 +111,7 @@ class SurveyLogicTest(TestCase):
         #pre-check
         self.assertEqual(ss.last_survey_open, None)
         self.assertEqual(ss.last_survey_close, None)
+        self.assertEqual(len(ss.surveys.all()), 0)
 
         #Make a survey
         survey = survey_logic.create_survey(o, [i, ])
@@ -137,6 +138,7 @@ class SurveyLogicTest(TestCase):
         ss = SurveySetting.objects.get(id=1)
         self.assertEqual(ss.last_survey_open, datetime.date.today())
         self.assertEqual(ss.last_survey_close, datetime.date.today()+datetime.timedelta(days=ss.surveys_remain_open_days))
+        self.assertEqual(len(ss.surveys.all()), 1)
 
         rsdr_list = RatioScaleDimensionResult.objects.all()
         dimension_list = Dimension.objects.all()
@@ -312,7 +314,8 @@ class SurveyLogicTest(TestCase):
             self.assertEqual(si.n_answered, 2)
             self.assertEqual(si.average, 3)
 
-    def test_get_results_from_survey(self):
+    def test_get_results_from_survey_and_get_results_from_instrument(self):
+        i = Instrument.objects.get(id=1)
 
         #check startconditions
         self.assertEqual(len(Instrument.objects.all()), 1) #Note, a new instrument WILL NOT be created by the createtestsurveydata-command!
@@ -328,24 +331,32 @@ class SurveyLogicTest(TestCase):
 
         #test get_results_from_survey()
         tsurvey = Survey.objects.get(id=1)
-        data = survey_logic.get_results_from_survey(tsurvey)
+        data = survey_logic.get_results_from_survey(tsurvey, i)
 
         instruments = Instrument.objects.all()
-        self.assertEqual(len(instruments), len(data))
+        self.assertEqual(data['instrument'], i)
+        self.assertEqual(data['survey'], tsurvey)
+        self.assertIn('dimension_results', data)
+        self.assertIn('item_results', data)
+        for dr in data['dimension_results']:
+            self.assertIn('dimension', dr)
+            self.assertIn('scale', dr)
+            self.assertIn('n_completed', dr)
+            self.assertIn('average', dr)
+        for ir in data['item_results']:
+            self.assertIn('formulation', ir)
+            self.assertIn('dimension', ir)
+            self.assertIn('scale', ir)
+            self.assertIn('n_answered', ir)
+            self.assertIn('average', ir)
+            self.assertIn('inverted', ir)
 
-        for inst in data:
-            self.assertIn(inst['instrument'], instruments)
-            self.assertIn('dimension_results', inst)
-            self.assertIn('item_results', inst)
-            for dr in inst['dimension_results']:
-                self.assertIn('dimension', dr)
-                self.assertIn('scale', dr)
-                self.assertIn('n_completed', dr)
-                self.assertIn('average', dr)
-            for ir in inst['item_results']:
-                self.assertIn('formulation', ir)
-                self.assertIn('dimension', ir)
-                self.assertIn('scale', ir)
-                self.assertIn('n_answered', ir)
-                self.assertIn('average', ir)
-                self.assertIn('inverted', ir)
+
+        #test get_results_from_instrument()
+        gfrs_data = data
+        data = survey_logic.get_results_from_instrument(instrument=i, organization=tsurvey.owner, depth=3)
+
+        self.assertEqual(data['instrument'], i)
+        self.assertEqual(len(data['surveys']), 1)
+
+        self.assertEqual(data['surveys'][0], gfrs_data)

@@ -37,3 +37,30 @@ class EditRespondentForm(AddRespondentForm):
                     params={'taken_email': self.cleaned_data['email']}
                 )
         return self.cleaned_data['email']
+
+class EditSurveySettingsForm(forms.Form):
+
+    is_active = forms.BooleanField(
+        label="Activate tracking?",
+        required=False,
+        widget=forms.CheckboxInput(attrs={'default': 'true'})
+    )
+    survey_interval = forms.ChoiceField(
+        label="How often should employees in your organization be surveyed?",
+        required=True,
+        choices=(
+            (90, 'Every 3 months (reccomended)'),
+            (180, 'Every 6 months'),
+            (365, 'Every year'),
+            )
+    )
+    surveys_remain_open_days = forms.ChoiceField(
+        label="How much time should employees be given to answer a survey?",
+        required=True,
+        choices=(
+            (7, 'One week (recommended)'),
+            (14, 'Two weeks'),
+            (21, 'Three weeks'),
+            (30, 'One month'),
+            )
+    )

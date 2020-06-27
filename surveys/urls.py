@@ -12,7 +12,7 @@ urlpatterns = [
         path('edit-employee/<uidb64>/', views.edit_employee_view, name='surveys-edit-employee'),
         path('delete-employee/<uidb64>/', views.delete_employee_view, name='surveys-delete-employee'),
 
-        #path('set-up-employee-satisfaction-tracking/', views.set_up_employee_satisfaction_tracking, name='surveys-set-up-employee-satisfaction-tracking'),
+        path('setup-tracking/<instrument>/', views.setup_instrument_view, name='surveys-setup-instrument'),
         #path('co-worker-satisfaction/<date_close>/', views.co_worker_satisfaction_data_view, name='surveys-co-worker-satisfaction-data'),
 
 ]

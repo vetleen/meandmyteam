@@ -20,7 +20,7 @@ from surveys.core import survey_logic
 from payments.tools import stripe_logic
 
 #custom forms and models
-from surveys.forms import AddRespondentForm, EditRespondentForm
+from surveys.forms import AddRespondentForm, EditRespondentForm, EditSurveySettingsForm
 from surveys.models import Respondent
 
 
@@ -129,7 +129,27 @@ def dashboard_view(request):
     employee_list = request.user.organization.respondent_set.all()
     employee_count = employee_list.count()
 
-    #get the organization's closed surveys
+    #get the Stripe subscription
+    stripe_subscription = None
+    if request.user.organization.stripe_subscription_id is not None:
+            stripe_subscription = stripe_logic.retrieve_stripe_subscription(request.user.organization.stripe_subscription_id)
+
+    #find list of active instruments
+    active_instrument_list = []
+    instrument_settings_list = SurveySetting.objects.filter(organization=request.user.organization)
+    for isetting in instrument_settings_list:
+        if isetting.is_active == True:
+            active_instrument_list.append(isetting.instrument)
+
+    #find inactive_instrument_list
+    inactive_instrument_list = [i for i in Instrument.objects.all() if i not in active_instrument_list]
+
+
+
+
+
+
+    #get surveys
     surveys_raw = Survey.objects.filter(owner=request.user.organization).order_by('-date_close') #the first item is the latest survey
 
     #find the open survey, if any
@@ -142,28 +162,21 @@ def dashboard_view(request):
     if len(open_surveys_list) > 0:
         open_survey=open_surveys_list[0]
 
-    #make a list of closed surveys
-    closed_surveys_list = [survey_logic.get_results_from_survey(s) for s in surveys_raw if s.is_closed == True]
+    #make a list of closed surveys' results
+    #closed_surveys_list = [survey_logic.get_results_from_survey(s) for s in surveys_raw if s.is_closed == True]
 
     #pop out the latest one
-    latest_survey = None
-    if len(closed_surveys_list) > 0:
-        latest_survey = closed_surveys_list.pop(-1)
+    #latest_survey = None
+    #if len(closed_surveys_list) > 0:
+    #    latest_survey = closed_surveys_list.pop(-1)
 
     #set closed_surveys_list to None if there are no surveys in it
-    if len(closed_surveys_list) < 1:
-        closed_surveys_list = None
+    #if len(closed_surveys_list) < 1:
+    #    closed_surveys_list = None
 
-    #get the subscription and pass that in in there
-    stripe_subscription = None
-    if request.user.organization.stripe_subscription_id is not None:
-            stripe_subscription = stripe_logic.retrieve_stripe_subscription(request.user.organization.stripe_subscription_id)
 
-    #find list of active instruments
-    active_instrument_list = []
-    instrument_settings_list = SurveySetting.objects.filter(organization=request.user.organization)
-    for isetting in instrument_settings_list:
-        active_instrument_list.append(isetting.instrument)
+
+
 
     #collect all the info that the dashboard needs (and maybe then some?)
     context = {
@@ -172,9 +185,61 @@ def dashboard_view(request):
         'employee_list': employee_list,
         'stripe_subscription': stripe_subscription,
         'active_instrument_list': active_instrument_list,
-        'open_survey': open_survey,
-        'closed_surveys_list': closed_surveys_list,
-        'latest_survey': latest_survey
+        'inactive_instrument_list': inactive_instrument_list,
+        #'open_survey': open_survey,
+        #'closed_surveys_list': closed_surveys_list,
+        #'latest_survey': latest_survey,
     }
 
     return render(request, 'dashboard.html', context)
+
+@login_required
+def setup_instrument_view(request, **kwargs):
+    #get the Instrument to be configured
+    instrument_name = kwargs.get('instrument', None)
+    instrument = Instrument.objects.get(name=instrument_name)
+
+    #get the SurveySetting to be configured
+    try:
+        survey_setting = SurveySetting.objects.get(organization=request.user.organization, instrument=instrument)
+    except SurveySetting.DoesNotExist as err:
+        survey_setting = survey_logic.configure_survey_setting(organization=request.user.organization, instrument=instrument)
+        survey_setting.save()
+
+    #prepare a form in case it's a get request
+    data={
+        'is_active':  survey_setting.is_active,
+        'survey_interval': survey_setting.survey_interval,
+        'surveys_remain_open_days': survey_setting.surveys_remain_open_days,
+
+    }
+    form = EditSurveySettingsForm(initial=data)
+
+    #if post, validate form and save, redirect to dashboard
+    if request.method == 'POST':
+        form=EditSurveySettingsForm(request.POST)
+        if form.is_valid():
+            #update settings
+            survey_setting.is_active = form.cleaned_data['is_active']
+            survey_setting.survey_interval = form.cleaned_data['survey_interval']
+            survey_setting.surveys_remain_open_days = form.cleaned_data['surveys_remain_open_days']
+            survey_setting.save()
+            #report back
+            if survey_setting.is_active == True:
+                success_string = "Your settings were updated successfully, %s tracking is ACTIVE!"%(survey_setting.instrument.name)
+                messages.success(request, success_string, extra_tags='alert alert-success')
+            else:
+                success_string = "Your settings were updated successfully, %s tracking is INACTIVE!"%(survey_setting.instrument.name)
+                messages.success(request, success_string, extra_tags='alert alert-warning')
+
+            #redirect to dashboard
+            return HttpResponseRedirect(reverse('surveys-dashboard'))
+
+    #if get, make form, return form,
+
+    context={
+        'form': form,
+        'instrument': instrument,
+        'submit_button_text': "Update settings"
+    }
+    return render(request, 'setup_instrument.html', context)

@@ -1,5 +1,6 @@
 {% extends "base_generic.html" %}
 
+
 {% block content %}
 <div class="container">
   <div class="row pt-4">
@@ -52,90 +53,62 @@
       {% else %}
       <div class="row">
         <div class="col-md-6">
+          {% if active_instrument_list is not None %}
+            {% for active_instrument in active_instrument_list %}
+              <div class="card">
+                <div class="card-header text-center">
+                   {{ active_instrument.name }}
+                </div><!-- card-header -->
+               <div class="card-body">
 
-        {% if active_instrument_list %}
-          {% for instrument in active_instrument_list %}
-          <div class="card">
-            <div class="card-header text-center">
+              {% if latest_survey is not None %}
+                {% for instrument_result in latest_survey.survey_data %}
+                 {% if instrument_result.instrument == active_instrument %}
+                    <h5 class="card-title text-left">Latest measurements</h5>
 
-              {{ instrument.name }}
 
-            </div>
-            <div class="card-body">
-              {% if latest_survey %}
-              <h5 class="card-title text-left">Latest measurements</h5>
-              <p class="text-muted">
 
-                {% for instrument_result in latest_survey %}
-                  {% if instrument_result.instrument == instrument %}
-                    {% for dr in instrument_result.dimension_results %}
-                      {{ dr.dimension.name }}: {{ dr.average|floatformat }}<br />
-                    {% endfor %}
+                  {% endif %} {#  #}
+                {% endfor %} {# or instrument_result in latest_survey.survey_data #}
+              {% else %} {# if latest_survey is not None #}
+                <!-- if latest_survey is None-->
+              {% endif %} {# if latest_survey is not None #}
+            </div><!-- card-body -->
 
-                  {% else %}
-                  Sit back and relax! We will now collect data from your co-workers, and once data is in we will let you know, and we will display it here.
-                  {% endif %}
-                {% endfor %}
-
-              </p>
-              {% else %}
-              <h5 class="card-title text-center">You are all set!</h5>
-              {% endif %}
-              <p class="card-text text-center">
-
-              {% if not latest_survey %}
-                Sit back and relax! We will now collect data from your co-workers, and once data is in we will let you know, and we will display it here. <br />
-              {% endif %}
-              {% if open_survey is not None %}
-                We are currently collecting data, which will be available once the survey closes, {{ open_survey.date_close }}.
-              {% endif %}
-              </p>
-              {% if surveys and number_of_respondents > 0 %}
-              <center>
-              <a href="#" class="btn btn-info">View details</a>
-              </center>
-              <h5 class="card-title text-left mt-4">Co-worker satisfaction tracking settings</h5>
-              {% endif %}
-              <center>
-              <a href="#" class="btn btn-info">Review settings</a>
-              </center>
-              <p class="card-text">
-              {% if surveys %}
-              <h5 class="card-title text-left mt-4">Your organization's surveys</h5>
-              <ul>
-                {% for survey in surveys %}
-                  <li><a href="{% url 'surveys-co-worker-satisfaction-data' survey.date_close %}">{{ survey.date_close }}</a>{% if forloop.counter == 1 %} (latest){% endif %}</li>
-                {% endfor %}
-              </ul>
-              {% endif %}
-              </p>
-
-            </div>
             <div class="card-footer text-muted  text-center">
               <p class="card-text">
-                <small class="text-muted">{{ instrument.name }} Tracking is currently <b>active</b></small>
+                <small class="text-muted">{{ active_instrument.name }} Tracking is currently <b>active</b></small>
               </p>
-            </div>
-          </div>
-          {% endfor %}
-        {% else %}
-          <div class="card text-center">
-            <div class="card-header">
-              Your next step to get started
-            </div>
-            <div class="card-body">
+            </div><!-- card-footer -->
+            </div><!-- card -->
 
-            <h5 class="card-title">You are ready!</h5>
-            <p class="card-text">Don't worry, you can always add more coworkers to track later.</p>
-            <a href="#" class="btn btn-lg btn-success">Start tracking!</a>
-            </div>
-            <div class="card-footer text-muted">
-              <p class="card-text">
-                <small class="text-muted"> ### is currently <b>not activated</b></small>
-              </p>
-            </div>
-          </div>
-        {% endif %}
+            {% endfor %}  {# for active_instrument in active_instrument_list #}
+            {% else %} {# if active_instrument_list is not None #}
+              <!-- if active_instrument_list is None-->
+          {% endif %} {# if active_instrument_list is not None #}
+
+
+          {% if inactive_instrument_list is not None %}
+          {% for inactive_instrument in inactive_instrument_list %}
+
+          <div class="card">
+            <div class="card-header text-center">
+               {{ inactive_instrument.name }}
+            </div><!-- card-header -->
+           <div class="card-body text-center">
+              <h5 class="card-title">You are ready!</h5>
+              <p class="card-text">Don't worry, you can always add more coworkers to track later.</p>
+              <a href="{% url 'surveys-setup-instrument' inactive_instrument.name %}" class="btn btn-lg btn-success">Start tracking!</a>
+          </div><!-- card-body-->
+
+          <div class="card-footer text-muted  text-center">
+            <p class="card-text">
+              <small class="text-muted">{{ inactive_instrument.name }} Tracking is currently <b>inactive</b></small>
+            </p>
+          </div><!-- card-footer -->
+          </div><!-- card -->
+          {% endfor %} {# for instrument in inactive_instrument_list #}
+          {% endif %} {# if inactive_instrument_list is not None #}
 
 
 
@@ -154,22 +127,31 @@
 
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item"><div class="d-flex justify-content-between"><span>Number of co-workers: </span> <span>{{ employee_count }}</span></div></li>
-
+                  {% for ai in active_instrument_list %}
                   <li class="list-group-item">
                     <div class="d-flex justify-content-between">
-                      <div>Coworker satisfaction tracking:</div>
+                      <div>{{ ai.name }} tracking:</div>
                       <div>
-                      {% if est_active == True %}
-                      <a href="#" class="badge badge-success align-self-end">ON</a>
-                      {% else %}
-                      <a href="#" class="badge badge-warning align-self-end">OFF</a>
-                      {% endif %}
+                        <a href="{% url 'surveys-setup-instrument' ai.name %}" class="badge badge-success align-self-end">ON</a>
                       </div>
                     </div>
                   </li>
+                  {% endfor %} {# for ai in active_instrument_list #}
+                  {% for iai in inactive_instrument_list %}
+                  <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                      <div>{{ iai.name }} tracking:</div>
+                      <div>
+                        <a href="{% url 'surveys-setup-instrument' iai.name %}" class="badge badge-warning align-self-end">OFF</a>
+                      </div>
+                    </div>
+                  </li>
+                  {% endfor %} {# for iai in inactive_instrument_list #}
+
+
                 </ul>
             <div class="card-body">
-              <center><a href="#" class="btn btn-info">Edit organization details</a></center>
+              <center><a href="{% url 'edit-account' %}" class="btn btn-info">Edit organization details</a></center>
 
             </div><!-- card-body -->
             <div class="card-footer text-muted text-center">
@@ -201,7 +183,6 @@
 
         </div><!-- col -->
       </div><!-- row -->
-
       {% endif %}
     </div><!-- col -->
 
