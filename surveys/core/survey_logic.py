@@ -510,14 +510,15 @@ def get_results_from_survey(survey, instrument):
     #deliver data
     return data
 
-def get_results_from_instrument(instrument, organization, depth):
+def get_results_from_instrument(instrument, organization, depth=None):
     #validate input
     assert isinstance(instrument, Instrument), \
         "'instrument' must be an Instrument object, but was %s"%(type(instrument))
     assert isinstance(organization, Organization), \
         "'organization' must be an Organization object, but was %s"%(type(organization))
-    assert isinstance(depth, int), \
-        "'depth' must be an integer, but was %s"%(type(depth))
+    if depth is not None:
+        assert isinstance(depth, int), \
+            "'depth' must be an integer, but was %s"%(type(depth))
 
     #get survey_setting
     try:
@@ -533,7 +534,10 @@ def get_results_from_instrument(instrument, organization, depth):
         depth += len(open_surveys_list)
 
     #get surveys from survey_settings, sorted by date and cut off at depth
-    surveys = survey_setting.surveys.all().order_by('-date_close')[:depth] #the first item is the latest survey
+    if depth is not None:
+        surveys = survey_setting.surveys.all().order_by('-date_close')[:depth] #the first item is the latest survey
+    else:
+        surveys = survey_setting.surveys.all().order_by('-date_close') #the first item is the latest survey
 
     #return None if no surveys
     if len(surveys) < 1:
@@ -552,7 +556,3 @@ def get_results_from_instrument(instrument, organization, depth):
 
     #deliver data
     return data
-
-
-
-    #return dicts

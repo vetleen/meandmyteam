@@ -144,23 +144,46 @@ def dashboard_view(request):
     #find inactive_instrument_list
     inactive_instrument_list = [i for i in Instrument.objects.all() if i not in active_instrument_list]
 
+    #get latest data for active instruments
+    active_instrument_data = None
+    if len(active_instrument_list) > 0:
+        active_instrument_data = []
+        for instrument in active_instrument_list:
+            #get data
+            latest_instrument_data = survey_logic.get_results_from_instrument(
+                instrument=instrument,
+                organization=request.user.organization,
+                depth=3)
+            #sort out open surveys
+            open_survey=None
+            closed_surveys=None
+            for survey_data_point in latest_instrument_data['surveys']:
+                if survey_data_point['survey'].is_closed == False:
+                    open_survey=survey_data_point['survey']
+                    print("found an open one")
+                else:
+                    if closed_surveys is None:
+                        closed_surveys = []
+                    closed_surveys.append(survey_data_point)
+                    #print("tried to append %s"%(survey_data_point))
 
+            #append data
+            active_instrument_data.append({
+                'instrument':instrument,
+                'closed_surveys': closed_surveys,
+                'open_survey': open_survey
+            })
 
-
-
-
-    #get surveys
-    surveys_raw = Survey.objects.filter(owner=request.user.organization).order_by('-date_close') #the first item is the latest survey
 
     #find the open survey, if any
-    open_surveys_list = [s for s in surveys_raw if s.is_closed == False]
-    if len(open_surveys_list) > 1:
-        logger.warning(
-        "%s %s %s dashboard_view: Found 2 open surveys for organization: %s"\
-        %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, request.user.organization))
-    open_survey = None
-    if len(open_surveys_list) > 0:
-        open_survey=open_surveys_list[0]
+    #open_surveys_list = [s for s in surveys_raw if s.is_closed == False]
+    #if len(open_surveys_list) > 1:
+    #    logger.warning(
+    #    "%s %s %s dashboard_view: Found 2 open surveys for organization: %s"\
+    #    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, request.user.organization))
+    #open_survey = None
+    #if len(open_surveys_list) > 0:
+    #    open_survey=open_surveys_list[0]
 
     #make a list of closed surveys' results
     #closed_surveys_list = [survey_logic.get_results_from_survey(s) for s in surveys_raw if s.is_closed == True]
@@ -184,8 +207,9 @@ def dashboard_view(request):
         'employee_count': employee_count,
         'employee_list': employee_list,
         'stripe_subscription': stripe_subscription,
-        'active_instrument_list': active_instrument_list,
+        #'active_instrument_list': active_instrument_list,
         'inactive_instrument_list': inactive_instrument_list,
+        'active_instrument_data': active_instrument_data,
         #'open_survey': open_survey,
         #'closed_surveys_list': closed_surveys_list,
         #'latest_survey': latest_survey,

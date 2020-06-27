@@ -37,3 +37,4 @@ progress bar for question pages
 Add *automatic* country selection in Organization set-up: https://docs.djangoproject.com/en/3.0/ref/contrib/gis/geoip2/
 pricing add impact stories to front page, and possibly own page
 add impact stories to front page, and possibly own page
+support fopr viewing older surveys than 3 surveys ago

@@ -68,7 +68,7 @@ class SurveyLogicTest(TestCase):
         self.assertEqual(ss.organization, o)
         self.assertEqual(ss.is_active, False)
         self.assertEqual(ss.survey_interval, 90)
-        self.assertEqual(ss.surveys_remain_open_days, 10)
+        self.assertEqual(ss.surveys_remain_open_days, 7)
         self.assertEqual(ss.last_survey_open, None)
         self.assertEqual(ss.last_survey_close, None)
 
