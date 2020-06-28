@@ -203,10 +203,7 @@ class ModelsTest(TestCase):
             )
             d2.save()
         self.assertRaises(IntegrityError, create_duplicate_dimension)
-        d.instrument=None #OH NO! With a new name, who will I be?
-        d.save()
-        d = Dimension.objects.get(id=1)
-        self.assertEqual(d.instrument, None)
+
 
 
     def test_Item(self):

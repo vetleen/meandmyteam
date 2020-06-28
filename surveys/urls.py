@@ -13,6 +13,6 @@ urlpatterns = [
         path('delete-employee/<uidb64>/', views.delete_employee_view, name='surveys-delete-employee'),
 
         path('setup-tracking/<instrument>/', views.setup_instrument_view, name='surveys-setup-instrument'),
-        #path('co-worker-satisfaction/<date_close>/', views.co_worker_satisfaction_data_view, name='surveys-co-worker-satisfaction-data'),
+        path('survey_details/<uidb64>/<instrument>/', views.survey_details_view, name='surveys-survey-details'),
 
 ]

@@ -24,13 +24,17 @@ class Scale(PolymorphicModel):
     scales, such as RatioScale, will inherit from this to implement its
     peculiarities.
     '''
-    name = models.CharField(max_length=255, help_text='')
+    name = models.CharField(max_length=255, unique=True, help_text='')
     instruction = models.CharField(max_length=255, blank=True, null=True, help_text='')
     opt_out = models.BooleanField(default=True, help_text='')
 
     def save(self, *args, **kwargs):
         if self.pk:
-            raise IntegrityError("You may not edit an existing %s object, because existing Surveys may use it. Instead make a new one and attach that for future use" % self._meta.model_name)
+            original_self=Scale.objects.get(id=self.id)
+            if original_self.name != self.name:
+                raise IntegrityError(
+                   "You may not change the 'name' of an existing %s object."%(self._meta.model_name)
+               )
         super(Scale, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -46,6 +50,19 @@ class RatioScale(Scale):
     max_value = models.SmallIntegerField(default=0, help_text='')
     min_value_description = models.CharField(max_length=255, blank=True, null=True, help_text='')
     max_value_description = models.CharField(max_length=255, blank=True, null=True, help_text='')
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            original_self=Scale.objects.get(id=self.id)
+            if original_self.min_value != self.min_value:
+                raise IntegrityError(
+                   "You may not change the 'min_value' of an existing %s object."%(self._meta.model_name)
+               )
+            if original_self.max_value != self.max_value:
+                raise IntegrityError(
+                   "You may not change the 'max_value' of an existing %s object."%(self._meta.model_name)
+               )
+        super(RatioScale, self).save(*args, **kwargs)
 
 class Instrument(models.Model):
     '''
@@ -95,9 +112,9 @@ class Dimension(models.Model):
                 raise IntegrityError(
                    "You may not change the name of an existing %s object, because self.name is used together with self.scale and self.instrument in product_configuration to see if a new Dimension needs to be made and attached to Instrument."%(self._meta.model_name)
                )
-            if original_self.instrument != self.instrument and self.instrument != None:
+            if original_self.instrument != self.instrument:
                 raise IntegrityError(
-                   "You may only change the instrument of an %s object to None, but you tried to set it to %s."%(self._meta.model_name, self.instrument)
+                   "You may not change the instrument of an %s object"%(self._meta.model_name)
                )
         #Ensure the GenericForeignKey for scale received a Scale or subclass thereof
         if not isinstance(self.scale, Scale):
@@ -186,6 +203,9 @@ class Survey(models.Model):
         '''
         ratio_items = RatioSurveyItem.objects.filter(survey=self)
         return [i for i in ratio_items]
+
+    def uidb64(self):
+        return urlsafe_base64_encode(force_bytes(self.pk))
 
     def __str__(self):
         """String for representing the Survey object (in Admin site etc.)."""

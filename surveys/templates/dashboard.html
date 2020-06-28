@@ -116,7 +116,7 @@
 
                   <p class="card-text">
                     <center>
-                      <a href="#" class="btn btn-info">View details</a>
+                      <a href="{% url 'surveys-survey-details' active_instrument.closed_surveys.0.survey.uidb64 active_instrument.instrument.name %}" class="btn btn-info">View details</a>
                       <a href="{% url 'surveys-setup-instrument' active_instrument.instrument.name %}" class="btn btn-info">Review settings</a>
                     </center>
                   </p>

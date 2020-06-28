@@ -105,10 +105,10 @@ def create_survey(owner, instrument_list, **kwargs):
             %(instrument, owner)
 
         #check that enough time has elapsed since last survey was initiated
-        if survey_setting.last_survey_open is not None:
-            assert (survey_setting.last_survey_open+datetime.timedelta(days=survey_setting.survey_interval)) < datetime.date.today(), \
-                "Could not create_survey() because it is too little time since we last surveyed %s with %s." \
-                %(owner, instrument)
+        #if survey_setting.last_survey_open is not None:
+        #    assert (survey_setting.last_survey_open+datetime.timedelta(days=survey_setting.survey_interval)) < datetime.date.today(), \
+        #        "Could not create_survey() because it is too little time since we last surveyed %s with %s." \
+        #        %(owner, instrument)
 
         #find the longest remain_open_time of all their instruments and use that
         if survey_remain_open_days < survey_setting.surveys_remain_open_days:
@@ -380,23 +380,66 @@ def close_survey(survey):
     #return survey for future use
     return survey
 
-def get_results_from_survey(survey, instrument):
+def get_results_from_survey(survey, instrument, get_previous=True):
     #validate input
     assert isinstance(survey, Survey), \
         "'survey' must be a Survey object, but was %s"%(type(survey))
     assert isinstance(instrument, Instrument), \
         "'instrument' must be a Instrument object, but was %s"%(type(instrument))
+    assert isinstance(get_previous, bool), \
+        "'get_previous' must be a bool, but was %s"%(type(get_previous))
+
+    def get_previous_survey_w_instrument(survey, instrument):
+        '''
+        Will return the last survey before survey that answered the dimensions in instrument, or None if none exists.
+        '''
+        #validate input
+        assert isinstance(survey, Survey), \
+            "'survey' must be a Survey object, but was %s"%(type(survey))
+        assert isinstance(instrument, Instrument), \
+            "'instrument' must be a Instrument object, but was %s"%(type(instrument))
+
+        #grab the latest survey
+        previous_surveys = Survey.objects.filter(owner=survey.owner, date_close__lt=survey.date_close).order_by('-date_close')[:1]
+
+        #if there wasn't any previuous surveys, return None
+        if len (previous_surveys) < 1:
+            return None
+        else:
+            previous_survey = previous_surveys[0]
+
+        #check of this survey measured the dimensions of the instrument
+        idimensions = [d for d in instrument.dimension_set.all()]
+        psdimensions = [dr.dimension for dr in previous_survey.dimensionresult_set.all()]
+        is_same = True
+        for d in idimensions:
+            if d not in psdimensions:
+                is_same = False
+
+        #if the same, return , if not, go deeper
+        if is_same == True:
+            return previous_survey
+        else:
+            return get_previous_survey_w_instrument(survey=previous_survey, instrument=instrument)
 
 
-    #instantiate list of results to be returned
-    #instrument_results_list=[]
+    #get results from previous survey
+    previous_data = None
+    if get_previous == True:
+        #get previous survey
+        previous_survey = get_previous_survey_w_instrument(survey=survey, instrument=instrument)
+
+        #get results from previous survey
+        if previous_survey is not None:
+            previous_data = get_results_from_survey(survey=previous_survey, instrument=instrument, get_previous=False)
 
     #instantiate dict to be returned
     data = {
         'instrument': instrument,
         'survey': survey,
         'dimension_results': [],
-        'item_results': []
+        'item_results': [],
+        'previous_data': previous_data,
     }
     if survey.is_closed == False:
         return data

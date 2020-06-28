@@ -1,5 +1,10 @@
 from surveys.models import *
 
+#set up logging
+import datetime
+import logging
+logger = logging.getLogger('__name__')
+
 def setup_instrument(raw_instrument):
     #assertions
 
@@ -59,10 +64,12 @@ def setup_instrument(raw_instrument):
     #We seemingly have valid inputs, now let's make sure the product is set up properly:
     ###############
     #INSTRUMENT:
+    new_instrument = False
     try:
         instrument = Instrument.objects.get(id=raw_instrument['instrument']['id'])
         instrument.name=raw_instrument['instrument']['name']
         instrument.description=raw_instrument['instrument']['description']
+        instrument.save()
 
     except Instrument.DoesNotExist as err:
         instrument = Instrument(
@@ -70,19 +77,18 @@ def setup_instrument(raw_instrument):
                 name=raw_instrument['instrument']['name'],
                 description=raw_instrument['instrument']['description']
             )
-
-    finally:
         instrument.save()
+        new_instrument = True
 
     ############
     #SCALE:
-    #print("Reached Scales, working with:")
-    #print(raw_instrument['scales'])
+
     scales=[]
-    for scale in raw_instrument['scales']:
-        if scale['type'] == "RatioScale":
-            try:
-                scale = RatioScale.objects.get(
+    #make scales only if its a new instrument
+    if new_instrument == True:
+        for scale in raw_instrument['scales']:
+            if scale['type'] == "RatioScale":
+                new_scale = RatioScale(
                     name=scale['name'],
                     instruction=scale['instruction'],
                     opt_out=scale['opt_out'],
@@ -91,84 +97,51 @@ def setup_instrument(raw_instrument):
                     min_value_description=scale['min_value_description'],
                     max_value_description=scale['max_value_description']
                 )
+                new_scale.save()
+                scales.append(new_scale)
+            else:
+                raise ValueError("scale['%s'] provided, but not supported. Try 'RatioScale'."%(scale['type']))
+    else:
+        for scale in raw_instrument['scales']:
+            if scale['type'] == "RatioScale":
+                try:
+                    #grab the scale based on what not to be changed!
+                    existing_scale = RatioScale.objects.get(
+                        name=scale['name'],
+                        min_value=scale['min_value'],
+                        max_value=scale['max_value']
+                    )
+                    #some minor changes are allowed
+                    existing_scale.instruction=scale['instruction']
+                    existing_scale.opt_out=scale['opt_out']
+                    existing_scale.min_value_description=scale['min_value_description']
+                    existing_scale.max_value_description=scale['max_value_description']
+                    #save changes
+                    existing_scale.save()
+                    #add to scales for further processing
+                    scales.append(existing_scale)
+                except RatioScale.DoesNotExist as err:
+                    raise IntegrityError(\
+                        "Something was changed in the raw_data for scale %s in instrument %s, which SHOULD NOT be changed! ('name', 'min_value' or 'max_value')")
 
-            except RatioScale.DoesNotExist as err:
-                #make a new attached Scale
-                scale = RatioScale(
-                    name=scale['name'],
-                    instruction=scale['instruction'],
-                    opt_out=scale['opt_out'],
-                    min_value=scale['min_value'],
-                    max_value=scale['max_value'],
-                    min_value_description=scale['min_value_description'],
-                    max_value_description=scale['max_value_description']
-                )
-                scale.save()
-
-            finally:
-                scales.append(scale)
-
-        else:
-            raise ValueError("scale['%s'] provided, but not supported. Try 'RatioScale'."%(scale['type']))
     assert len(scales) == len(raw_instrument['scales'])
-    #print("Finished Scales, now working with:")
-    #for s in scales:
-    #    print("Scale: ", s.name)
 
     ################
     #DIMENSIONS
 
+    #Should never mess with dimensions if instrument already existed and had dimensions
+    #
+
     #add actual Instrument and Scale objects to raw_data
     for d in raw_instrument['dimensions']:
-        #print(type(d['instrument']))
-        #print(d['instrument'])
         real_inst = Instrument.objects.get(id=d['instrument_id'])
         real_scale = scales[d['scale_location']]
         d['instrument'] = real_inst
         d['scale'] = real_scale
 
-    #ensure there are no unwanted dimensions for the instrument:
-    current_dimensions = instrument.dimension_set.all()
-    if len(current_dimensions)>0:
-        raw_names = [d['name'] for d in raw_instrument['dimensions']]
-        for d in current_dimensions:
-            if d.name not in raw_names:
-                d.instrument=None
-                d.save()
-
-    #Ensure wanted dimesnions are found:
-    #print("Reached Dimensions, now working with:")
-    #for d in raw_instrument['dimensions']:
-    #    print("Scale: ", d['scale'].name)
-    for d in raw_instrument['dimensions']:
-        #print("Looking at dimensions")
-        try:
-            #print("Trying to find existing")
-            existing_d = Dimension.objects.get(
-                instrument=d['instrument'],
-                name=d['name']
-            )
-            #print("Found existing")
-            if existing_d.description != d['description']:
-                #If there's a new description, we can change that
-                #print("Needs new description")
-                existing_d.description = d['description']
-                existing_d.save()
-            if d['scale'] != existing_d.scale:
-                #If there's a new scale, scrap the dimension, and make a new one
-                #print("Needs scraping and to make a new one!")
-                existing_d.instrument=None
-                existing_d.save()
-                new_d = Dimension(
-                    instrument=d['instrument'],
-                    name=d['name'],
-                    description=d['description'],
-                    scale=d['scale']
-                )
-                new_d.save()
-                #print("Should have anew one!")
-
-        except Dimension.DoesNotExist:
+    #Make dimensions ONLY if this is a new instrument
+    if new_instrument == True:
+        for d in raw_instrument['dimensions']:
             new_d = Dimension(
                 instrument=d['instrument'],
                 name=d['name'],
@@ -177,11 +150,21 @@ def setup_instrument(raw_instrument):
             )
             new_d.save()
 
+    #We may change some attributes of old dimensions, but only description right now
+    if new_instrument == False:
+        for d in raw_instrument['dimensions']:
+            try:
+                existing_d = Dimension.objects.get(instrument=d['instrument'], name=d['name'])
+                if existing_d.description != d['description']:
+                    existing_d.description = d['description']
+                    d.save()
+            except Dimension.DoesNotExist as err:
+                    logger.info(
+                    "%s %s %s dashboard_view: Small whoopsie. Couldn't find a dimension for the instrument %s with the name %s. Don't worry though, everything should work, but dimension names cannot be changed, and so long as the raw_data dimension name does not match the name in the database, other changes may not be made during setup of the instrument."\
+                    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, d['instrument'], d['name']))
+
     dimensions = Dimension.objects.filter(instrument=instrument)
-    #print("Have these scales:")
-    #for d in dimensions:
-    #    print(d.scale.name)
-    assert len(dimensions) == len(raw_instrument['dimensions']), "Somehow we have ended up with %s dimensions for %s-instrument, while trying to have %s."%(len(dimensions), instrument.name, len(raw_instrument['dimensions']))
+    assert len(dimensions) == len(raw_instrument['dimensions']), "Somehow we have ended up with %s dimensions for %s-instrument, while trying to have %s. Probably you changed the raw_data for the survey, but setup_instrument doesnt change dimensions for existing Instruments."%(len(dimensions), instrument.name, len(raw_instrument['dimensions']))
 
     ######
     #ITEMS

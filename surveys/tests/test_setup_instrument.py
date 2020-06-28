@@ -219,7 +219,7 @@ class SetupInstrumentTest(TestCase):
 
         #check totals
         self.assertEqual(len (Instrument.objects.all()), 2)
-        self.assertEqual(len (Scale.objects.all()), 1) #the same scale can be used,. because scales are immuteable, and these two scales would be completely the same
+        self.assertEqual(len (Scale.objects.all()), 2) #gotta have it's own scale
         self.assertEqual(len (Dimension.objects.all()), 6)
         self.assertEqual(len (Item.objects.all()), 12)
 
@@ -247,43 +247,39 @@ class SetupInstrumentTest(TestCase):
         self.assertEqual(len (Dimension.objects.all()), 3)
         self.assertEqual(len (Item.objects.all()), 6)
 
-        #Try change the scale -> this should detach the dimension, and create a new dimension with the new scale, and also new items
-        rti2 = create_test_data(1)
-        scale002 = {
-            'type': "RatioScale",
-            'name':"How often? Scale of One to Six",
-            'instruction':"Please indicate how frequently the following occurs on a scale from one (Never) to six (always) the following:",
-            'opt_out': True,
-            'min_value': 1,
-            'max_value': 6,
-            'min_value_description':"never",
-            'max_value_description':"always",
-        }
-        self.assertNotEqual(rti2['scales'][0], scale002)
-        rti2['scales'][0] = scale002
-        self.assertEqual(rti2['scales'][0], scale002)
+        #Try change the scale -> you should never change name, min or max value...
+        def try_change_scale():
+            rti2 = create_test_data(1)
+            scale002 = {
+                'type': "RatioScale",
+                'name':"How often? Scale of One to Six",
+                'instruction':"Please indicate how frequently the following occurs on a scale from one (Never) to six (always) the following:",
+                'opt_out': True,
+                'min_value': 1,
+                'max_value': 6,
+                'min_value_description':"never",
+                'max_value_description':"always",
+            }
+            self.assertNotEqual(rti2['scales'][0], scale002)
+            rti2['scales'][0] = scale002
+            self.assertEqual(rti2['scales'][0], scale002)
 
-        setup_instrument.setup_instrument(raw_instrument=rti2)
+            setup_instrument.setup_instrument(raw_instrument=rti2)
+
+        self.assertRaises(IntegrityError, try_change_scale)
+
         i = Instrument.objects.get(id=1)
         self.assertEqual(i.id, 1)
         ds = i.dimension_set.all()
         self.assertEqual(len(ds), 3)
-        for d in ds:
-            self.assertEqual(d.scale.max_value, scale002['max_value'])
-            self.assertEqual(d.scale.instruction, scale002['instruction'])
-            self.assertEqual(d.scale.name, scale002['name'])
 
         allds = Dimension.objects.all()
-        self.assertEqual(len(allds), 6)
-        for d in allds:
-            if d not in ds:
-                self.assertEqual(d.instrument, None)
 
         #check totals
         self.assertEqual(len (Instrument.objects.all()), 1)
-        self.assertEqual(len (Scale.objects.all()), 2)
-        self.assertEqual(len (Dimension.objects.all()), 6)
-        self.assertEqual(len (Item.objects.all()), 12)
+        self.assertEqual(len (Scale.objects.all()), 1)
+        self.assertEqual(len (Dimension.objects.all()), 3)
+        self.assertEqual(len (Item.objects.all()), 6)
 
     def test_setup_instrument_and_then_try_change_dimensions(self):
         #check that all is calm
@@ -304,7 +300,7 @@ class SetupInstrumentTest(TestCase):
 
         #Try change the dimension in varying ways:
 
-        #change name and description, this should work
+        #change name and description, this should NOT work
         rti2 = create_test_data(1)
         td_vigor = {
             'instrument_id': 1,
@@ -316,7 +312,14 @@ class SetupInstrumentTest(TestCase):
         self.assertNotEqual(rti2['dimensions'][0], td_vigor)
         rti2['dimensions'][0] = td_vigor
         self.assertEqual(rti2['dimensions'][0], td_vigor)
-        test_instrument = setup_instrument.setup_instrument(raw_instrument=rti2)
+        setup_instrument.setup_instrument(raw_instrument=rti2)
+        test_instrument = Instrument.objects.get(id=1)
+
+        tidimensions = test_instrument.dimension_set.all()
+        tidimension_names = [d.name for d in tidimensions]
+
+        self.assertNotIn(td_vigor['name'], tidimension_names)
+
 
         #change instrument - should give assertion error, since it will be different form the id supplied in rti['instrument']['id']
         rti3 = create_test_data(1)
@@ -336,7 +339,7 @@ class SetupInstrumentTest(TestCase):
 
         #change scale -
         rti4 = create_test_data(1)
-        #TEST DATA scale
+        #new scales to change it up
         td_scale001 = {
             'type': "RatioScale",
             'name':"How often? Scale of One to Five",
@@ -369,7 +372,7 @@ class SetupInstrumentTest(TestCase):
         }
         td_scales = [td_scale001, td_scale002, td_scale003]
 
-        #TEST DATA Dimensions
+        #new Dimensions using new scales
         td_vigor = {
             'instrument_id': 1,
             'name': "Vigor",
@@ -398,15 +401,12 @@ class SetupInstrumentTest(TestCase):
         self.assertEqual(rti4['scales'], td_scales)
         self.assertEqual(rti4['dimensions'], td_dimensions)
 
-        test_instrument = setup_instrument.setup_instrument(raw_instrument=rti4)
+        def try_change_scale_raw_data():
+            test_instrument = setup_instrument.setup_instrument(raw_instrument=rti4)
 
-        ss = Scale.objects.all()
+        self.assertRaises(IntegrityError, try_change_scale_raw_data)
 
-        #check that it worked
-        self.assertEqual(len (Instrument.objects.all()), 1)
-        self.assertEqual(len (Scale.objects.all()), 3)
-        self.assertEqual(len (Dimension.objects.all()), 7)
-        self.assertEqual(len (Item.objects.all()), 14)
+
 
         #final one where we try to supply a out of range scale:
         rti5 = create_test_data(1)

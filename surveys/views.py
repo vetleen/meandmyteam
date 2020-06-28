@@ -267,3 +267,27 @@ def setup_instrument_view(request, **kwargs):
         'submit_button_text': "Update settings"
     }
     return render(request, 'setup_instrument.html', context)
+
+@login_required
+def survey_details_view(request, **kwargs):
+    #get the relevant survey
+    uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
+    survey = get_object_or_404(Survey, pk=uid)
+
+    #get the Instrument that we want to watych results for
+    instrument_name = kwargs.get('instrument', None)
+    instrument = Instrument.objects.get(name=instrument_name)
+
+    #check that User is allowed to view this survey
+    if not request.user == survey.owner.owner:
+        return HttpResponseForbidden()
+
+    #get the survey_data
+    survey_data = survey_logic.get_results_from_survey(survey=survey, instrument=instrument)
+
+    context = {
+        'survey_data': survey_data,
+        'instrument': instrument
+    }
+
+    return render(request, 'instrument_report.html', context)

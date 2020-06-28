@@ -327,7 +327,7 @@ class SurveyLogicTest(TestCase):
         call_command('createtestsurveydata', stdout=out)
 
         #Check that it worked as excpected
-        self.assertEqual(len(Survey.objects.all()), 1)
+        self.assertEqual(len(Survey.objects.all()), 3)
 
         #test get_results_from_survey()
         tsurvey = Survey.objects.get(id=1)
@@ -357,6 +357,6 @@ class SurveyLogicTest(TestCase):
         data = survey_logic.get_results_from_instrument(instrument=i, organization=tsurvey.owner, depth=3)
 
         self.assertEqual(data['instrument'], i)
-        self.assertEqual(len(data['surveys']), 1)
+        self.assertEqual(len(data['surveys']), 3)
 
         self.assertEqual(data['surveys'][0], gfrs_data)
