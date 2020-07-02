@@ -11,7 +11,7 @@ instrument = {
 scale001 = {
     'type': "RatioScale",
     'name':"How often? Scale of One to Five",
-    'instruction':"Please indicate how frequently the following occurs on a scale from one (Never) to five (always) the following:",
+    'instruction':"Please indicate how frequently the following occurs on a scale from one (Never) to five (always):",
     'opt_out': True,
     'min_value': 1,
     'max_value': 5,

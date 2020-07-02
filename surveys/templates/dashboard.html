@@ -75,7 +75,7 @@
                     {% for dimension in active_instrument.closed_surveys.0.dimension_results %}
                     <div class="row">
                       <div class="col-lg-3">
-                        <a href="{# url 'surveys-co-worker-satisfaction-data' surveys.0.date_close #}#{{ result.dimension|slugify }}">{{ dimension.dimension.name }}</a>
+                        <a href="{% url 'surveys-survey-details' active_instrument.closed_surveys.0.survey.uidb64 active_instrument.instrument.name %}#{{ dimension.dimension.name|slugify }}">{{ dimension.dimension.name }}</a>
                       </div><!-- col -->
 
                       <div class="col-2 text-right px-0">
@@ -120,10 +120,10 @@
                       <a href="{% url 'surveys-setup-instrument' active_instrument.instrument.name %}" class="btn btn-info">Review settings</a>
                     </center>
                   </p>
-                  <h5 class="card-title text-left mt-4">Previous {{ active_instrument.instrument.name }} surveys</h5>
+                  <h5 class="card-title text-left mt-4">{{ active_instrument.instrument.name }} measurements</h5>
                   <ul>
                     {% for survey in active_instrument.closed_surveys %}
-                      <li><a href="{# url 'surveys-co-worker-satisfaction-data' survey.date_close #}#">{{ survey.survey.date_close }}</a>{% if forloop.counter == 1 %} (latest){% endif %}</li>
+                      <li><a href="{% url 'surveys-survey-details' survey.survey.uidb64 active_instrument.instrument.name %}">{{ survey.survey.date_close }}</a>{% if forloop.counter == 1 %} (latest){% endif %}</li>
                     {% endfor %}
                   </ul>
 

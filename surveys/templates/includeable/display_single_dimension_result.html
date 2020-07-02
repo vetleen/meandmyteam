@@ -1,0 +1,47 @@
+
+{# this templates takes a dimension_result argument #}
+
+
+<div class="row">
+  <div class="col-sm-3">
+    {% if label == dimension_result.dimension.name %}
+      <a href="#{{ dimension_result.dimension.name|slugify }}">{{ dimension_result.dimension.name }}</a>
+    {% else %}
+      {{ label }}
+    {% endif %}
+  </div><!-- col -->
+  <div class="col-1 text-right px-0">
+    <span class="text-muted"><small> Weakn. </small></span>
+  </div><!-- col -->
+  <div class="col">
+    <div class="progress"  style="height: 20px;">
+      {% if dimension_result.n_completed > 3 %}
+        <div class="progress-bar
+        {% if dimension_result.percent_of_max < 20 %}
+          {% if colored == True %}
+            bg-danger
+          {% else %}
+            bg-secondary
+          {% endif %}
+        {% elif dimension_result.percent_of_max >= 80 %}
+          {% if colored == True %}
+            bg-success
+          {% else %}
+            bg-secondary
+          {% endif %}
+        {% else %}
+          {% if colored == True %}
+            bg-warning
+          {% else %}
+            bg-secondary
+          {% endif %}
+        {% endif %}" role="progressbar" style="width: {{ dimension_result.percent_of_max }}%" aria-valuenow="{{ dimension_result.percent_of_max }}" aria-valuemin="0" aria-valuemax="100">{{ dimension_result.average|floatformat }}</div>
+      {% else %}
+        <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">Score hidden</span></div>
+      {% endif %}
+        </div>
+  </div><!-- col -->
+  <div class="col-1 text-right px-0">
+    <span class="text-muted"><small> Strength </small></span>
+  </div><!-- col -->
+</div><!-- row -->

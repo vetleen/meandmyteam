@@ -402,13 +402,16 @@ def get_results_from_survey(survey, instrument, get_previous=True):
         #grab the latest survey
         previous_surveys = Survey.objects.filter(owner=survey.owner, date_close__lt=survey.date_close).order_by('-date_close')[:1]
 
+        #print("get_previous_survey_w_instrument was called with survey %s"%(survey))
+        #print("previous survey is: %s."%(previous_surveys))
+
         #if there wasn't any previuous surveys, return None
         if len (previous_surveys) < 1:
             return None
         else:
             previous_survey = previous_surveys[0]
 
-        #check of this survey measured the dimensions of the instrument
+        #check if this survey measured the dimensions of the instrument
         idimensions = [d for d in instrument.dimension_set.all()]
         psdimensions = [dr.dimension for dr in previous_survey.dimensionresult_set.all()]
         is_same = True
@@ -470,16 +473,54 @@ def get_results_from_survey(survey, instrument, get_previous=True):
                     if dr.average < lowest_average_rsdr_value:
                         lowest_average_rsdr = dr
                         lowest_average_rsdr_value = dr.average
-                #print("Highest: %s (%s)"%(highest_average_rsdr_value, highest_average_rsdr))
-                #print("Lowest: %s (%s)"%(lowest_average_rsdr_value, lowest_average_rsdr))
+
+
                 #give full data if enough respondents
                 if dr.n_completed > 3:
+                    #percent_of_max
+                    percent_of_max = (((dr.average-dr.dimension.scale.min_value)/(dr.dimension.scale.max_value-dr.dimension.scale.min_value)))*100
+                    #if previous data, get the changes
+                    change_average = None
+                    change_percent_of_max = None
+                    red_bar = None
+                    green_bar = None
+                    blue_bar = None
+                    #but only if the previous numbers can be shown
+                    if previous_data is not None:
+                        for pdr in previous_data['dimension_results']:
+                            if pdr['dimension'] == dr.dimension:
+                                if pdr['average'] is not None:
+                                    previous_average = pdr['average']
+                                    change_average = dr.average-previous_average
+
+                                if pdr['percent_of_max'] is not None:
+                                    previous_percent_of_max = pdr['percent_of_max']
+                                    change_percent_of_max = percent_of_max-previous_percent_of_max
+                                    #make the bar lengths to display (maybe this should be in view?)
+                                    if change_percent_of_max > 0:
+                                        red_bar = 0
+                                        green_bar = change_percent_of_max
+                                        blue_bar = previous_percent_of_max
+                                    elif change_percent_of_max == 0:
+                                        red_bar = 0
+                                        green_bar = 0
+                                        blue_bar = 0
+                                    else:
+                                        red_bar = -change_percent_of_max
+                                        green_bar = 0
+                                        blue_bar = percent_of_max
+                    #add data
                     dr_data = {
                         'dimension': dr.dimension,
                         'scale': dr.dimension.scale,
                         'n_completed': dr.n_completed,
                         'average': dr.average,
-                        'percent_of_max': (((dr.average-dr.dimension.scale.min_value)/(dr.dimension.scale.max_value-dr.dimension.scale.min_value)))*100,
+                        'percent_of_max': percent_of_max,
+                        'change_average': change_average,
+                        'change_percent_of_max': change_percent_of_max,
+                        'red_bar': red_bar,
+                        'green_bar': green_bar,
+                        'blue_bar': blue_bar,
                         'highest_average': None,
                         'lowest_average': None
                     }
@@ -491,6 +532,8 @@ def get_results_from_survey(survey, instrument, get_previous=True):
                         'n_completed': dr.n_completed,
                         'average': None,
                         'highest_average': None,
+                        'change_average': None,
+                        'change_percent_of_max': None,
                         'lowest_average': None
 
                     }

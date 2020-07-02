@@ -9,3 +9,7 @@ from .models import *
 @admin.register(SurveySetting)
 class SurveySettingAdmin(admin.ModelAdmin):
         list_display = ('organization', 'instrument', 'is_active', 'survey_interval', 'surveys_remain_open_days')
+
+@admin.register(Survey)
+class SurveyAdmin(admin.ModelAdmin):
+        pass
