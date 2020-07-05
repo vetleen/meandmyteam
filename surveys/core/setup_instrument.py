@@ -23,6 +23,7 @@ def setup_instrument(raw_instrument):
     ##... inside instrument
     assert type(raw_instrument['instrument']['id']) == int, "raw_instrument['instrument']['id'] was type %s, expected int"%(type(raw_instrument['instrument']['id']))
     assert type(raw_instrument['instrument']['name']) == str, "raw_instrument['instrument']['name'] was type %s, expected str"%(type(raw_instrument['instrument']['name']))
+    assert type(raw_instrument['instrument']['slug_name']) == str, "raw_instrument['instrument']['slug_name'] was type %s, expected str"%(type(raw_instrument['instrument']['slug_name']))
     assert type(raw_instrument['instrument']['description']) == str, "raw_instrument['instrument']['description'] was type %s, expected str"%(type(raw_instrument['instrument']['description']))
 
     ##... inside scales

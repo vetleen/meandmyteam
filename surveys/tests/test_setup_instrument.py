@@ -166,6 +166,7 @@ class SetupInstrumentTest(TestCase):
         new_instrument = {
             'id': 1, #THIS IS THE FOREIGN KEY, SO THAT WE HAVE TIGHT CONTROL OVER INSTRUMENTS
             'name': "Employee Engagement 2",
+            'slug_name': "employee_engagement_2",
             'description': "An instrument that measures employee engagement"
         }
         rti2 =create_test_data(1)
@@ -188,6 +189,7 @@ class SetupInstrumentTest(TestCase):
         new_instrument = {
             'id': 1, #THIS IS THE FOREIGN KEY, SO THAT WE HAVE TIGHT CONTROL OVER INSTRUMENTS
             'name': "Employee Engagement 2",
+            'slug_name': "employee_engagement_2",
             'description': "An instrument that measures employee engagement 2"
         }
         rti2 =create_test_data(1)
@@ -208,6 +210,7 @@ class SetupInstrumentTest(TestCase):
 
         #Try make an additonal Instrument -> now everything should be doubled
         rti2 = create_test_data(2)
+        rti2['scales'][0]['name'] = "How often? Scale of One to Five (2)"
         test_instrument = setup_instrument.setup_instrument(raw_instrument=rti2)
 
         ##check that it's fine

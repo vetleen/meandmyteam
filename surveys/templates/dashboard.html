@@ -75,7 +75,7 @@
                     {% for dimension in active_instrument.closed_surveys.0.dimension_results %}
                     <div class="row">
                       <div class="col-lg-3">
-                        <a href="{% url 'surveys-survey-details' active_instrument.closed_surveys.0.survey.uidb64 active_instrument.instrument.name %}#{{ dimension.dimension.name|slugify }}">{{ dimension.dimension.name }}</a>
+                        <a href="{% url 'surveys-survey-details' active_instrument.closed_surveys.0.survey.uidb64 active_instrument.instrument.slug_name %}#{{ dimension.dimension.name|slugify }}">{{ dimension.dimension.name }}</a>
                       </div><!-- col -->
 
                       <div class="col-2 text-right px-0">
@@ -105,7 +105,7 @@
                   {% else %}{# if active_instrument.latest_instrument_data is not None #}
                   <h5 class="card-title text-left">No measurements yet!</h5>
                   <p class="card-text">
-                    {{ active_instrument.instrument.name }} Tracking has not finished collecting your first set of data yet.
+                    {{ active_instrument.instrument.slug_name }} Tracking has not finished collecting your first set of data yet.
                       {% if active_instrument.open_survey is not None %}
                         But fear not, we are currently collecting data, and it will be available for review{{ active_instrument.open_survey.date_close }}.
                       {% else %}{# if active_instrument.open_survey is not None #}
@@ -116,14 +116,14 @@
 
                   <p class="card-text">
                     <center>
-                      <a href="{% url 'surveys-survey-details' active_instrument.closed_surveys.0.survey.uidb64 active_instrument.instrument.name %}" class="btn btn-info">View details</a>
-                      <a href="{% url 'surveys-setup-instrument' active_instrument.instrument.name %}" class="btn btn-info">Review settings</a>
+                      <a href="{% url 'surveys-survey-details' active_instrument.closed_surveys.0.survey.uidb64 active_instrument.instrument.slug_name %}" class="btn btn-info">View details</a>
+                      <a href="{% url 'surveys-setup-instrument' active_instrument.instrument.slug_name %}" class="btn btn-info">Review settings</a>
                     </center>
                   </p>
                   <h5 class="card-title text-left mt-4">{{ active_instrument.instrument.name }} measurements</h5>
                   <ul>
                     {% for survey in active_instrument.closed_surveys %}
-                      <li><a href="{% url 'surveys-survey-details' survey.survey.uidb64 active_instrument.instrument.name %}">{{ survey.survey.date_close }}</a>{% if forloop.counter == 1 %} (latest){% endif %}</li>
+                      <li><a href="{% url 'surveys-survey-details' survey.survey.uidb64 active_instrument.instrument.slug_name %}">{{ survey.survey.date_close }}</a>{% if forloop.counter == 1 %} (latest){% endif %}</li>
                     {% endfor %}
                   </ul>
 

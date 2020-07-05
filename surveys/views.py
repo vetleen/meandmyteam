@@ -220,8 +220,8 @@ def dashboard_view(request):
 @login_required
 def setup_instrument_view(request, **kwargs):
     #get the Instrument to be configured
-    instrument_name = kwargs.get('instrument', None)
-    instrument = Instrument.objects.get(name=instrument_name)
+    instrument_slug_name = kwargs.get('instrument', None)
+    instrument = Instrument.objects.get(slug_name=instrument_slug_name)
 
     #get the SurveySetting to be configured
     try:
@@ -275,8 +275,8 @@ def survey_details_view(request, **kwargs):
     survey = get_object_or_404(Survey, pk=uid)
 
     #get the Instrument that we want to watych results for
-    instrument_name = kwargs.get('instrument', None)
-    instrument = Instrument.objects.get(name=instrument_name)
+    instrument_slug_name = kwargs.get('instrument', None)
+    instrument = Instrument.objects.get(slug_name=instrument_slug_name)
 
     #check that User is allowed to view this survey
     if not request.user == survey.owner.owner:

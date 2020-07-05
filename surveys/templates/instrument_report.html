@@ -88,7 +88,7 @@
         {% include "includeable/display_single_dr_change.html" with label=dimension_result.dimension.name colored=True %} {# displays the dr change sincel last bar #}
       {% endfor %}
       <p class="mt-2 text-center">
-        <a href="{% url 'surveys-survey-details' survey_data.previous_data.survey.uidb64 instrument.name %}">View previous survey</a>
+        <a href="{% url 'surveys-survey-details' survey_data.previous_data.survey.uidb64 instrument.slug_name %}">View previous survey</a>
       </p>
     </div> <!-- col -->
     {% endif %} {# done showing data/change from previous (1.2) #}
@@ -150,7 +150,7 @@
                     <div class="progress-bar
                       {% if item_result.percent_of_max < 20 %} bg-primary
                       {% elif item_result.percent_of_max >= 80 %} bg-primary
-                      {% else %} bg-primary{% endif %}" role="progressbar" style="width: {{ item_result.percent_of_max }}%" aria-valuenow="{{ item_result.percent_of_max }}" aria-valuemin="0" aria-valuemax="100">{{ item_result.average }}</div>
+                      {% else %} bg-primary{% endif %}" role="progressbar" style="width: {{ item_result.percent_of_max }}%" aria-valuenow="{{ item_result.percent_of_max }}" aria-valuemin="0" aria-valuemax="100">{{ item_result.average|floatformat }}</div>
                   </div>
                 </div><!-- col -->
                 <div class="col text-left px-0">

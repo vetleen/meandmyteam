@@ -12,7 +12,5 @@ urlpatterns = [
         path('edit-employee/<uidb64>/', views.edit_employee_view, name='surveys-edit-employee'),
         path('delete-employee/<uidb64>/', views.delete_employee_view, name='surveys-delete-employee'),
 
-        path('setup-tracking/<instrument>/', views.setup_instrument_view, name='surveys-setup-instrument'),
-        path('survey_details/<uidb64>/<instrument>/', views.survey_details_view, name='surveys-survey-details'),
 
 ]

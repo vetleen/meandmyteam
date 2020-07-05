@@ -4,7 +4,9 @@ instrument_id = 1#THIS IS THE FOREIGN KEY, SO THAT WE HAVE TIGHT CONTROL OVER IN
 instrument = {
     'id': instrument_id, #THIS IS THE FOREIGN KEY, SO THAT WE HAVE TIGHT CONTROL OVER INSTRUMENTS
     'name': "Employee Engagement",
+    'slug_name': "employee-engagement",
     'description': "An instrument that measures employee engagement"
+
 }
 
 #Scale

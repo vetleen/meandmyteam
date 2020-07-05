@@ -23,12 +23,10 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('surveys/', include('surveys.urls')),
 
-    path('dashboard/', include('surveys.urls')),
+    path('dashboard/', include('surveys.dashboard_urls')),
+    path('surveys/', include('surveys.surveys_urls')),
     path('', include('website.urls')),
-    #path('answer-survey/<token>/', survey_views.answer_survey_view, name='surveys-answer-survey'),
-    #path('answer-survey/<token>/<page>/', survey_views.answer_survey_view, name='surveys-answer-survey-pages'),
     path('payments/', include('payments.urls')),
 
 ]

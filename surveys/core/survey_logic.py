@@ -104,12 +104,6 @@ def create_survey(owner, instrument_list, **kwargs):
             "Could not create_survey() because an instrument in the instrument_list (%s) provided was not an active instrument for this organization (%s)"\
             %(instrument, owner)
 
-        #check that enough time has elapsed since last survey was initiated
-        #if survey_setting.last_survey_open is not None:
-        #    assert (survey_setting.last_survey_open+datetime.timedelta(days=survey_setting.survey_interval)) < datetime.date.today(), \
-        #        "Could not create_survey() because it is too little time since we last surveyed %s with %s." \
-        #        %(owner, instrument)
-
         #find the longest remain_open_time of all their instruments and use that
         if survey_remain_open_days < survey_setting.surveys_remain_open_days:
             survey_remain_open_days = survey_setting.surveys_remain_open_days
@@ -132,6 +126,7 @@ def create_survey(owner, instrument_list, **kwargs):
     #Update settings with new data
     for instrument in instrument_list:
         #update the last_survey_open- and last_survey_close dates
+
         survey_setting = configure_survey_setting(owner, instrument, last_survey_open=date_open, last_survey_close=date_close)
 
         #add survey to instrument.surveys (m2m-list)
@@ -461,19 +456,23 @@ def get_results_from_survey(survey, instrument, get_previous=True):
     for dr in dr_list:
         if dr.dimension in instrument_dimensions:
             if isinstance(dr, RatioScaleDimensionResult):
-                #determine the lowest and highest RSDR, to be included in data below, after for loop
-                if dr.average > highest_average_rsdr_value:
-                    highest_average_rsdr = dr
-                    highest_average_rsdr_value = dr.average
+                #determine the lowest and highest RSDR, to be included in data
+                if dr.average is not None:
+                    if highest_average_rsdr_value is None:
+                        highest_average_rsdr = dr
+                        highest_average_rsdr_value = dr.average
+                    else:
+                        if dr.average > highest_average_rsdr_value:
+                            highest_average_rsdr = dr
+                            highest_average_rsdr_value = dr.average
 
-                if lowest_average_rsdr_value is None:
-                    lowest_average_rsdr = dr
-                    lowest_average_rsdr_value = dr.average
-                else:
-                    if dr.average < lowest_average_rsdr_value:
+                    if lowest_average_rsdr_value is None:
                         lowest_average_rsdr = dr
                         lowest_average_rsdr_value = dr.average
-
+                    else:
+                        if dr.average < lowest_average_rsdr_value:
+                            lowest_average_rsdr = dr
+                            lowest_average_rsdr_value = dr.average
 
                 #give full data if enough respondents
                 if dr.n_completed > 3:
@@ -488,6 +487,7 @@ def get_results_from_survey(survey, instrument, get_previous=True):
                     #but only if the previous numbers can be shown
                     if previous_data is not None:
                         for pdr in previous_data['dimension_results']:
+                            print(pdr)
                             if pdr['dimension'] == dr.dimension:
                                 if pdr['average'] is not None:
                                     previous_average = pdr['average']
@@ -531,9 +531,13 @@ def get_results_from_survey(survey, instrument, get_previous=True):
                         'scale': dr.dimension.scale,
                         'n_completed': dr.n_completed,
                         'average': None,
-                        'highest_average': None,
+                        'percent_of_max': None,
                         'change_average': None,
                         'change_percent_of_max': None,
+                        'red_bar': None,
+                        'green_bar': None,
+                        'blue_bar': None,
+                        'highest_average': None,
                         'lowest_average': None
 
                     }
@@ -642,3 +646,66 @@ def get_results_from_instrument(instrument, organization, depth=None):
 
     #deliver data
     return data
+
+#automatically create surveys when due
+def create_survey_if_due(organization):
+    '''
+    Looks at an organization and creates a survey with all due instruments, if
+    any. If none are due, it does nothing.
+    '''
+    #assert that valid inputs were given
+    assert isinstance(organization, Organization), \
+        "'organization' must be a Organization object, but was %s"%(type(organization))
+
+    #grab settings
+    survey_setting_list = SurveySetting.objects.filter(organization=organization)
+    #Make a list of due instruments
+    active_and_due_survey_setting_list = []
+    active_but_not_due_survey_setting_list = []
+    #sort out the settings for instruments that are active and due
+    for survey_setting in survey_setting_list:
+        #print("looking at survey setting for %s"%(survey_setting.instrument))
+        if survey_setting.is_active == True:
+            if survey_setting.last_survey_open is None:
+                active_and_due_survey_setting_list.append(survey_setting)
+            else:
+                next_survey_due_date = survey_setting.last_survey_open+datetime.timedelta(days=survey_setting.survey_interval)
+                if datetime.date.today() > next_survey_due_date:
+                    active_and_due_survey_setting_list.append(survey_setting)
+                else:
+                    active_but_not_due_survey_setting_list.append(survey_setting)
+    #create the list of survey_settings that we will make surveys for, begin with those that are due and active
+    due_survey_setting_list = active_and_due_survey_setting_list
+    #check active, but not due ones, if they are "close enough" to add in
+    if len(due_survey_setting_list) > 0:
+        for survey_setting in active_but_not_due_survey_setting_list:
+            #Is this instrument due within half of the interval?, if so proceed...
+            next_survey_due_date = survey_setting.last_survey_open+datetime.timedelta(days=survey_setting.survey_interval)
+            if next_survey_due_date < datetime.date.today()+datetime.timedelta(days=(survey_setting.survey_interval/2)):
+                #Is it also due in the next 60 days, if so add it to the current survey
+                if next_survey_due_date < datetime.date.today()+datetime.timedelta(days=60):
+                    due_survey_setting_list.append(survey_setting)
+
+    #create the survey
+    if len(due_survey_setting_list) > 0:
+
+        survey = create_survey (
+            owner=organization,
+            instrument_list=[survey_setting.instrument for survey_setting in due_survey_setting_list]
+        )
+        return survey
+    return None
+
+def close_survey_if_date_close_has_passed(survey):
+    #validate input
+    assert isinstance(survey, Survey), \
+        "'survey' must be a Survey object, but was %s"%(type(survey_instance_item))
+    assert survey.is_closed == False, \
+        "this survey was already closed"
+    assert survey.date_close < datetime.date.today(), \
+        "It is not yet time to close this survey, it will close %s."%(survey.date_close)
+
+    #close it
+    survey = close_survey(survey)
+    #return it
+    return survey

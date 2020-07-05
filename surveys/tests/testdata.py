@@ -2,6 +2,7 @@ def create_test_data(instrument_id):
     instrument = {
         'id': instrument_id, #THIS IS THE FOREIGN KEY, SO THAT WE HAVE TIGHT CONTROL OVER INSTRUMENTS
         'name': "Employee Engagement",
+        'slug_name': "employee_engagement",
         'description': "An instrument that measures employee engagement"
     }
 

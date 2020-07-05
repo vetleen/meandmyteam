@@ -13,3 +13,7 @@ class SurveySettingAdmin(admin.ModelAdmin):
 @admin.register(Survey)
 class SurveyAdmin(admin.ModelAdmin):
         pass
+
+@admin.register(Instrument)
+class InstrumentAdmin(admin.ModelAdmin):
+        pass

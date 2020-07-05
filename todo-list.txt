@@ -1,7 +1,9 @@
 ##MeAndMyTeam
 
 #dev
-
+"daily" logic (open and close surveys, send emails with unique links)
+ability to follow link and answer surveys
+automate setup product or add to readme how to get this app started from scratch
 
 # TODO before launch
 SEO
@@ -12,8 +14,7 @@ Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#cus
 password validation for signup
 contact us page and link in footer
 
-decide if need to revamp questions for product
-add about us explaining scientific background of test (if any...)
+dadd about us explaining scientific background of test (if any...)
 
 more data in sign-up, incl. check "accept terms". Consider also edit profile for this.
 add a terms-accepted checkbox to sign-up

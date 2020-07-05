@@ -360,3 +360,246 @@ class SurveyLogicTest(TestCase):
         self.assertEqual(len(data['surveys']), 3)
 
         self.assertEqual(data['surveys'][0], gfrs_data)
+
+class SurveyLogicTest_dailytaskfunctions(TestCase):
+    ''' TESTS THAT THE ANSWER SURVEY VIEW BEHAVES PROPERLY '''
+    def setUp(self):
+        rti = create_test_data(1)
+        setup_instrument.setup_instrument(rti)
+        i=Instrument.objects.get(id=1)
+        u = User (username="testuser@tt.tt", email="testuser@tt.tt", password="password")
+        u.save()
+        o = Organization(
+                owner=u,
+                name="TestOrg",
+                phone=None,
+                #active_products = models.ManyToManyField(Product, blank=True, help_text='Products this organization is currently using')
+                address_line_1="Test st. 77",
+                address_line_2=None,
+                zip_code="7777",
+                city="Test Town",
+                country='NO'
+            )
+        o.save()
+        ss = survey_logic.configure_survey_setting(organization=o, instrument=i, is_active=True)
+        ss.save()
+
+
+    def test_create_survey_if_due(self):
+        o=Organization.objects.get(id=1)
+        i=Instrument.objects.get(id=1)
+        ss=SurveySetting.objects.get(id=1)
+
+        #test all is calm to set things off
+        survey_list = Survey.objects.all()
+        self.assertEqual(len(survey_list), 0)
+        self.assertEqual(ss.last_survey_open, None)
+        self.assertEqual(ss.last_survey_close, None)
+        self.assertEqual(len(ss.surveys.all()), 0)
+
+        #run it once, creating a survey
+        survey = survey_logic.create_survey_if_due(organization=o)
+
+        #Test that it worked, creating 1 survey
+        survey_list = Survey.objects.all()
+        self.assertEqual(len(survey_list), 1)
+        self.assertIsInstance(survey, Survey)
+        self.assertEqual(survey.date_open, datetime.date.today())
+        self.assertEqual(survey.date_close, datetime.date.today()+datetime.timedelta(days=ss.surveys_remain_open_days))
+        ss=SurveySetting.objects.get(id=1)
+        self.assertEqual(ss.last_survey_open, datetime.date.today())
+        self.assertEqual(ss.last_survey_close, datetime.date.today()+datetime.timedelta(days=ss.surveys_remain_open_days))
+        self.assertEqual(len(ss.surveys.all()), 1)
+
+        #run it again, NOT creating a survey
+        survey2 = survey_logic.create_survey_if_due(organization=o)
+        survey3 = survey_logic.create_survey_if_due(organization=o)
+        survey4 = survey_logic.create_survey_if_due(organization=o)
+        survey5 = survey_logic.create_survey_if_due(organization=o)
+
+        #Test that it didnt create more surveys
+        self.assertIsInstance(survey, Survey)
+        self.assertEqual(survey2, None)
+        self.assertEqual(survey3, None)
+        self.assertEqual(survey4, None)
+        self.assertEqual(survey5, None)
+        survey_list = Survey.objects.all()
+        self.assertEqual(len(survey_list), 1)
+
+        #Move date_open and _close back in time so it a survey becomes due again
+        survey.date_open = datetime.date.today()+datetime.timedelta(days=-100)
+        survey.date_close = datetime.date.today()+datetime.timedelta(days=-93)
+        survey.save()
+        ss.last_survey_open = datetime.date.today()+datetime.timedelta(days=-100)
+        ss.last_survey_close = datetime.date.today()+datetime.timedelta(days=-93)
+        ss.save()
+        survey_logic.close_survey(survey)
+
+        #run it once, creating a new survey
+        survey6 = survey_logic.create_survey_if_due(organization=o)
+
+        #Test that it worked, creating 1 additional survey
+        self.assertIsInstance(survey6, Survey)
+        survey_list = Survey.objects.all()
+        self.assertEqual(len(survey_list), 2)
+
+        #add another instrument
+        rti = create_test_data(2)
+        rti['instrument']['name'] = "Another instrument"
+        rti['scales'][0]['name'] = "Another Scale"
+        setup_instrument.setup_instrument(rti)
+        i2=Instrument.objects.get(id=2)
+
+        #run it once, ensure no new Surveys are made
+        survey7 = survey_logic.create_survey_if_due(organization=o)
+        survey_list = Survey.objects.all()
+        self.assertEqual(len(survey_list), 2)
+
+        #Move date_open and _close back in time so it a survey becomes due again
+        survey6.date_open = datetime.date.today()+datetime.timedelta(days=-100)
+        survey6.date_close = datetime.date.today()+datetime.timedelta(days=-93)
+        survey6.save()
+        ss.last_survey_open = datetime.date.today()+datetime.timedelta(days=-100)
+        ss.last_survey_close = datetime.date.today()+datetime.timedelta(days=-93)
+        ss.save()
+        survey_logic.close_survey(survey6)
+
+        #configure new instrument
+        ss2 = survey_logic.configure_survey_setting(organization=o, instrument=i2, is_active=True)
+        ss2.save()
+
+        #run it once, 1 new survey should be made
+        survey8 = survey_logic.create_survey_if_due(organization=o)
+
+        #check that 1 was made
+        self.assertIsInstance(survey8, Survey)
+        survey_list = Survey.objects.all()
+        self.assertEqual(len(survey_list), 3)
+
+        #check that both instruments were included
+        dr_list8 = survey8.dimensionresult_set.all()
+        self.assertEqual(len(dr_list8), 6)
+        #while in the old one, only 1 instrument
+        dr_list6 = survey6.dimensionresult_set.all()
+        self.assertEqual(len(dr_list6), 3)
+
+        #Move date_open and _close back in time so it a survey becomes due again
+        survey8.date_open = datetime.date.today()+datetime.timedelta(days=-100)
+        survey8.date_close = datetime.date.today()+datetime.timedelta(days=-93)
+        survey8.save()
+        ss.last_survey_open = datetime.date.today()+datetime.timedelta(days=-100)
+        ss.last_survey_close = datetime.date.today()+datetime.timedelta(days=-93)
+        ss.save()
+        ss2.last_survey_open = datetime.date.today()+datetime.timedelta(days=-100)
+        ss2.last_survey_close = datetime.date.today()+datetime.timedelta(days=-93)
+        ss2.save()
+        survey_logic.close_survey(survey8)
+
+        #deactive the first product
+        ss = survey_logic.configure_survey_setting(organization=o, instrument=i, is_active=False)
+        ss.save()
+
+        #surveys are due again
+        survey9 = survey_logic.create_survey_if_due(organization=o)
+
+        #only one instrument should be included
+        dr_list9 = survey9.dimensionresult_set.all()
+        self.assertEqual(len(dr_list9), 3)
+
+        #Move date_open and _close back in time so it becomes not due, but still in the timewindow to be included with anopther instrument
+        survey9.date_open = datetime.date.today()+datetime.timedelta(days=-75)
+        survey9.date_close = datetime.date.today()+datetime.timedelta(days=-70)
+        survey9.save()
+        ss2.last_survey_open = datetime.date.today()+datetime.timedelta(days=-75)
+        ss2.last_survey_close = datetime.date.today()+datetime.timedelta(days=-70)
+        ss2.save()
+        survey_logic.close_survey(survey9)
+
+        #Run it again, nothing happens... it not due...
+        survey10 = survey_logic.create_survey_if_due(organization=o)
+        self.assertEqual(survey10, None)
+
+        #Activate first product again
+        ss = survey_logic.configure_survey_setting(organization=o, instrument=i, is_active=True)
+        ss.save()
+
+        #check that everything is in order befoe the big finale
+        self.assertEqual(ss.last_survey_open, datetime.date.today()+datetime.timedelta(days=-100)) #is due
+        self.assertEqual(ss.last_survey_close, datetime.date.today()+datetime.timedelta(days=-93))
+        self.assertEqual(ss2.last_survey_open, datetime.date.today()+datetime.timedelta(days=-75)) #is not due, but close enough
+        self.assertEqual(ss2.last_survey_close, datetime.date.today()+datetime.timedelta(days=-70))
+
+        #Run it again, both should be included, product 1 because it's so lojng ago, and product 2 it get's dragged in because it's due within 60 days and 1/3 of 90 days
+        survey11 = survey_logic.create_survey_if_due(organization=o)
+
+        #Both should be included
+        dr_list11 = survey11.dimensionresult_set.all()
+        self.assertEqual(len(dr_list11), 6)
+
+        #and dates are now aligned so that in the future, they fire at the same time
+        ss = survey_logic.configure_survey_setting(organization=o, instrument=i)
+        self.assertEqual(ss.last_survey_open, datetime.date.today())
+        self.assertEqual(ss.last_survey_close, datetime.date.today()+datetime.timedelta(days=ss.surveys_remain_open_days))
+        ss2 = survey_logic.configure_survey_setting(organization=o, instrument=i2)
+        self.assertEqual(ss2.last_survey_open, datetime.date.today())
+        self.assertEqual(ss2.last_survey_close, datetime.date.today()+datetime.timedelta(days=ss.surveys_remain_open_days))
+
+        #Move date_open and _close back in time so it a survey becomes due again
+        survey11.date_open = datetime.date.today()+datetime.timedelta(days=-100)
+        survey11.date_close = datetime.date.today()+datetime.timedelta(days=-93)
+        survey11.save()
+        ss.last_survey_open = datetime.date.today()+datetime.timedelta(days=-100)
+        ss.last_survey_close = datetime.date.today()+datetime.timedelta(days=-93)
+        ss.save()
+        ss2.last_survey_open = datetime.date.today()+datetime.timedelta(days=-100)
+        ss2.last_survey_close = datetime.date.today()+datetime.timedelta(days=-93)
+        ss2.save()
+        survey_logic.close_survey(survey11)
+
+    def test_close_survey_if_date_close_has_passed(self):
+        o=Organization.objects.get(id=1)
+        i=Instrument.objects.get(id=1)
+        ss=SurveySetting.objects.get(id=1)
+
+        #test all is calm to set things off
+        survey_list = Survey.objects.all()
+        self.assertEqual(len(survey_list), 0)
+        self.assertEqual(ss.last_survey_open, None)
+        self.assertEqual(ss.last_survey_close, None)
+        self.assertEqual(len(ss.surveys.all()), 0)
+
+        #Create a survey
+        survey = survey_logic.create_survey_if_due(organization=o)
+
+        #run the close-if-date-closed-has-passed function
+        def try_close_w_future_date_close():
+            survey_logic.close_survey_if_date_close_has_passed(survey)
+
+        #check that trying to close it raises assertion error
+        self.assertRaises(AssertionError, try_close_w_future_date_close)
+
+        #Move date_open and _close back in time so the survey should be closed
+        survey.date_open = datetime.date.today()+datetime.timedelta(days=-100)
+        survey.date_close = datetime.date.today()+datetime.timedelta(days=-93)
+        survey.save()
+        ss.last_survey_open = datetime.date.today()+datetime.timedelta(days=-100)
+        ss.last_survey_close = datetime.date.today()+datetime.timedelta(days=-93)
+        ss.save()
+
+        #precheck
+        survey_list = Survey.objects.filter(is_closed=True)
+        self.assertEqual(len(survey_list), 0)
+
+        #run the close-if-date-closed-has-passed fdunction
+        survey = survey_logic.close_survey_if_date_close_has_passed(survey)
+
+        #Check that the survey was closed
+        survey_list = Survey.objects.filter(is_closed=True)
+        self.assertEqual(len(survey_list), 1)
+
+        #run the close-if-date-closed-has-passed function
+        def try_close_w_is_close_true():
+            survey_logic.close_survey_if_date_close_has_passed(survey)
+
+        #check that trying to close it AGAIN raises assertion error
+        self.assertRaises(AssertionError, try_close_w_is_close_true)

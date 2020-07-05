@@ -72,6 +72,7 @@ class Instrument(models.Model):
     '''
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True, help_text='')
+    slug_name = models.CharField(max_length=255, unique=True, blank=True, null=True, help_text='')
     description = models.CharField(max_length=255, blank=True, null=True, help_text='')
 
     def get_items(self):
