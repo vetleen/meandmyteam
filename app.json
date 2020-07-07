@@ -1,6 +1,6 @@
 {
 	"addons": ["papertrail:choklad", "scheduler:standard"],
 	"scripts": {
-		"postdeploy": "python manage.py makeproducts"
+		"postdeploy": "python manage.py setupsurveys"
 	}
 }
