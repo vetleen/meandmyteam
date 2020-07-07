@@ -53,6 +53,7 @@ def setup_instrument(raw_instrument):
         assert type(i['formulation']) == str, "raw_instrument['dimensions'][%s]['formulation'] was type %s, expected str"%(n, type(d['formulation']))
         assert type(i['active']) == bool, "raw_instrument['dimensions'][%s]['active'] was type %s, expected bool"%(n, type(d['active']))
         assert type(i['inverted']) == bool, "raw_instrument['dimensions'][%s]['inverted'] was type %s, expected bool"%(n, type(d['inverted']))
+        
 
     #assert that the the index for desired Scale to be found in scales-list is valid
     for d in raw_instrument['dimensions']:

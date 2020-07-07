@@ -26,7 +26,7 @@ import datetime
 #from django.contrib import auth
 
 # Create your tests here.
-'''
+
 class SurveyLogicTest(TestCase):
 
     def setUp(self):
@@ -364,7 +364,7 @@ class SurveyLogicTest(TestCase):
         self.assertEqual(len(data['surveys']), 3)
 
         self.assertEqual(data['surveys'][0], gfrs_data)
-'''
+
 
 class SurveyLogicTest_dailytaskfunctions(TestCase):
     ''' TESTS THAT THE ANSWER SURVEY VIEW BEHAVES PROPERLY '''
@@ -391,8 +391,6 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
 
 
     def test_create_survey_if_due(self):
-        pass
-        '''
         o=Organization.objects.get(id=1)
         i=Instrument.objects.get(id=1)
         ss=SurveySetting.objects.get(id=1)
@@ -562,10 +560,8 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         ss2.last_survey_close = datetime.date.today()+datetime.timedelta(days=-93)
         ss2.save()
         survey_logic.close_survey(survey11)
-        '''
+
     def test_close_survey_if_date_close_has_passed(self):
-        pass
-        '''
         o=Organization.objects.get(id=1)
         i=Instrument.objects.get(id=1)
         ss=SurveySetting.objects.get(id=1)
@@ -612,7 +608,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
 
         #check that trying to close it AGAIN raises assertion error
         self.assertRaises(AssertionError, try_close_w_is_close_true)
-        '''
+
 
     def test_send_email_for_survey_instance(self):
         o=Organization.objects.get(id=1)
@@ -646,7 +642,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
             self.assertEqual(len(mail.outbox), 1)
             #print(dir(mail.outbox))
             for m in mail.outbox:
-                print(m.message())
+                #print(m.message())
                 pass
 
 

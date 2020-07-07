@@ -96,7 +96,7 @@ class Dimension(models.Model):
     '''
     instrument = models.ForeignKey(Instrument, blank=True, null=True, on_delete=models.SET_NULL, help_text='') #enables instrument.dimension_set.all()
     name = models.CharField(max_length=255, help_text='')
-    description = models.CharField(max_length=255, blank=True, null=True, help_text='')
+    description = models.TextField(blank=True, null=True, help_text='')
 
     #to make FK to Scale work, since there are different kinds of Scales
     content_type = models.ForeignKey(ContentType, blank=True, null=True, default=None, on_delete=models.PROTECT)
@@ -147,7 +147,7 @@ class Item(models.Model):
     A concrete question or statement for Respondents to react to by scoring it.
     '''
     dimension = models.ForeignKey(Dimension, on_delete=models.CASCADE, help_text='')
-    formulation = models.CharField(max_length=255, help_text='')
+    formulation = models.TextField(help_text='')
     active = models.BooleanField(default=True, help_text='')
     inverted = models.BooleanField(default=False, help_text='')
 
@@ -253,7 +253,7 @@ class SurveyItem(PolymorphicModel):
     '''
     #common to all kinds of SurveyItems
     survey = models.ForeignKey(Survey, on_delete=models.PROTECT, null=True, help_text='Organization that owns this survey') #enables survey.surveyitem_set.all(), hopefully this incldes subcalsses? I bet not... probably survey.ratiosurveyitem_set.all() works
-    item_formulation = models.CharField(max_length=255, blank=True, null=True,  help_text='A question or statement to confront Respondents with')
+    item_formulation = models.TextField(blank=True, null=True,  help_text='A question or statement to confront Respondents with')
     item_inverted = models.BooleanField(default=False, help_text='')
     item_dimension = models.ForeignKey(Dimension, blank=True, null=True, on_delete=models.PROTECT, help_text='')
     n_answered = models.IntegerField(default=0, help_text='Number of respondents')
