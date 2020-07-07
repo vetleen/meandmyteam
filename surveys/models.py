@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.db import models, IntegrityError
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
+from django.utils.crypto import salted_hmac
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -334,6 +336,7 @@ class SurveyInstance(models.Model):
     completed = models.BooleanField(default=False, help_text='')
     started = models.BooleanField(default=False, help_text='')
 
+
     def get_items(self):
         '''
         As different kinds of items are implemented, just update this, and
@@ -360,6 +363,20 @@ class SurveyInstance(models.Model):
 
         #return answer
         return was_completed
+
+    def get_hash_string(self):
+        hash_string = salted_hmac(
+            "django.contrib.auth.tokens.PasswordResetTokenGenerator",
+            urlsafe_base64_encode(force_bytes(10*self.respondent.email+str(self.pk+self.survey.pk+self.survey.owner.pk)+self.respondent.email)),
+            settings.SECRET_KEY,
+        ).hexdigest()[::2]
+        return hash_string
+
+    def get_url_token(self):
+        si = urlsafe_base64_encode(force_bytes(self.pk))
+        s = urlsafe_base64_encode(force_bytes(self.pk))
+        hash_string = self.get_hash_string()
+        return "%s-%s"%(si, hash_string)
 
     def save(self, *args, **kwargs):
         ##Ensure some parameters cannot be changed
@@ -421,3 +438,36 @@ class RatioSurveyInstanceItem(SurveyInstanceItem):
                    "You may not change the 'survey_item' of an existing %s object."%(self._meta.model_name)
                )
         super(RatioSurveyInstanceItem, self).save(*args, **kwargs)
+
+class RespondentEmail(models.Model):
+    survey_instance = models.ForeignKey(SurveyInstance,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        help_text=''
+    )
+    email_date = models.DateField(
+        auto_now=False,
+        auto_now_add=False,
+        blank=True,
+        null=True,
+        help_text=''
+    )
+    ALLOWED_CATEGORIES = ['initial', 'reminder', 'last_chance', 'failure']
+    category = models.CharField(
+        max_length=255,
+        help_text=''
+    )
+    error_message = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=''
+    )
+    def save(self, *args, **kwargs):
+        #Ensure type is always an ALLOWED_TYPE
+        if self.category not in self.ALLOWED_CATEGORIES:
+            raise ValueError(
+               "'type' must be on of %s, but was %s."%(ALLOWED_CATEGORIES, self.type)
+            )
+        super(RespondentEmail, self).save(*args, **kwargs)

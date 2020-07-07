@@ -1,5 +1,9 @@
 from surveys.models import *
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
 import datetime
+import os
 
 #set up logging
 import logging
@@ -699,13 +703,175 @@ def create_survey_if_due(organization):
 def close_survey_if_date_close_has_passed(survey):
     #validate input
     assert isinstance(survey, Survey), \
-        "'survey' must be a Survey object, but was %s"%(type(survey_instance_item))
+        "'survey' must be a Survey object, but was %s"%(type(survey))
     assert survey.is_closed == False, \
         "this survey was already closed"
     assert survey.date_close < datetime.date.today(), \
         "It is not yet time to close this survey, it will close %s."%(survey.date_close)
 
-    #close it
+    #close the survey
     survey = close_survey(survey)
-    #return it
+    #return the now closed survey
     return survey
+
+
+def send_email_for_survey_instance(survey_instance):
+    #validate input
+    assert isinstance(survey_instance, SurveyInstance), \
+        "'survey_instance' must be a SurveyInstance object, but was %s"%(type(survey_instance))
+    assert survey_instance.survey.is_closed == False, \
+        "'survey_instance' must belong to an open survey"
+
+    #define the function that actually sends the emails
+    def create_and_send_email_about_survey_instance(survey_instance, email_txt_template, email_html_template, subject_template):
+        #validate input
+        assert isinstance(survey_instance, SurveyInstance), \
+            "'survey_instance' must be a SurveyInstance object, but was %s"%(type(survey_instance))
+
+        #Make a Token so the Respondent can find the instance
+        url_token = survey_instance.get_url_token()
+
+        #Get a string representation fon the owner of the Survey
+        contact_person = survey_instance.survey.owner.owner
+        contact_person_str = contact_person.email
+        if contact_person.first_name !='' and contact_person.last_name !='':
+            contact_person_str = '%s %s'%(survey_instance.survey.owner.owner.first_name, survey_instance.survey.owner.owner.last_name)
+
+        #find out the topics covered
+        instrument_list = []
+        dimension_result_list = survey_instance.survey.dimensionresult_set.all()
+        for dr in dimension_result_list:
+            if dr.dimension.instrument not in instrument_list:
+                instrument_list.append(dr.dimension.instrument)
+
+
+        #prepare context to be passed into the email
+        context={
+                'token': url_token,
+                'organization': survey_instance.survey.owner.name,
+                'contact_person': contact_person_str,
+                'instrument_list': instrument_list,
+                'hostname': 'www.motpanel.com'#os.environ.get('HOSTNAME', 'www.motpanel.com')
+                }
+        #print (os.environ)
+        #gather content for the email
+        subject=render_to_string(subject_template, context).rstrip("\n\r")
+        text_content=render_to_string(email_txt_template, context)
+        html_content=render_to_string(email_html_template, context)
+        from_email='surveys@motpanel.com'
+        to=[survey_instance.respondent.email]
+
+        #make and send email
+        email_message = EmailMultiAlternatives(subject, text_content, from_email, to)
+        email_message.attach_alternative(html_content, "text/html")
+        email_message.send()
+        return email_message
+
+    def configure_and_call_send_email(email_txt_template, email_html_template, subject_template, category):
+        #validate input
+        assert isinstance(email_txt_template, str), \
+            "'email_txt_template' must be of the type string, but was"%(type(email_txt_template))
+        assert isinstance(email_html_template, str), \
+            "'email_html_template' must be of the type string, but was"%(type(email_html_template))
+        assert isinstance(subject_template, str), \
+            "'subject_template' must be of the type string, but was"%(type(subject_template))
+        assert isinstance(category, str), \
+            "'category' must be of the type string, but was"%(type(category))
+        assert category in RespondentEmail.ALLOWED_CATEGORIES, \
+            "'category' %s was not found in allowed categories, %s."%(category, RespondentEmail.ALLOWED_CATEGORIES)
+        #create and send email
+        try:
+            email_message = create_and_send_email_about_survey_instance(
+                survey_instance=survey_instance,
+                email_txt_template=email_txt_template,
+                email_html_template=email_html_template,
+                subject_template=subject_template,
+            )
+            assert isinstance(email_message, EmailMultiAlternatives), \
+                "send_email_about_survey_instance returned %s, but expected an instance of EmailMultiAlternatives"%(type(email_message))
+            #log success
+            respondent_email = RespondentEmail(
+                survey_instance=survey_instance,
+                email_date = datetime.date.today(),
+                category = category,
+                error_message=None
+            )
+            respondent_email.save()
+            return respondent_email
+
+        except AssertionError as err:
+            #log error
+            respondent_email = RespondentEmail(
+                survey_instance=survey_instance,
+                email_date = datetime.date.today(),
+                category = 'failure',
+                error_message=err
+            )
+            respondent_email.save()
+            return respondent_email
+
+    #if this survey_instance was already completed, don't send anything
+    if survey_instance.check_completed() == True:
+        return None
+
+    #an initial invitation should be sent out if it hasn't already been done
+    try:
+        initial_email = survey_instance.respondentemail_set.get(category='initial')
+    except RespondentEmail.DoesNotExist:
+        initial_email = configure_and_call_send_email(
+            email_txt_template='emails/new_survey_instance_email_txt.html',
+            email_html_template='emails/new_survey_instance_email_html.html',
+            subject_template='emails/new_survey_subject.txt',
+            category='initial'
+        )
+        if initial_email.category == 'failure':
+            logger.warning(
+                "%s %s: %s: Tried to send 'initial' email to %s about the survey %s, but failed."\
+                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey_instance.respondent.email, survey_instance.survey)
+            )
+        return initial_email
+
+    #Deal with reminders
+    #some settings for reminders
+    max_reminders_per_survey = 2
+    send_last_reminder_date = survey_instance.survey.date_close + datetime.timedelta(days=-1)
+    remind_after_days = 3
+    #see what's been sent before
+    email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(type='failure') #the first shall be the last (latest email_date)
+    #don't send more emails than max reminders + 1 (for the 'inital')
+    if len(email_list) >= max_reminders_per_survey+1:
+        return None
+    #also, don't send more reminders if the 'last_chance' email has gone out
+    elif email_list[0].category == 'last_chance':
+        return None
+    #send last_chance if that date has come
+    elif datetime.date.today() >= send_last_reminder_date:
+        last_chance_email = configure_and_call_send_email(
+            email_txt_template='emails/new_survey_instance_email_txt.html',
+            email_html_template='emails/new_survey_instance_email_html.html',
+            subject_template='emails/new_survey_subject.txt',
+            category='last_chance'
+        )
+        if last_chance_email.category == 'failure':
+            logger.warning(
+                "%s %s: %s: Tried to send 'last chance' email to %s about the survey %s, but failed."\
+                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey_instance.respondent.email, survey_instance.survey)
+            )
+        return last_chance_email
+    #or, send normal reminder if max reminders have not been reached (saving one for 'last_chance', AND if some time has passed since the last email)
+    elif len(email_list) <= max_reminders_per_survey-1 and datetime.date.today() >= (email_list[0].email_date+datetime.timedelta(days=remind_after_days)):
+        reminder_email = configure_and_call_send_email(
+            email_txt_template='emails/new_survey_instance_email_txt.html',
+            email_html_template='emails/new_survey_instance_email_html.html',
+            subject_template='emails/new_survey_subject.txt',
+            category='reminder'
+        )
+        if reminder_email.category == 'failure':
+            logger.warning(
+                "%s %s: %s: Tried to send 'reminder' email to %s about the survey %s, but failed."\
+                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey_instance.respondent.email, survey_instance.survey)
+            )
+        return last_chance_email
+    #or, ...?
+    else:
+        return None

@@ -122,6 +122,7 @@ def delete_employee_view(request, **kwargs):
     else:
         return HttpResponseForbidden()
 
+@login_required
 def dashboard_view(request):
     """View function for the dashboard"""
 
@@ -174,45 +175,14 @@ def dashboard_view(request):
                 'open_survey': open_survey
             })
 
-
-    #find the open survey, if any
-    #open_surveys_list = [s for s in surveys_raw if s.is_closed == False]
-    #if len(open_surveys_list) > 1:
-    #    logger.warning(
-    #    "%s %s %s dashboard_view: Found 2 open surveys for organization: %s"\
-    #    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, request.user.organization))
-    #open_survey = None
-    #if len(open_surveys_list) > 0:
-    #    open_survey=open_surveys_list[0]
-
-    #make a list of closed surveys' results
-    #closed_surveys_list = [survey_logic.get_results_from_survey(s) for s in surveys_raw if s.is_closed == True]
-
-    #pop out the latest one
-    #latest_survey = None
-    #if len(closed_surveys_list) > 0:
-    #    latest_survey = closed_surveys_list.pop(-1)
-
-    #set closed_surveys_list to None if there are no surveys in it
-    #if len(closed_surveys_list) < 1:
-    #    closed_surveys_list = None
-
-
-
-
-
     #collect all the info that the dashboard needs (and maybe then some?)
     context = {
         'todays_date': datetime.date.today(),
         'employee_count': employee_count,
         'employee_list': employee_list,
         'stripe_subscription': stripe_subscription,
-        #'active_instrument_list': active_instrument_list,
         'inactive_instrument_list': inactive_instrument_list,
         'active_instrument_data': active_instrument_data,
-        #'open_survey': open_survey,
-        #'closed_surveys_list': closed_surveys_list,
-        #'latest_survey': latest_survey,
     }
 
     return render(request, 'dashboard.html', context)
@@ -291,3 +261,6 @@ def survey_details_view(request, **kwargs):
     }
 
     return render(request, 'instrument_report.html', context)
+
+def answer_survey_view(request):
+    pass
