@@ -20,7 +20,7 @@ from surveys.core import survey_logic
 from payments.tools import stripe_logic
 
 #custom forms and models
-from surveys.forms import AddRespondentForm, EditRespondentForm, EditSurveySettingsForm
+from surveys.forms import AddRespondentForm, EditRespondentForm, EditSurveySettingsForm, AnswerSurveyForm
 from surveys.models import Respondent
 
 
@@ -262,5 +262,124 @@ def survey_details_view(request, **kwargs):
 
     return render(request, 'instrument_report.html', context)
 
-def answer_survey_view(request):
-    pass
+def answer_survey_view(request, **kwargs):
+    #Validate link and get the correct survey_instance or 404
+    try:
+        #get the si-id and token from the url, and check that it's format is correct
+        url_token = kwargs.get('token', None)
+        url_token_args = url_token.split("-")
+        assert len(url_token_args) == 2, "Faulty link (wrong link format)"
+        #get the associated SurveyInstance
+        si_id = int(force_text(urlsafe_base64_decode(url_token_args[0])))
+        survey_instance = get_object_or_404(SurveyInstance, pk=si_id)
+        #ensure the url_token matches the SurveyInstance
+        assert survey_instance.get_hash_string() == url_token_args[1], "Faulty link (invalid hash)"
+        #ensure the Survey that the SurveyInstance belongs to is still open
+        assert survey_instance.survey.date_close >= datetime.date.today()
+
+    except Exception as err:
+        logger.exception("%s %s: answer_survey_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
+        raise Http404("The survey you asked for does not exist. If you pasted a link, make sure you got the entire link.")
+
+    #get the page argument, to see if we should be inn the paginated pages, and if so, which one?
+    page=kwargs.get('page', None)
+
+    # make the context
+    context = {
+        'survey_instance': survey_instance,
+        'page': page,
+        'submit_button_text': 'Continue',
+    }
+
+    #if this view was requested without a page argument, we can skip forward a bit
+    if page is None:
+        #Go directly to first unanswered item if survey was started but not completed:
+        if survey_instance.check_completed() == False and survey_instance.started == True:
+            items = survey_instance.surveyinstanceitem_set.all().order_by('pk')
+            answered_item_counter = 0
+            for item in items:
+                answered_item_counter+=1
+                if item.answered == False:
+                    current_page = math.ceil((answered_item_counter/page_size))
+                    return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(url_token, current_page)))
+
+        #otherwise show a pretty plain view
+        return render(request, 'answer_survey.html', context)
+
+    #Show questions now that we know we are in the paginated part
+
+    #config
+    #set how many questions will be shown per page
+    page_size = 5
+    #make sure the page variable is an integer
+    page = int(page)
+
+    #make a list 'item_list' containing exactly the items the user should be asked
+    all_survey_instance_items_list=survey_instance.surveyinstanceitem_set.all().order_by('pk')
+    item_list = []
+    last_item_id = page*page_size
+    for count, item in enumerate(all_survey_instance_items_list):
+        if count < last_item_id and count >= (last_item_id-page_size):
+            item_list.append(item)
+
+
+    #make the form, including previous answers if any
+    data={}
+    #get previous answers for the questions in qlist and add them to the dict
+    for i in item_list:
+        if i.answered == True:
+            a = i.answer
+            data.update({'item_%s'%(i.pk): a})
+    form=AnswerSurveyForm(items=item_list, initial=data)
+    context.update({'form': form})
+
+    #did the user POST something?
+    if request.method == 'POST':
+        print("method was POST")
+
+        #overwrite the existing form with the values POSTED
+        posted_form=AnswerSurveyForm(request.POST, items=item_list)
+        context.update({'form': posted_form})
+
+        #deal with data if it's valid
+        if posted_form.is_valid():
+            for answer in posted_form.cleaned_data:
+                # identify the question that has been answered
+                item_id = int(answer.replace('item_', ''))
+                item = SurveyInstanceItem.objects.get(id=item_id)
+                #make sure it's in the item_list
+                try:
+                    assert item in item_list, \
+                        "An answer was submitted for an unexpected item with the id %s, but expected one of %s."%\
+                        (item.id, [item.id for item in item_list])
+                except AssertionError as err:
+                    logger.exception(
+                        "%s %s: answer_survey_view: (user: %s) %s: %s."\
+                        %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
+                    return HttpResponseForbidden()
+
+                # find the value that has been provided as the answer
+                if isinstance(item, RatioSurveyInstanceItem):
+                    value=int(posted_form.cleaned_data[answer])
+                    print(value)
+                #elif other types of scales
+                else:
+                    logger.warning(
+                        "%s %s: %s: tried answer a SurveyInstanceItem, but its subclass (%s) was not recognized:\n---\"%s\""\
+                        %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, type(item), item)
+                    )
+                    value=None
+
+                # use the answer method of the question to create answer objects for this si
+                if value is not None:
+                    item.answer_item(value=value)
+
+            #if there are more questions, send them to the next page
+            if len(all_survey_instance_items_list) > int(page)*page_size:
+                return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(url_token, page+1)))
+
+            #else, we are done answering, and redirect to thank you message
+            return HttpResponseRedirect(reverse('surveys-answer-survey', args=(url_token, )))
+
+    print("method was NOT POST")
+    return render(request, 'answer_survey.html', context)

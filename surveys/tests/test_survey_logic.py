@@ -451,6 +451,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         #add another instrument
         rti = create_test_data(2)
         rti['instrument']['name'] = "Another instrument"
+        rti['instrument']['slug_name'] = "another_instrument"
         rti['scales'][0]['name'] = "Another Scale"
         setup_instrument.setup_instrument(rti)
         i2=Instrument.objects.get(id=2)

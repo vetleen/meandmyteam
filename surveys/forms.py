@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from surveys.models import Respondent
 from django_countries.widgets import CountrySelectWidget
 from django_countries.fields import CountryField
+from surveys.models import SurveyInstanceItem, RatioSurveyInstanceItem
 
 
 
@@ -64,3 +65,40 @@ class EditSurveySettingsForm(forms.Form):
             (30, 'One month'),
             )
     )
+
+class AnswerSurveyForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        #self.user = kwargs.pop('user',None)
+        self.items = kwargs.pop('items', None)
+        super(AnswerSurveyForm, self).__init__(*args, **kwargs)
+
+        assert self.items is not None, \
+            "tried to instantiate AnswerSurveyForm without providing 'items'"
+
+        assert isinstance(self.items, list), \
+            "the 'items' variable provdided to AnswerSurveyForm must be a list but was %s."%(type(self.items))
+
+        for item in self.items:
+            assert isinstance(item, SurveyInstanceItem), \
+                "survey_instance_items in 'items' provdided to AnswerSurveyForm must be of the type SurveyInstanceItem but at least one was %s:\n --- \"%s\"."%(type(item), item)
+
+        for item in self.items:
+
+            field_name = 'item_%s'%(item.pk)
+            if isinstance(item, RatioSurveyInstanceItem):
+                CHOICES = [(number, str(number)) for number in range (item.survey_item.item_dimension.scale.min_value, item.survey_item.item_dimension.scale.max_value)]
+                self.fields[field_name] = forms.ChoiceField(
+                    label=item.survey_item.item_formulation,
+                    choices=CHOICES,
+                    help_text=item.survey_item.item_dimension.scale.instruction,
+                    label_suffix='',
+                    widget=forms.RadioSelect(attrs={
+                        'class': 'form-check-input'
+                    })
+                )
+            #elif other types of scales
+            else:
+                logger.warning(
+                    "%s %s: %s: tried to make a form field for the supplied item, but its subclass (%s) was not recognized:\n---\"%s\""\
+                    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, type(item), item)
+                )

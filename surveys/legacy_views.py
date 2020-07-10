@@ -499,7 +499,7 @@ def answer_survey_view(request, **kwargs):
 
     #if it's not paginated, we present the user with the "start survey" help text and button
     if page is None:
-        #check of this survey was started before, and if so, find the first unanswered and go there
+        #check if this survey was started before, and if so, find the first unanswered and go there
         alist = IntAnswer.objects.filter(survey_instance=si)
         if len(alist) > 0:
             q_counter = 0

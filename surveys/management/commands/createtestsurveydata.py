@@ -56,7 +56,7 @@ class Command(BaseCommand):
         assert torganization is not None, "torganization was None"
 
         #create little employees
-        employee_target = 20
+        employee_target = 1
         existing_employees = Respondent.objects.filter(organization=torganization)
         if len(existing_employees) < employee_target:
             for e in range(employee_target-len(existing_employees)):
@@ -87,7 +87,12 @@ class Command(BaseCommand):
         logger.info("...created survey settings: %s"%(tsurvey_setting))
 
         #create surveys
-        surveys_target = 3
+        logger.info("Closing existing surveys....")
+        open_surveys = Survey.objects.filter(owner=torganization, is_closed=False)
+        for survey in open_surveys:
+            survey_logic.close_survey(survey)
+        logger.info("... done!")
+        surveys_target = 1
         for i in range(surveys_target):
             logger.info("Creating a survey for the test-organization...")
 
@@ -97,17 +102,21 @@ class Command(BaseCommand):
             tsurvey_instance_list = survey_logic.survey_instances_from_survey(tsurvey)
             logger.info("...created %s survey instances."%(len(tsurvey_instance_list)))
 
+        #send emails:
+        for survey_instance in tsurvey_instance_list:
+            survey_logic.send_email_for_survey_instance(survey_instance)
+
             #answer survey
-            logger.info("Creating answers to the survey...")
-            for tsinstance in tsurvey_instance_list:
-                logger.info("...answering survey for %s."%(tsinstance.respondent))
-                for titem in tsinstance.get_items():
-                    answer_value = random.randint(titem.survey_item.item_dimension.scale.min_value, titem.survey_item.item_dimension.scale.max_value)
-                    titem = survey_logic.answer_item(titem, answer_value)
+            #logger.info("Creating answers to the survey...")
+            #for tsinstance in tsurvey_instance_list:
+            #    logger.info("...answering survey for %s."%(tsinstance.respondent))
+            #    for titem in tsinstance.get_items():
+            #        answer_value = random.randint(titem.survey_item.item_dimension.scale.min_value, titem.survey_item.item_dimension.scale.max_value)
+            #        titem = survey_logic.answer_item(titem, answer_value)
 
             #close survey
-            logger.info("Closing survey....")
-            tsurvey = survey_logic.close_survey(tsurvey)
-            logger.info("...done!")
+            #logger.info("Closing survey....")
+            #tsurvey = survey_logic.close_survey(tsurvey)
+            #logger.info("...done!")
 
         logger.info("All done!")

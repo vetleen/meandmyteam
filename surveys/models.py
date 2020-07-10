@@ -414,7 +414,7 @@ class SurveyInstanceItem(PolymorphicModel):
             original_self = SurveyInstanceItem.objects.get(id=self.id)
             if original_self.survey_instance != self.survey_instance:
                 raise IntegrityError(
-                   "You may not change the 'survey_instances' to which an existing an%s object belongs."%(self._meta.model_name)
+                   "You may not change the 'survey_instances' to which an existing %s object belongs."%(self._meta.model_name)
                )
         super(SurveyInstanceItem, self).save(*args, **kwargs)
 
@@ -428,6 +428,17 @@ class RatioSurveyInstanceItem(SurveyInstanceItem):
 
     def dimension(self):
         return self.survey_item.item_dimension
+
+    def answer_item(self, value):
+        #answer the item
+        self.answer = value
+        self.answered = True
+        self.save()
+        #update status of survey_instance
+        self.survey_instance.check_completed()
+        if self.survey_instance.started == False:
+            self.survey_instance.started == True
+            self.survey_instance.save()
 
     def save(self, *args, **kwargs):
         ##Ensure some parameters cannot be changed

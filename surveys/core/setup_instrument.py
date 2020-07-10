@@ -53,7 +53,7 @@ def setup_instrument(raw_instrument):
         assert type(i['formulation']) == str, "raw_instrument['dimensions'][%s]['formulation'] was type %s, expected str"%(n, type(d['formulation']))
         assert type(i['active']) == bool, "raw_instrument['dimensions'][%s]['active'] was type %s, expected bool"%(n, type(d['active']))
         assert type(i['inverted']) == bool, "raw_instrument['dimensions'][%s]['inverted'] was type %s, expected bool"%(n, type(d['inverted']))
-        
+
 
     #assert that the the index for desired Scale to be found in scales-list is valid
     for d in raw_instrument['dimensions']:
@@ -71,13 +71,15 @@ def setup_instrument(raw_instrument):
         instrument = Instrument.objects.get(id=raw_instrument['instrument']['id'])
         instrument.name=raw_instrument['instrument']['name']
         instrument.description=raw_instrument['instrument']['description']
+        instrument.slug_name=raw_instrument['instrument']['slug_name']
         instrument.save()
 
     except Instrument.DoesNotExist as err:
         instrument = Instrument(
                 id=raw_instrument['instrument']['id'],
                 name=raw_instrument['instrument']['name'],
-                description=raw_instrument['instrument']['description']
+                description=raw_instrument['instrument']['description'],
+                slug_name=raw_instrument['instrument']['slug_name']
             )
         instrument.save()
         new_instrument = True
