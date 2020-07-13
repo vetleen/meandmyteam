@@ -289,6 +289,7 @@ def answer_survey_view(request, **kwargs):
         'survey_instance': survey_instance,
         'page': page,
         'submit_button_text': 'Continue',
+
     }
 
     #if this view was requested without a page argument, we can skip forward a bit
@@ -322,6 +323,11 @@ def answer_survey_view(request, **kwargs):
         if count < last_item_id and count >= (last_item_id-page_size):
             item_list.append(item)
 
+    #add the progress so the progress bar may be shown
+    progress = last_item_id/len(all_survey_instance_items_list)*100
+    if progress > 100:
+        progress = 100
+    context.update({'progress': progress})
 
     #make the form, including previous answers if any
     data={}
@@ -335,7 +341,6 @@ def answer_survey_view(request, **kwargs):
 
     #did the user POST something?
     if request.method == 'POST':
-        print("method was POST")
 
         #overwrite the existing form with the values POSTED
         posted_form=AnswerSurveyForm(request.POST, items=item_list)
@@ -361,7 +366,7 @@ def answer_survey_view(request, **kwargs):
                 # find the value that has been provided as the answer
                 if isinstance(item, RatioSurveyInstanceItem):
                     value=int(posted_form.cleaned_data[answer])
-                    print(value)
+
                 #elif other types of scales
                 else:
                     logger.warning(
@@ -381,5 +386,5 @@ def answer_survey_view(request, **kwargs):
             #else, we are done answering, and redirect to thank you message
             return HttpResponseRedirect(reverse('surveys-answer-survey', args=(url_token, )))
 
-    print("method was NOT POST")
+
     return render(request, 'answer_survey.html', context)

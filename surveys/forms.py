@@ -65,29 +65,38 @@ class EditSurveySettingsForm(forms.Form):
             (30, 'One month'),
             )
     )
+class CustomChoiceField(forms.ChoiceField):
+    def __init__(self, *args, **kwargs):
+        self.min_value_description = kwargs.pop('min_value_description', 'Disagree')
+        self.max_value_description = kwargs.pop('max_value_description', 'Agree')
+        super(CustomChoiceField, self).__init__(*args, **kwargs)
 
 class AnswerSurveyForm(forms.Form):
+
     def __init__(self, *args, **kwargs):
         #self.user = kwargs.pop('user',None)
         self.items = kwargs.pop('items', None)
-        super(AnswerSurveyForm, self).__init__(*args, **kwargs)
 
         assert self.items is not None, \
             "tried to instantiate AnswerSurveyForm without providing 'items'"
-
         assert isinstance(self.items, list), \
             "the 'items' variable provdided to AnswerSurveyForm must be a list but was %s."%(type(self.items))
 
         for item in self.items:
             assert isinstance(item, SurveyInstanceItem), \
-                "survey_instance_items in 'items' provdided to AnswerSurveyForm must be of the type SurveyInstanceItem but at least one was %s:\n --- \"%s\"."%(type(item), item)
+                "survey_instance_items in 'items' provdided to AnswerSurveyForm must be of the type SurveyInstanceItem but at least one was %s:\n --- \"%s\"."\
+                %(type(item), item)
+
+
+        super(AnswerSurveyForm, self).__init__(*args, **kwargs)
 
         for item in self.items:
-
             field_name = 'item_%s'%(item.pk)
             if isinstance(item, RatioSurveyInstanceItem):
                 CHOICES = [(number, str(number)) for number in range (item.survey_item.item_dimension.scale.min_value, item.survey_item.item_dimension.scale.max_value)]
-                self.fields[field_name] = forms.ChoiceField(
+                self.fields[field_name] = CustomChoiceField(
+                    min_value_description = item.survey_item.item_dimension.scale.min_value_description,
+                    max_value_description = item.survey_item.item_dimension.scale.max_value_description,
                     label=item.survey_item.item_formulation,
                     choices=CHOICES,
                     help_text=item.survey_item.item_dimension.scale.instruction,
@@ -96,6 +105,7 @@ class AnswerSurveyForm(forms.Form):
                         'class': 'form-check-input'
                     })
                 )
+
             #elif other types of scales
             else:
                 logger.warning(
