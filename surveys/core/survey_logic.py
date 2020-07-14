@@ -219,6 +219,7 @@ def survey_instances_from_survey(survey):
     #update number of invited for survey
     si_list = SurveyInstance.objects.filter(survey=survey)
     survey.n_invited = len(si_list)
+    survey.save()
     return si_list
 
 def answer_item(survey_instance_item, answer):
@@ -723,7 +724,7 @@ def send_email_for_survey_instance(survey_instance):
         "'survey_instance' must belong to an open survey"
 
     #define the function that actually sends the emails
-    def create_and_send_email_about_survey_instance(survey_instance, email_txt_template, email_html_template, subject_template):
+    def create_and_send_single_email_about_survey_instance(survey_instance, email_txt_template, email_html_template, subject_template):
         #validate input
         assert isinstance(survey_instance, SurveyInstance), \
             "'survey_instance' must be a SurveyInstance object, but was %s"%(type(survey_instance))
@@ -781,7 +782,7 @@ def send_email_for_survey_instance(survey_instance):
             "'category' %s was not found in allowed categories, %s."%(category, RespondentEmail.ALLOWED_CATEGORIES)
         #create and send email
         try:
-            email_message = create_and_send_email_about_survey_instance(
+            email_message = create_and_send_single_email_about_survey_instance(
                 survey_instance=survey_instance,
                 email_txt_template=email_txt_template,
                 email_html_template=email_html_template,
@@ -835,21 +836,25 @@ def send_email_for_survey_instance(survey_instance):
     #some settings for reminders
     max_reminders_per_survey = 2
     send_last_reminder_date = survey_instance.survey.date_close + datetime.timedelta(days=-1)
+    #print("Going to send last reminder on %s"%(send_last_reminder_date))
     remind_after_days = 3
     #see what's been sent before
-    email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(type='failure') #the first shall be the last (latest email_date)
+    email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure') #the first shall be the last (latest email_date)
+    #print("email_list has a length of %s"%(len(email_list)))
     #don't send more emails than max reminders + 1 (for the 'inital')
     if len(email_list) >= max_reminders_per_survey+1:
+        #print("too many reminders, return None")
         return None
     #also, don't send more reminders if the 'last_chance' email has gone out
     elif email_list[0].category == 'last_chance':
+        #print("last chance was already sent out, return None")
         return None
     #send last_chance if that date has come
     elif datetime.date.today() >= send_last_reminder_date:
         last_chance_email = configure_and_call_send_email(
-            email_txt_template='emails/new_survey_instance_email_txt.html',
-            email_html_template='emails/new_survey_instance_email_html.html',
-            subject_template='emails/new_survey_subject.txt',
+            email_txt_template='emails/last_chance_survey_instance_email_txt.html',
+            email_html_template='emails/last_chance_survey_instance_email_html.html',
+            subject_template='emails/last_chance_survey_subject.txt',
             category='last_chance'
         )
         if last_chance_email.category == 'failure':
@@ -861,9 +866,9 @@ def send_email_for_survey_instance(survey_instance):
     #or, send normal reminder if max reminders have not been reached (saving one for 'last_chance', AND if some time has passed since the last email)
     elif len(email_list) <= max_reminders_per_survey-1 and datetime.date.today() >= (email_list[0].email_date+datetime.timedelta(days=remind_after_days)):
         reminder_email = configure_and_call_send_email(
-            email_txt_template='emails/new_survey_instance_email_txt.html',
-            email_html_template='emails/new_survey_instance_email_html.html',
-            subject_template='emails/new_survey_subject.txt',
+            email_txt_template='emails/remind_survey_instance_email_txt.html',
+            email_html_template='emails/remind_survey_instance_email_html.html',
+            subject_template='emails/remind_survey_subject.txt',
             category='reminder'
         )
         if reminder_email.category == 'failure':
@@ -871,7 +876,8 @@ def send_email_for_survey_instance(survey_instance):
                 "%s %s: %s: Tried to send 'reminder' email to %s about the survey %s, but failed."\
                 %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey_instance.respondent.email, survey_instance.survey)
             )
-        return last_chance_email
+        return reminder_email
     #or, ...?
     else:
+        #print("catchall, return None")
         return None

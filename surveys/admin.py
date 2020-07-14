@@ -10,10 +10,39 @@ from .models import *
 class SurveySettingAdmin(admin.ModelAdmin):
         list_display = ('organization', 'instrument', 'is_active', 'survey_interval', 'surveys_remain_open_days')
 
-@admin.register(Survey)
-class SurveyAdmin(admin.ModelAdmin):
-        pass
+
+class DimensionInline(admin.StackedInline): #for use in UserAdmin
+    model = Dimension
+    can_delete = False
 
 @admin.register(Instrument)
 class InstrumentAdmin(admin.ModelAdmin):
+        inlines = (DimensionInline, )
+
+@admin.register(Scale)
+class ScaleAdmin(admin.ModelAdmin):
         pass
+
+@admin.register(Dimension)
+class DimensionAdmin(admin.ModelAdmin):
+        pass
+
+@admin.register(Item)
+class ItemAdmin(admin.ModelAdmin):
+        pass
+
+class SurveyInstanceInline(admin.StackedInline): #for use in UserAdmin
+    model = SurveyInstance
+    can_delete = False
+
+class RatioScaleDimensionResultInline(admin.StackedInline): #for use in UserAdmin
+    model = RatioScaleDimensionResult
+    can_delete = False
+
+class RatioSurveyItemInline(admin.StackedInline): #for use in UserAdmin
+    model = RatioSurveyItem
+    can_delete = False
+
+@admin.register(Survey)
+class SurveyAdmin(admin.ModelAdmin):
+        inlines = (RatioScaleDimensionResultInline, RatioSurveyItemInline, SurveyInstanceInline)

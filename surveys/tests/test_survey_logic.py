@@ -55,7 +55,7 @@ class SurveyLogicTest(TestCase):
 
         rti = create_test_data(1)
         setup_instrument.setup_instrument(rti)
-
+'''
     def test_configure_survey_setting(self):
         o=Organization.objects.get(id=1)
         o.save()
@@ -331,7 +331,7 @@ class SurveyLogicTest(TestCase):
         call_command('createtestsurveydata', stdout=out)
 
         #Check that it worked as excpected
-        self.assertEqual(len(Survey.objects.all()), 3)
+        self.assertEqual(len(Survey.objects.all()), 1)
 
         #test get_results_from_survey()
         tsurvey = Survey.objects.get(id=1)
@@ -361,11 +361,11 @@ class SurveyLogicTest(TestCase):
         data = survey_logic.get_results_from_instrument(instrument=i, organization=tsurvey.owner, depth=3)
 
         self.assertEqual(data['instrument'], i)
-        self.assertEqual(len(data['surveys']), 3)
+        self.assertEqual(len(data['surveys']), 1)
 
         self.assertEqual(data['surveys'][0], gfrs_data)
 
-
+'''
 class SurveyLogicTest_dailytaskfunctions(TestCase):
     ''' TESTS THAT THE ANSWER SURVEY VIEW BEHAVES PROPERLY '''
     def setUp(self):
@@ -389,7 +389,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         ss = survey_logic.configure_survey_setting(organization=o, instrument=i, is_active=True)
         ss.save()
 
-
+    '''
     def test_create_survey_if_due(self):
         o=Organization.objects.get(id=1)
         i=Instrument.objects.get(id=1)
@@ -610,7 +610,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         #check that trying to close it AGAIN raises assertion error
         self.assertRaises(AssertionError, try_close_w_is_close_true)
 
-
+    '''
     def test_send_email_for_survey_instance(self):
         o=Organization.objects.get(id=1)
         i=Instrument.objects.get(id=1)
@@ -635,18 +635,225 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         self.assertEqual(len(si_list), 1)
 
         #run the function that we are testing
-
         for survey_instance in si_list:
             respondent_email = survey_logic.send_email_for_survey_instance(survey_instance)
             self.assertIsInstance(respondent_email, RespondentEmail)
             self.assertEqual(respondent_email.category, 'initial')
             self.assertEqual(len(mail.outbox), 1)
             #print(dir(mail.outbox))
-            for m in mail.outbox:
-                #print(m.message())
-                pass
+            for email in mail.outbox:
+                #print(email.message())
+                for address in email.to:
+                    self.assertIn(address, [r.email for r in respondent_list])
+                self.assertEqual(email.from_email, "surveys@motpanel.com")
+                self.assertIn("They would appreciate it if you took the time to fill out the survey at this link", email.body)
+                self.assertIn("You have been invited by %s to participate in %s's survey"%(o.owner.email, o.name), email.body)
+                self.assertEqual("Employee survey for %s"%(o.name), email.subject)
+
+        #one day later...
+        #refresh from db
+        ss=SurveySetting.objects.get(id=1)
+        survey = Survey.objects.get(owner=o)
+        si_list = survey_logic.survey_instances_from_survey(survey)
+        self.assertEqual(ss.last_survey_open, datetime.date.today())
+        self.assertEqual(ss.last_survey_close, datetime.date.today()+datetime.timedelta(days=ss.surveys_remain_open_days))
+        self.assertEqual(survey.date_open, datetime.date.today())
+        self.assertEqual(survey.date_close, datetime.date.today()+datetime.timedelta(days=ss.surveys_remain_open_days))
 
 
+        #move time & save (DAY +1)
+        survey.date_open += datetime.timedelta(days=-1)
+        survey.date_close += datetime.timedelta(days=-1)
+        survey.save()
+        ss.last_survey_open += datetime.timedelta(days=-1)
+        ss.last_survey_close += datetime.timedelta(days=-1)
+        ss.save()
+        for survey_instance in si_list:
+            self.assertEqual(survey_instance.survey, survey)
+            email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
+            for email in email_list:
+                self.assertEqual(email.email_date, datetime.date.today())
+                email.email_date += datetime.timedelta(days=-1)
+                email.save()
+                self.assertEqual(email.email_date, datetime.date.today()+datetime.timedelta(days=-1))
+        self.assertEqual(ss.last_survey_open, datetime.date.today()+datetime.timedelta(days=-1))
+        self.assertEqual(ss.last_survey_close, datetime.date.today()+datetime.timedelta(days=ss.surveys_remain_open_days)+datetime.timedelta(days=-1))
+        self.assertEqual(survey.date_open, datetime.date.today()+datetime.timedelta(days=-1))
+        self.assertEqual(survey.date_close, datetime.date.today()+datetime.timedelta(days=ss.surveys_remain_open_days)+datetime.timedelta(days=-1))
+
+        #Test that no new emails are sent today
+        for survey_instance in si_list:
+            respondent_email = survey_logic.send_email_for_survey_instance(survey_instance)
+            self.assertEqual(respondent_email, None)
+        self.assertEqual(len(mail.outbox), 1)
+
+        #move time & save (DAY +2)
+        si_list = survey_logic.survey_instances_from_survey(survey)
+        survey.date_open += datetime.timedelta(days=-1)
+        survey.date_close += datetime.timedelta(days=-1)
+        survey.save()
+        ss.last_survey_open += datetime.timedelta(days=-1)
+        ss.last_survey_close += datetime.timedelta(days=-1)
+        ss.save()
+        for survey_instance in si_list:
+            self.assertEqual(survey_instance.survey, survey)
+            email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
+            for email in email_list:
+                email.email_date += datetime.timedelta(days=-1)
+                email.save()
+
+        #Test that no new emails are sent today
+        for survey_instance in si_list:
+            respondent_email = survey_logic.send_email_for_survey_instance(survey_instance)
+            self.assertEqual(respondent_email, None)
+        self.assertEqual(len(mail.outbox), 1)
+
+        #move time & save (DAY +3)
+        si_list = survey_logic.survey_instances_from_survey(survey)
+        survey.date_open += datetime.timedelta(days=-1)
+        survey.date_close += datetime.timedelta(days=-1)
+        survey.save()
+        ss.last_survey_open += datetime.timedelta(days=-1)
+        ss.last_survey_close += datetime.timedelta(days=-1)
+        ss.save()
+        for survey_instance in si_list:
+            email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
+            for email in email_list:
+                email.email_date += datetime.timedelta(days=-1)
+                email.save()
+
+        #Test that mails are sent today & that content is correct (reminder)
+        #print("Day 3:")
+        for survey_instance in si_list:
+            respondent_email = survey_logic.send_email_for_survey_instance(survey_instance)
+            self.assertIsInstance(respondent_email, RespondentEmail)
+            self.assertEqual(respondent_email.category, 'reminder')
+            self.assertEqual(len(mail.outbox), 2)
+
+        for address in mail.outbox[1].to:
+            self.assertIn(address, [r.email for r in respondent_list])
+        self.assertEqual(mail.outbox[1].from_email, "surveys@motpanel.com")
+        self.assertIn("A few days ago we sent you an email regarding %s's regular surveys to investigate"%(o.name), mail.outbox[1].body)
+        self.assertEqual("Reminder: %s is conducting a survey among its employees - please take the time to fill it out"%(o.name), mail.outbox[1].subject)
 
 
-        #send_email_for_survey_instance(survey_instance)
+        #move time & save (DAY +4)
+        si_list = survey_logic.survey_instances_from_survey(survey)
+        survey.date_open += datetime.timedelta(days=-1)
+        survey.date_close += datetime.timedelta(days=-1)
+        survey.save()
+        ss.last_survey_open += datetime.timedelta(days=-1)
+        ss.last_survey_close += datetime.timedelta(days=-1)
+        ss.save()
+        for survey_instance in si_list:
+            self.assertEqual(survey_instance.survey, survey)
+            email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
+            for email in email_list:
+                email.email_date += datetime.timedelta(days=-1)
+                email.save()
+
+        #Test that no new emails are sent today
+        #print("Day 4:")
+        for survey_instance in si_list:
+            respondent_email = survey_logic.send_email_for_survey_instance(survey_instance)
+            self.assertEqual(respondent_email, None)
+        self.assertEqual(len(mail.outbox), 2)
+
+
+        #move time & save (DAY +5)
+        si_list = survey_logic.survey_instances_from_survey(survey)
+        survey.date_open += datetime.timedelta(days=-1)
+        survey.date_close += datetime.timedelta(days=-1)
+        survey.save()
+        ss.last_survey_open += datetime.timedelta(days=-1)
+        ss.last_survey_close += datetime.timedelta(days=-1)
+        ss.save()
+        for survey_instance in si_list:
+            self.assertEqual(survey_instance.survey, survey)
+            email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
+            for email in email_list:
+                email.email_date += datetime.timedelta(days=-1)
+                email.save()
+
+        #Test that no new emails are sent today
+        #print("Day 5:")
+        for survey_instance in si_list:
+            respondent_email = survey_logic.send_email_for_survey_instance(survey_instance)
+            self.assertEqual(respondent_email, None)
+        self.assertEqual(len(mail.outbox), 2)
+
+        #move time & save (DAY +6)
+        si_list = survey_logic.survey_instances_from_survey(survey)
+        survey.date_open += datetime.timedelta(days=-1)
+        survey.date_close += datetime.timedelta(days=-1)
+        survey.save()
+        ss.last_survey_open += datetime.timedelta(days=-1)
+        ss.last_survey_close += datetime.timedelta(days=-1)
+        ss.save()
+        for survey_instance in si_list:
+            self.assertEqual(survey_instance.survey, survey)
+            email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
+            for email in email_list:
+                email.email_date += datetime.timedelta(days=-1)
+                email.save()
+
+        #Test that mails are sent today & that content is correct (reminder)
+        #print("Day 6:")
+        for survey_instance in si_list:
+            respondent_email = survey_logic.send_email_for_survey_instance(survey_instance)
+            self.assertIsInstance(respondent_email, RespondentEmail)
+            self.assertEqual(respondent_email.category, 'last_chance')
+            self.assertEqual(len(mail.outbox), 3)
+
+        for address in mail.outbox[2].to:
+            self.assertIn(address, [r.email for r in respondent_list])
+        self.assertEqual(mail.outbox[2].from_email, "surveys@motpanel.com")
+        self.assertIn("This is your last chance!", mail.outbox[2].body)
+        self.assertEqual("Last chance to answer %s's employee survey! - it's closing today"%(o.name), mail.outbox[2].subject)
+
+
+        #move time & save (DAY +7)
+        si_list = survey_logic.survey_instances_from_survey(survey)
+        survey.date_open += datetime.timedelta(days=-1)
+        survey.date_close += datetime.timedelta(days=-1)
+        survey.save()
+        ss.last_survey_open += datetime.timedelta(days=-1)
+        ss.last_survey_close += datetime.timedelta(days=-1)
+        ss.save()
+        for survey_instance in si_list:
+            self.assertEqual(survey_instance.survey, survey)
+            email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
+            for email in email_list:
+                email.email_date += datetime.timedelta(days=-1)
+                email.save()
+
+        #Test that no new emails are sent today
+        #print("Day 7:")
+        for survey_instance in si_list:
+            respondent_email = survey_logic.send_email_for_survey_instance(survey_instance)
+            self.assertEqual(respondent_email, None)
+        self.assertEqual(len(mail.outbox), 3)
+
+        #move time & save (DAY +8)
+        si_list = survey_logic.survey_instances_from_survey(survey)
+        #print("Day 8:")
+        survey.date_open += datetime.timedelta(days=-1)
+        survey.date_close += datetime.timedelta(days=-1)
+        survey.save()
+        ss.last_survey_open += datetime.timedelta(days=-1)
+        ss.last_survey_close += datetime.timedelta(days=-1)
+        ss.save()
+        for survey_instance in si_list:
+            self.assertEqual(survey_instance.survey, survey)
+            email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
+            for email in email_list:
+                email.email_date += datetime.timedelta(days=-1)
+                email.save()
+
+        #Test that no new emails are sent today
+        for survey_instance in si_list:
+            respondent_email = survey_logic.send_email_for_survey_instance(survey_instance)
+            self.assertEqual(respondent_email, None)
+        self.assertEqual(len(mail.outbox), 3)
+
+        print(mail.outbox[2].message())

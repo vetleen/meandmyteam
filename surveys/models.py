@@ -252,7 +252,7 @@ class SurveyItem(PolymorphicModel):
     A SUBCLASS SHOULD ALWAYS BE USED!
     '''
     #common to all kinds of SurveyItems
-    survey = models.ForeignKey(Survey, on_delete=models.PROTECT, null=True, help_text='Organization that owns this survey') #enables survey.surveyitem_set.all(), hopefully this incldes subcalsses? I bet not... probably survey.ratiosurveyitem_set.all() works
+    survey = models.ForeignKey(Survey, on_delete=models.PROTECT, null=True, help_text='Organization that owns this survey') 
     item_formulation = models.TextField(blank=True, null=True,  help_text='A question or statement to confront Respondents with')
     item_inverted = models.BooleanField(default=False, help_text='')
     item_dimension = models.ForeignKey(Dimension, blank=True, null=True, on_delete=models.PROTECT, help_text='')

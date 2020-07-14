@@ -386,5 +386,4 @@ def answer_survey_view(request, **kwargs):
             #else, we are done answering, and redirect to thank you message
             return HttpResponseRedirect(reverse('surveys-answer-survey', args=(url_token, )))
 
-
     return render(request, 'answer_survey.html', context)

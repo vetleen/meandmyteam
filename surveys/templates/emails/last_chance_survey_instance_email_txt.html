@@ -1,0 +1,12 @@
+Hi!
+
+Some time ago we sent you an email regarding {{ organization }}'s regular surveys to investigate {% if instrument_list|length == 1  %}{{ instrument_list.0.name|lower }}.{% else %}{% for i in instrument_list %}{% if forloop.last %}and {{ i.name|lower }}.{% else %}{{ i.name|lower }}, {% endif %}{% endfor %}{% endif %}
+
+{{ contact_person }} on behalf of {{ organization }} would greatly appreciate it if you took the time to fill out the survey at this link:
+https://{{ hostname }}{% url 'surveys-answer-survey' token=token %}
+
+This is your last chance!
+Please contact {{ contact_person }} if you have any questions.
+
+Best regards,
+The www.motpanel.com team

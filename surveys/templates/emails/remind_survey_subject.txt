@@ -1,1 +1,1 @@
-Remember to fill out the {{ organization }} co-worker happiness survey
+Reminder: {{ organization }} is conducting a survey among its employees - please take the time to fill it out

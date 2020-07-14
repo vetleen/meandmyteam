@@ -1,0 +1,12 @@
+<p>Hi!</p>
+
+<p>Some time ago we sent you an email regarding {{ organization }}'s regular surveys to investigate {% if instrument_list|length == 1  %}{{ instrument_list.0.name|lower }}.{% else %}{% for i in instrument_list %}{% if forloop.last %}and {{ i.name|lower }}.{% else %}{{ i.name|lower }}, {% endif %}{% endfor %}{% endif %}</p>
+
+<p>{{ contact_person }} on behalf of {{ organization }} would greatly appreciate it if you took the time to fill out the survey at this link:<br />
+<a href="https://{{ hostname }}{% url 'surveys-answer-survey' token=token %}">https://{{ hostname }}{% url 'surveys-answer-survey' token=token %}</a></p>
+
+<p>This is your last chance! <br />
+Please contact {{ contact_person }} if you have any questions.</p>
+
+<p>Best regards,<br />
+The www.motpanel.com team</p>
