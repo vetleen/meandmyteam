@@ -225,6 +225,15 @@ class SurveySetting(models.Model):
     last_survey_close = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Last closing date of survey with this product/prganization combo')
     surveys =  models.ManyToManyField(Survey, blank=True, help_text='')
 
+    def check_last_survey_dates(self):
+        last_open_survey = self.surveys.order_by('-date_open')[:1]
+        last_close_survey = self.surveys.order_by('-date_close')[:1]
+        if len(last_open_survey) > 0:
+            self.last_survey_open = last_open_survey[0].date_open
+        if len(last_close_survey) > 0:
+            self.last_survey_close = last_close_survey[0].date_close
+        self.save()
+
     def __str__(self):
         """String for representing the SurveySetting object (in Admin site etc.)."""
         return '(%s - %s)'%(self.organization, self.instrument)
@@ -252,7 +261,7 @@ class SurveyItem(PolymorphicModel):
     A SUBCLASS SHOULD ALWAYS BE USED!
     '''
     #common to all kinds of SurveyItems
-    survey = models.ForeignKey(Survey, on_delete=models.PROTECT, null=True, help_text='Organization that owns this survey') 
+    survey = models.ForeignKey(Survey, on_delete=models.PROTECT, null=True, help_text='Organization that owns this survey')
     item_formulation = models.TextField(blank=True, null=True,  help_text='A question or statement to confront Respondents with')
     item_inverted = models.BooleanField(default=False, help_text='')
     item_dimension = models.ForeignKey(Dimension, blank=True, null=True, on_delete=models.PROTECT, help_text='')

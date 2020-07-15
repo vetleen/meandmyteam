@@ -45,15 +45,18 @@ def configure_survey_setting(organization, instrument, **kwargs):
         assert isinstance(new_surveys_remain_open_days, int)
         ss.surveys_remain_open_days = new_surveys_remain_open_days
 
-    if 'last_survey_open' in kwargs:
-        new_last_survey_open = kwargs.get('last_survey_open', None)
-        assert isinstance(new_last_survey_open, datetime.date) and not isinstance(new_last_survey_open, datetime.datetime)
-        ss.last_survey_open = new_last_survey_open
+    #if 'last_survey_open' in kwargs:
+    #    new_last_survey_open = kwargs.get('last_survey_open', None)
+    #    assert isinstance(new_last_survey_open, datetime.date) and not isinstance(new_last_survey_open, datetime.datetime)
+    #    ss.last_survey_open = new_last_survey_open
 
-    if 'last_survey_close' in kwargs:
-        new_last_survey_close = kwargs.get('last_survey_close', None)
-        assert isinstance(new_last_survey_close, datetime.date) and not isinstance(new_last_survey_close, datetime.datetime)
-        ss.last_survey_close = new_last_survey_close
+    #if 'last_survey_close' in kwargs:
+    #    new_last_survey_close = kwargs.get('last_survey_close', None)
+    #    assert isinstance(new_last_survey_close, datetime.date) and not isinstance(new_last_survey_close, datetime.datetime)
+    #    ss.last_survey_close = new_last_survey_close
+
+    #ensure that dates are updated
+    ss.check_last_survey_dates()
 
     #save all changes
     ss.save()
@@ -131,10 +134,11 @@ def create_survey(owner, instrument_list, **kwargs):
     for instrument in instrument_list:
         #update the last_survey_open- and last_survey_close dates
 
-        survey_setting = configure_survey_setting(owner, instrument, last_survey_open=date_open, last_survey_close=date_close)
+        survey_setting = configure_survey_setting(owner, instrument)
 
         #add survey to instrument.surveys (m2m-list)
         survey_setting.surveys.add(survey)
+        survey_setting.check_last_survey_dates()
 
     #create the SurveyItems that go with this object
     for instrument in instrument_list:
@@ -669,7 +673,9 @@ def create_survey_if_due(organization):
     active_but_not_due_survey_setting_list = []
     #sort out the settings for instruments that are active and due
     for survey_setting in survey_setting_list:
-        #print("looking at survey setting for %s"%(survey_setting.instrument))
+        #ensure that it's up to date
+        survey_setting.check_last_survey_dates()
+        #continue
         if survey_setting.is_active == True:
             if survey_setting.last_survey_open is None:
                 active_and_due_survey_setting_list.append(survey_setting)

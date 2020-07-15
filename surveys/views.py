@@ -154,14 +154,14 @@ def dashboard_view(request):
             latest_instrument_data = survey_logic.get_results_from_instrument(
                 instrument=instrument,
                 organization=request.user.organization,
-                depth=3)
+                depth=10)
             #sort out open surveys
             open_survey=None
             closed_surveys=None
             for survey_data_point in latest_instrument_data['surveys']:
                 if survey_data_point['survey'].is_closed == False:
                     open_survey=survey_data_point['survey']
-                    print("found an open one")
+
                 else:
                     if closed_surveys is None:
                         closed_surveys = []

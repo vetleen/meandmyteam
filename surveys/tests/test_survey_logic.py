@@ -55,14 +55,14 @@ class SurveyLogicTest(TestCase):
 
         rti = create_test_data(1)
         setup_instrument.setup_instrument(rti)
-'''
+
     def test_configure_survey_setting(self):
         o=Organization.objects.get(id=1)
         o.save()
         i=Instrument.objects.get(id=1)
         i.save()
 
-        #configure instrument for organization
+        #Test: try to configure instrument for organization
         ss = survey_logic.configure_survey_setting(o, i)
         ss2 = SurveySetting.objects.get(id=1)
 
@@ -82,9 +82,7 @@ class SurveyLogicTest(TestCase):
             i,
             is_active=True,
             survey_interval=180,
-            surveys_remain_open_days=15,
-            last_survey_open=datetime.date.today(),
-            last_survey_close=datetime.date.today()+datetime.timedelta(days=15)
+            surveys_remain_open_days=15
         )
 
         #check that it worked
@@ -95,9 +93,7 @@ class SurveyLogicTest(TestCase):
         self.assertEqual(ss3.is_active, True)
         self.assertEqual(ss3.survey_interval, 180)
         self.assertEqual(ss3.surveys_remain_open_days, 15)
-        self.assertEqual(ss3.last_survey_open, datetime.date.today())
-        self.assertEqual(ss3.last_survey_close, datetime.date.today()+datetime.timedelta(days=ss3.surveys_remain_open_days))
-
+        
         #check that we cannot make a new SS for the same org and i
         def create_bad_ss():
             bad_ss = SurveySetting(organization=o, instrument=i)
@@ -328,10 +324,10 @@ class SurveyLogicTest(TestCase):
 
         #create, answer and close survey
         out = StringIO()
-        call_command('createtestsurveydata', stdout=out)
+        call_command('createtestsurveydata_for_testing', stdout=out)
 
         #Check that it worked as excpected
-        self.assertEqual(len(Survey.objects.all()), 1)
+        self.assertEqual(len(Survey.objects.all()), 3)
 
         #test get_results_from_survey()
         tsurvey = Survey.objects.get(id=1)
@@ -361,13 +357,13 @@ class SurveyLogicTest(TestCase):
         data = survey_logic.get_results_from_instrument(instrument=i, organization=tsurvey.owner, depth=3)
 
         self.assertEqual(data['instrument'], i)
-        self.assertEqual(len(data['surveys']), 1)
+        self.assertEqual(len(data['surveys']), 3)
 
         self.assertEqual(data['surveys'][0], gfrs_data)
 
-'''
+
 class SurveyLogicTest_dailytaskfunctions(TestCase):
-    ''' TESTS THAT THE ANSWER SURVEY VIEW BEHAVES PROPERLY '''
+
     def setUp(self):
         rti = create_test_data(1)
         setup_instrument.setup_instrument(rti)
@@ -389,7 +385,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         ss = survey_logic.configure_survey_setting(organization=o, instrument=i, is_active=True)
         ss.save()
 
-    '''
+
     def test_create_survey_if_due(self):
         o=Organization.objects.get(id=1)
         i=Instrument.objects.get(id=1)
@@ -610,7 +606,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         #check that trying to close it AGAIN raises assertion error
         self.assertRaises(AssertionError, try_close_w_is_close_true)
 
-    '''
+
     def test_send_email_for_survey_instance(self):
         o=Organization.objects.get(id=1)
         i=Instrument.objects.get(id=1)
@@ -665,9 +661,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         survey.date_open += datetime.timedelta(days=-1)
         survey.date_close += datetime.timedelta(days=-1)
         survey.save()
-        ss.last_survey_open += datetime.timedelta(days=-1)
-        ss.last_survey_close += datetime.timedelta(days=-1)
-        ss.save()
+        ss.check_last_survey_dates()
         for survey_instance in si_list:
             self.assertEqual(survey_instance.survey, survey)
             email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
@@ -692,9 +686,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         survey.date_open += datetime.timedelta(days=-1)
         survey.date_close += datetime.timedelta(days=-1)
         survey.save()
-        ss.last_survey_open += datetime.timedelta(days=-1)
-        ss.last_survey_close += datetime.timedelta(days=-1)
-        ss.save()
+        ss.check_last_survey_dates()
         for survey_instance in si_list:
             self.assertEqual(survey_instance.survey, survey)
             email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
@@ -713,9 +705,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         survey.date_open += datetime.timedelta(days=-1)
         survey.date_close += datetime.timedelta(days=-1)
         survey.save()
-        ss.last_survey_open += datetime.timedelta(days=-1)
-        ss.last_survey_close += datetime.timedelta(days=-1)
-        ss.save()
+        ss.check_last_survey_dates()
         for survey_instance in si_list:
             email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
             for email in email_list:
@@ -742,9 +732,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         survey.date_open += datetime.timedelta(days=-1)
         survey.date_close += datetime.timedelta(days=-1)
         survey.save()
-        ss.last_survey_open += datetime.timedelta(days=-1)
-        ss.last_survey_close += datetime.timedelta(days=-1)
-        ss.save()
+        ss.check_last_survey_dates()
         for survey_instance in si_list:
             self.assertEqual(survey_instance.survey, survey)
             email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
@@ -765,9 +753,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         survey.date_open += datetime.timedelta(days=-1)
         survey.date_close += datetime.timedelta(days=-1)
         survey.save()
-        ss.last_survey_open += datetime.timedelta(days=-1)
-        ss.last_survey_close += datetime.timedelta(days=-1)
-        ss.save()
+        ss.check_last_survey_dates()
         for survey_instance in si_list:
             self.assertEqual(survey_instance.survey, survey)
             email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
@@ -787,9 +773,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         survey.date_open += datetime.timedelta(days=-1)
         survey.date_close += datetime.timedelta(days=-1)
         survey.save()
-        ss.last_survey_open += datetime.timedelta(days=-1)
-        ss.last_survey_close += datetime.timedelta(days=-1)
-        ss.save()
+        ss.check_last_survey_dates()
         for survey_instance in si_list:
             self.assertEqual(survey_instance.survey, survey)
             email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
@@ -817,9 +801,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         survey.date_open += datetime.timedelta(days=-1)
         survey.date_close += datetime.timedelta(days=-1)
         survey.save()
-        ss.last_survey_open += datetime.timedelta(days=-1)
-        ss.last_survey_close += datetime.timedelta(days=-1)
-        ss.save()
+        ss.check_last_survey_dates()
         for survey_instance in si_list:
             self.assertEqual(survey_instance.survey, survey)
             email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
@@ -840,9 +822,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         survey.date_open += datetime.timedelta(days=-1)
         survey.date_close += datetime.timedelta(days=-1)
         survey.save()
-        ss.last_survey_open += datetime.timedelta(days=-1)
-        ss.last_survey_close += datetime.timedelta(days=-1)
-        ss.save()
+        ss.check_last_survey_dates()
         for survey_instance in si_list:
             self.assertEqual(survey_instance.survey, survey)
             email_list = survey_instance.respondentemail_set.all().order_by('-email_date').exclude(category='failure')
@@ -855,5 +835,3 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
             respondent_email = survey_logic.send_email_for_survey_instance(survey_instance)
             self.assertEqual(respondent_email, None)
         self.assertEqual(len(mail.outbox), 3)
-
-        print(mail.outbox[2].message())
