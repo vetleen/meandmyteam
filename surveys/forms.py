@@ -87,7 +87,6 @@ class AnswerSurveyForm(forms.Form):
                 "survey_instance_items in 'items' provdided to AnswerSurveyForm must be of the type SurveyInstanceItem but at least one was %s:\n --- \"%s\"."\
                 %(type(item), item)
 
-
         super(AnswerSurveyForm, self).__init__(*args, **kwargs)
 
         for item in self.items:
