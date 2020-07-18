@@ -93,7 +93,7 @@ class SurveyLogicTest(TestCase):
         self.assertEqual(ss3.is_active, True)
         self.assertEqual(ss3.survey_interval, 180)
         self.assertEqual(ss3.surveys_remain_open_days, 15)
-        
+
         #check that we cannot make a new SS for the same org and i
         def create_bad_ss():
             bad_ss = SurveySetting(organization=o, instrument=i)

@@ -1,9 +1,8 @@
+
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseForbidden, Http404, HttpResponseRedirect
-
-#from django.db import RelatedObjectDoesNotExist
-
+from django.utils.encoding import DjangoUnicodeDecodeError
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -38,7 +37,7 @@ def add_or_remove_employee_view(request):
     #Prepare a normal GET view that will be shown no matter what:
     organization = request.user.organization
     employee_list = organization.respondent_set.all()
-    form = AddRespondentForm
+    form = AddRespondentForm()
     context = {
         'form': form,
         'submit_button_text': 'Add employee',
@@ -62,18 +61,22 @@ def add_or_remove_employee_view(request):
             #also update stripe subscription quantity
             q = request.user.organization.update_stripe_subscription_quantity()
 
-            #decalare success and make a new form for the next employee
+            #declare success and make a new form for the next employee
             messages.success(request, 'You have added a coworker (%s)! You can continue to add more below.'%(form.cleaned_data['email']), extra_tags='alert alert-success')
-            form = AddRespondentForm
+            form = AddRespondentForm()
             context.update({'form': form})
     #finally, return the prepared view
     return render(request, 'add_or_remove_employees.html', context)
 
 @login_required
 def edit_employee_view(request, **kwargs):
-    #find thje Respondent we are trying to edit
-    uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
-    respondent = get_object_or_404(Respondent, pk=uid)
+    #find the Respondent we are trying to edit
+    try:
+        uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
+        respondent = Respondent.objects.get(pk=uid)
+    except Exception as err:
+        logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
+        raise Http404("We couldn't find the employee you were looking for.")
 
     #check that User is allowed to change this Respondent
     if not request.user == respondent.organization.owner:
@@ -111,16 +114,28 @@ def edit_employee_view(request, **kwargs):
 
 @login_required
 def delete_employee_view(request, **kwargs):
-    uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
-    respondent = get_object_or_404(Respondent, pk=uid)
-    if respondent.organization.owner == request.user:
+
+    #find the Respondent we are trying to delete
+    try:
+        uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
+        respondent = Respondent.objects.get(pk=uid)
+    except DjangoUnicodeDecodeError as err:
+        raise Http404("We couldn't find the employee you were looking for.")
+    except Respondent.DoesNotExist as err:
+        logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
+        raise Http404("We couldn't find the employee you were looking for.")
+
+
+    #check that User is allowed to change this Respondent
+    if not request.user == respondent.organization.owner:
+        return HttpResponseForbidden()
+
+    else:
         messages.info(request, '%s was permanently deleted, and will not receive future surveys.'%(respondent.email), extra_tags='alert alert-warning')
         respondent.delete()
         #also update stripe subscription quantity
         q = request.user.organization.update_stripe_subscription_quantity()
         return HttpResponseRedirect(request.GET.get('next', reverse('surveys-add-or-remove-employees')))
-    else:
-        return HttpResponseForbidden()
 
 @login_required
 def dashboard_view(request):
@@ -191,7 +206,7 @@ def dashboard_view(request):
 def setup_instrument_view(request, **kwargs):
     #get the Instrument to be configured
     instrument_slug_name = kwargs.get('instrument', None)
-    instrument = Instrument.objects.get(slug_name=instrument_slug_name)
+    instrument = get_object_or_404(Instrument, slug_name=instrument_slug_name)
 
     #get the SurveySetting to be configured
     try:

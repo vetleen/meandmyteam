@@ -100,23 +100,8 @@ class Organization(models.Model):
     stripe_subscription_quantity = models.PositiveSmallIntegerField(default=0, help_text='Current number of users/employees that are billed for', validators=[MinValueValidator(0), MaxValueValidator(2000000)])
 
     def update_stripe_subscription_quantity(self):
-        ''' #stolen for leagcy_view of surveys
-        elist= None
-        try:
-            elist = Employee.objects.filter(organization=request.user.organization)
-        except Exception as err:
-            print('Got an unexpected error while trying to add employees: %s.'%(request.user.username, err))
-            logger.exception("%s %s: edit_coworker_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
-        if elist is not None and request.user.organization.stripe_subscription_id is not None and request.user.organization.stripe_subscription_id != '':
-            current_sub_quantity = len(elist)
-            try:
-                s = modify_stripe_subscription(request.user.subscriber.stripe_subscription_id, quantity=current_sub_quantity)
-            except Exception as err:
-                logger.exception("%s %s: edit_coworker_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
-        '''
-        #elist = Employee.objects.filter(organization=self)
-        #self.stripe_subscription_quantity = len(elist)
-        self.stripe_subscription_quantity = 1
+        respondents_list = self.respondent_set.all()
+        self.stripe_subscription_quantity = len(respondents_list)
         self.save()
         return self.stripe_subscription_quantity
 
@@ -126,11 +111,11 @@ class Organization(models.Model):
             return self.name
         else:
             return "Organization object owned by %s."%(self.owner)
-
+    '''
 class Subscriber(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     #plan = models.ForeignKey(Plan, on_delete=models.SET_NULL, blank=True, null=True)
-    '''
+
     date_current_plan_expires = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='The date the current stripe subscription ends')
     status = models.CharField(max_length=35, blank=True, null=True, default=None, help_text='The subscrition status of the Subscriber')
     date_last_synced_with_stripe = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='The date this object was synced with Stripe')
@@ -179,7 +164,8 @@ class Subscriber(models.Model):
 
         self.save()
         return self
-        '''
+
     def __str__(self):
         """String for representing the Plan object (in Admin site etc.)."""
         return self.user.username
+        '''

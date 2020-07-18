@@ -374,6 +374,7 @@ class SurveyInstance(models.Model):
         return was_completed
 
     def get_hash_string(self):
+        
         hash_string = salted_hmac(
             "django.contrib.auth.tokens.PasswordResetTokenGenerator",
             urlsafe_base64_encode(force_bytes(10*self.respondent.email+str(self.pk+self.survey.pk+self.survey.owner.pk)+self.respondent.email)),

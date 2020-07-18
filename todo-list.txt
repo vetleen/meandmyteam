@@ -3,7 +3,7 @@
 #dev
 "daily" logic - run proper functions daily
 automate setup product or add to readme how to get this app started from scratch
-add support for None in answers to surveys -
+add support for None in answers to surveys - "i dont want to answr/dont know"
 
 # TODO before launch
 Double check that the django secret variable is the one set in os.environ
@@ -42,3 +42,4 @@ Add *automatic* country selection in Organization set-up: https://docs.djangopro
 pricing add impact stories to front page, and possibly own page
 add impact stories to front page, and possibly own page
 support fopr viewing older surveys than 3 surveys ago
+update subscription quantity with stripe on login/logout // WHEN do we sync wiuth stripe? Probs when sending survey? like, invitations = quantity?

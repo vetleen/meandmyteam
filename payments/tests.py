@@ -69,7 +69,7 @@ class HandleSubscribersTest(TestCase):
         #clean up
         dc = delete_stripe_customer(c.id)
 
-    def test_create_stripe_subscription(self):
+    def test_create_stripe_subscription(self): #FAILING LINE 82 -> reate_stripe_subscription() missing 1 required positional argument: 'price_id'
         o = Organization.objects.get(pk=1)
         c = create_stripe_customer(o)
         card ={
@@ -87,7 +87,7 @@ class HandleSubscribersTest(TestCase):
         #clean up
         dc = delete_stripe_customer(c.id)
 
-    def test_retrieve_stripe_subscription(self):
+    def test_retrieve_stripe_subscription(self): #FAILING LINE 100:  create_stripe_subscription() missing 1 required positional argument: 'price_id'
         o = Organization.objects.get(pk=1)
         c = create_stripe_customer(o)
         card ={
@@ -106,7 +106,7 @@ class HandleSubscribersTest(TestCase):
         #clean up
         dc = delete_stripe_customer(c.id)
 
-    def test_delete_stripe_subscription(self):
+    def test_delete_stripe_subscription(self):# FAILING LINE 119: create_stripe_subscription() missing 1 required positional argument: 'price_id'
         o = Organization.objects.get(pk=1)
         c = create_stripe_customer(o)
         card ={
@@ -126,7 +126,7 @@ class HandleSubscribersTest(TestCase):
         #clean up
         dc = delete_stripe_customer(c.id)
 
-    def test_modify_stripe_subscription(self):
+    def test_modify_stripe_subscription(self): #FAILING LINE 139: create_stripe_subscription() missing 1 required positional argument: 'price_id'
         o = Organization.objects.get(pk=1)
         c = create_stripe_customer(o)
         card ={
