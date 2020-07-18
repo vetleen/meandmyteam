@@ -114,14 +114,11 @@ def edit_employee_view(request, **kwargs):
 
 @login_required
 def delete_employee_view(request, **kwargs):
-
     #find the Respondent we are trying to delete
     try:
         uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
         respondent = Respondent.objects.get(pk=uid)
-    except DjangoUnicodeDecodeError as err:
-        raise Http404("We couldn't find the employee you were looking for.")
-    except Respondent.DoesNotExist as err:
+    except (Respondent.DoesNotExist, DjangoUnicodeDecodeError) as err:
         logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         raise Http404("We couldn't find the employee you were looking for.")
 

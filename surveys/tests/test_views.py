@@ -1,3 +1,4 @@
+import datetime
 from django.test import TestCase
 from django.test import SimpleTestCase
 from django.test import Client
@@ -12,6 +13,14 @@ from surveys.models import *
 from surveys.tests.testdata import create_test_data
 from surveys.core import setup_instrument
 from surveys.core import survey_logic
+
+
+
+#set up logging
+import logging
+logger = logging.getLogger('__name__')
+logging.disable(logging.CRITICAL)
+#logging.disable(logging.NOTSET)
 
 # Create your tests here.
 class TestThatUrlsExist(TestCase):
@@ -54,7 +63,7 @@ class TestThatUrlsExist(TestCase):
         #create a survey and instance
         s = survey_logic.create_survey(owner=o, instrument_list=[i, ])
         si_list = survey_logic.survey_instances_from_survey(s)
-
+'''
     def test_url_status_codes(self):
         user = User.objects.get(id=1)
         organization = Organization.objects.get(id=1)
@@ -92,7 +101,7 @@ class TestThatUrlsExist(TestCase):
         for url in urls_to_test:
             response = self.client.get(url, follow=True, secure=True)
             self.assertEqual(response.status_code, 200, "%s gives url status code %s."%(url, response.status_code))
-
+'''
 
 class TestViews(TestCase):
     """
@@ -134,7 +143,7 @@ class TestViews(TestCase):
         #create a survey and instance
         s = survey_logic.create_survey(owner=o, instrument_list=[i, ])
         si_list = survey_logic.survey_instances_from_survey(s)
-
+    '''
     def test_add_or_remove_employee_view(self):
         user = User.objects.get(id=1)
         organization = Organization.objects.get(id=1)
@@ -275,11 +284,11 @@ class TestViews(TestCase):
 
     def test_delete_employee_view(self):
         user = User.objects.get(id=1)
-        #organization = Organization.objects.get(id=1)
+        organization = Organization.objects.get(id=1)
         employee = Respondent.objects.get(id=1)
-        #instrument = Instrument.objects.get(id=1)
-        #survey_instance = SurveyInstance.objects.get(id=1)
-        #survey = Survey.objects.get(id=1)
+
+        organization.update_stripe_subscription_quantity()
+        self.assertEqual(len(Respondent.objects.all()), organization.stripe_subscription_quantity)
 
         #test that login is required
         self.assertEqual(len(Respondent.objects.all()), 1)
@@ -298,15 +307,61 @@ class TestViews(TestCase):
         self.client.logout()
         self.client.force_login(user=user)
 
-        #try a faulty link
+        #try a faulty link -> trigger DjangoUnicodeDecodeError
         response = self.client.get(reverse('surveys-delete-employee', args=['42']), follow=True, secure=True)
         self.assertEqual(response.status_code, 404)
 
-        #finally delete your employee
+        #Actually delete the employee
         response = self.client.get(reverse('surveys-delete-employee', args=[employee.uidb64()]), follow=True, secure=True)
         self.assertRedirects(response, reverse('surveys-add-or-remove-employees'), 302, 200)
         self.assertTemplateUsed(response, 'add_or_remove_employees.html')
         self.assertEqual(len(Respondent.objects.all()), 0)
+        self.assertIn("testrespondent@tt.tt was permanently deleted, and will not receive future surveys.", response.content.decode())
+
+        #check that stripe subscription quantity was updated
+        organization = Organization.objects.get(id=1)
+        self.assertEqual(len(Respondent.objects.all()), organization.stripe_subscription_quantity)
 
         #do it again to trigger DoesNotExist
         response = self.client.get(reverse('surveys-delete-employee', args=[employee.uidb64()]), follow=True, secure=True)
+        self.assertEqual(response.status_code, 404)
+
+    '''
+    def test_dashboard_view(self):
+        user = User.objects.get(id=1)
+        organization = Organization.objects.get(id=1)
+        employee = Respondent.objects.get(id=1)
+        instrument = Instrument.objects.get(id=1)
+        #survey_instance = SurveyInstance.objects.get(id=1)
+        survey = Survey.objects.get(id=1)
+
+        #test that login is required
+        self.assertEqual(len(Respondent.objects.all()), 1)
+        response = self.client.get(reverse('surveys-dashboard'), follow=True, secure=True)
+        self.assertRedirects(response, reverse('loginc')+"?next="+reverse('surveys-dashboard'), 302, 200)
+
+        #test that we can see the dashboard
+        self.client.force_login(user=user)
+        response = self.client.get(reverse('surveys-dashboard'), follow=True, secure=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'dashboard.html')
+        #test if we get the correct context
+        self.assertEqual(response.context['todays_date'], datetime.date.today())
+        self.assertEqual(response.context['employee_count'], 1)
+        self.assertEqual(len(response.context['employee_list']), 1)
+        self.assertEqual(response.context['employee_list'][0], employee)
+        self.assertEqual(response.context['stripe_subscription'], None)
+        self.assertEqual(response.context['inactive_instrument_list'], [])
+        self.assertEqual(response.context['active_instrument_data'][0]['instrument'], instrument)
+        self.assertEqual(response.context['active_instrument_data'][0]['closed_surveys'], None)
+        self.assertEqual(response.context['active_instrument_data'][0]['open_survey'], survey)
+
+        #Test if we can get some content in inactive instrument_list
+        survey_setting = survey_logic.configure_survey_setting(
+            organization=organization,
+            instrument=instrument,
+            is_active=False
+        )
+        response = self.client.get(reverse('surveys-dashboard'), follow=True, secure=True)
+        self.assertEqual(response.context['inactive_instrument_list'], [instrument])
+        self.assertEqual(response.context['active_instrument_data'], None)
