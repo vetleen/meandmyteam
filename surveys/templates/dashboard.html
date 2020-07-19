@@ -22,7 +22,7 @@
         </div>
         <div class="card-body">
           <h5 class="card-title">Enter your organization details</h5>
-          <p class="card-text">We don't know who you are yet. Help us out by giving us a little more info on your organization.</p>
+          <p class="card-text">We don't know who you are yet. Help us out by giving us a little more info about your organization.</p>
           <a href="#" class="btn btn-info">Set up organization</a>
         </div>
       </div>
@@ -149,7 +149,7 @@
            <div class="card-body text-center">
               <h5 class="card-title">You are ready!</h5>
               <p class="card-text">Don't worry, you can always add more coworkers to track later.</p>
-              <a href="{% url 'surveys-setup-instrument' inactive_instrument.name %}" class="btn btn-lg btn-success">Start tracking!</a>
+              <a href="{% url 'surveys-setup-instrument' inactive_instrument.slug_name %}" class="btn btn-lg btn-success">Start tracking!</a>
           </div><!-- card-body-->
 
           <div class="card-footer text-muted  text-center">
@@ -184,7 +184,7 @@
                     <div class="d-flex justify-content-between">
                       <div>{{ ai.instrument.name }} tracking:</div>
                       <div>
-                        <a href="{% url 'surveys-setup-instrument' ai.instrument.name %}" class="badge badge-success align-self-end">ON</a>
+                        <a href="{% url 'surveys-setup-instrument' ai.instrument.slug_name %}" class="badge badge-success align-self-end">ON</a>
                       </div>
                     </div>
                   </li>
