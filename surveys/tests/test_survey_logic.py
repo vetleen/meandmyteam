@@ -351,14 +351,11 @@ class SurveyLogicTest(TestCase):
             self.assertIn('average', ir)
             self.assertIn('inverted', ir)
 
-
         #test get_results_from_instrument()
         gfrs_data = data
         data = survey_logic.get_results_from_instrument(instrument=i, organization=tsurvey.owner, depth=3)
-
         self.assertEqual(data['instrument'], i)
         self.assertEqual(len(data['surveys']), 3)
-
         self.assertEqual(data['surveys'][0], gfrs_data)
 
 

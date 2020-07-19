@@ -1,4 +1,4 @@
-
+import math
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseForbidden, Http404, HttpResponseRedirect
@@ -217,7 +217,6 @@ def setup_instrument_view(request, **kwargs):
         'is_active':  survey_setting.is_active,
         'survey_interval': survey_setting.survey_interval,
         'surveys_remain_open_days': survey_setting.surveys_remain_open_days,
-
     }
     form = EditSurveySettingsForm(initial=data)
 
@@ -253,16 +252,33 @@ def setup_instrument_view(request, **kwargs):
 @login_required
 def survey_details_view(request, **kwargs):
     #get the relevant survey
-    uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
-    survey = get_object_or_404(Survey, pk=uid)
-
-    #get the Instrument that we want to watych results for
-    instrument_slug_name = kwargs.get('instrument', None)
-    instrument = Instrument.objects.get(slug_name=instrument_slug_name)
+    try:
+        uid = force_text(urlsafe_base64_decode(kwargs.get('uidb64', None)))
+        survey = Survey.objects.get(pk=uid)
+        assert survey.is_closed == True, \
+            "Cannot view details of a survey that is not closed."
+    except (Survey.DoesNotExist, DjangoUnicodeDecodeError, AssertionError) as err:
+        logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."\
+            %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
+        raise Http404("We couldn't find the survey you were looking for.")
 
     #check that User is allowed to view this survey
-    if not request.user == survey.owner.owner:
+    try:
+        assert request.user == survey.owner.owner, \
+            "This survey does not belong to the user that is requesting it."
+    except AssertionError as err:
+        logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."\
+            %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         return HttpResponseForbidden()
+
+    #get the Instrument that we want to view the results for
+    try:
+        instrument_slug_name = kwargs.get('instrument', None)
+        instrument = Instrument.objects.get(slug_name=instrument_slug_name)
+    except Instrument.DoesNotExist as err:
+        logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."\
+            %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
+        raise Http404("We couldn't find that instrument you were looking for.")
 
     #get the survey_data
     survey_data = survey_logic.get_results_from_survey(survey=survey, instrument=instrument)
@@ -280,21 +296,26 @@ def answer_survey_view(request, **kwargs):
         #get the si-id and token from the url, and check that it's format is correct
         url_token = kwargs.get('token', None)
         url_token_args = url_token.split("-")
-        assert len(url_token_args) == 2, "Faulty link (wrong link format)"
+        assert len(url_token_args) == 2, \
+            "Faulty link (wrong link format)"
         #get the associated SurveyInstance
         si_id = int(force_text(urlsafe_base64_decode(url_token_args[0])))
-        survey_instance = get_object_or_404(SurveyInstance, pk=si_id)
+        survey_instance = SurveyInstance.objects.get(id=si_id)
         #ensure the url_token matches the SurveyInstance
-        assert survey_instance.get_hash_string() == url_token_args[1], "Faulty link (invalid hash)"
+        assert survey_instance.get_hash_string() == url_token_args[1], \
+            "Faulty link (invalid hash)"
         #ensure the Survey that the SurveyInstance belongs to is still open
-        assert survey_instance.survey.date_close >= datetime.date.today()
+        assert survey_instance.survey.date_close >= datetime.date.today(), \
+            "This survey has already closed, closed %s."%(survey_instance.survey.date_close)
 
-    except Exception as err:
+    except (AssertionError, SurveyInstance.DoesNotExist, DjangoUnicodeDecodeError) as err:
         logger.exception("%s %s: answer_survey_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         raise Http404("The survey you asked for does not exist. If you pasted a link, make sure you got the entire link.")
 
-    #get the page argument, to see if we should be inn the paginated pages, and if so, which one?
+    #get the page argument, to see if we should be inn the paginated pages, and if so, which one
     page=kwargs.get('page', None)
+    if page is not None:
+        page = int(page)
 
     # make the context
     context = {
@@ -303,6 +324,9 @@ def answer_survey_view(request, **kwargs):
         'submit_button_text': 'Continue',
 
     }
+
+    #set how many questions will be shown per page
+    page_size = 5
 
     #if this view was requested without a page argument, we can skip forward a bit
     if page is None:
@@ -314,19 +338,13 @@ def answer_survey_view(request, **kwargs):
                 answered_item_counter+=1
                 if item.answered == False:
                     current_page = math.ceil((answered_item_counter/page_size))
+                    messages.info(request, "Welcome back! We saved your place, so you can continue where you left off.", extra_tags='alert alert-info')
                     return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(url_token, current_page)))
 
         #otherwise show a pretty plain view
         return render(request, 'answer_survey.html', context)
 
     #Show questions now that we know we are in the paginated part
-
-    #config
-    #set how many questions will be shown per page
-    page_size = 5
-    #make sure the page variable is an integer
-    page = int(page)
-
     #make a list 'item_list' containing exactly the items the user should be asked
     all_survey_instance_items_list=survey_instance.surveyinstanceitem_set.all().order_by('pk')
     item_list = []
