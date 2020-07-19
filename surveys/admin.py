@@ -46,3 +46,7 @@ class RatioSurveyItemInline(admin.StackedInline): #for use in UserAdmin
 @admin.register(Survey)
 class SurveyAdmin(admin.ModelAdmin):
         inlines = (RatioScaleDimensionResultInline, RatioSurveyItemInline, SurveyInstanceInline)
+
+@admin.register(RespondentEmail)
+class RespondentEmail(admin.ModelAdmin):
+        pass

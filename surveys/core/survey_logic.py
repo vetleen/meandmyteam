@@ -13,12 +13,12 @@ def configure_survey_setting(organization, instrument, **kwargs):
     #Assert that we received valid input
     if not isinstance(organization, Organization):
         raise TypeError(
-            "configure_survey_setting() takes an argument 'organization' that must be an instance of models.Organziation, but was %s"\
+            "configure_survey_setting() takes an argument 'organization' that must be an instance of models. Organziation, but was %s"\
             %(type(organization))
         )
     if not isinstance(instrument, Instrument):
         raise TypeError(
-            "configure_survey_setting() takes an argument 'instrument' that must be an instance of models.Instrument, but was %s"\
+            "configure_survey_setting() takes an argument 'instrument' that must be an instance of models. Instrument, but was %s"\
             %(type(instrument))
         )
 
@@ -496,7 +496,6 @@ def get_results_from_survey(survey, instrument, get_previous=True):
                     #but only if the previous numbers can be shown
                     if previous_data is not None:
                         for pdr in previous_data['dimension_results']:
-                            print(pdr)
                             if pdr['dimension'] == dr.dimension:
                                 if pdr['average'] is not None:
                                     previous_average = pdr['average']
@@ -723,6 +722,7 @@ def close_survey_if_date_close_has_passed(survey):
 
 
 def send_email_for_survey_instance(survey_instance):
+    """ Takes a survey_instance and sends an email to it's respondent if it is time """
     #validate input
     assert isinstance(survey_instance, SurveyInstance), \
         "'survey_instance' must be a SurveyInstance object, but was %s"%(type(survey_instance))

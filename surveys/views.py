@@ -178,7 +178,6 @@ def dashboard_view(request):
                     if closed_surveys is None:
                         closed_surveys = []
                     closed_surveys.append(survey_data_point)
-                    #print("tried to append %s"%(survey_data_point))
 
             #append data
             active_instrument_data.append({

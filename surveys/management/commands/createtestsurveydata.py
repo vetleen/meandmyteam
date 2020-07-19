@@ -92,11 +92,13 @@ class Command(BaseCommand):
         open_surveys = Survey.objects.filter(owner=torganization, is_closed=False)
         for survey in open_surveys:
             survey_logic.close_survey(survey)
+            ("... closed a survey with id %s!"%(survey.id))
         logger.warning("... done!")
         surveys_target = 5
         survey_list = []
+        current_date = date.today()
         for i in range(surveys_target):
-            logger.warning("Creating a survey for the test-organization...")
+            logger.warning("Creating a survey (number %s) for the test-organization..."%(i))
 
             tsurvey = survey_logic.create_survey(owner=torganization, instrument_list=[tinstrument, ])
             survey_list.append(tsurvey)
@@ -106,9 +108,9 @@ class Command(BaseCommand):
             logger.warning("...created %s survey instances."%(len(tsurvey_instance_list)))
 
             #send emails:
-            for survey_instance in tsurvey_instance_list:
-                survey_logic.send_email_for_survey_instance(survey_instance)
-                logger.warning("... sent an email to %s"%(survey_instance.respondent))
+            #for survey_instance in tsurvey_instance_list:
+            #    survey_logic.send_email_for_survey_instance(survey_instance)
+            #    logger.warning("... sent an email to %s"%(survey_instance.respondent))
 
             #answer survey
             logger.warning("... answering this survey...")
@@ -117,23 +119,21 @@ class Command(BaseCommand):
                 for titem in tsinstance.get_items():
                     answer_value = random.randint(titem.survey_item.item_dimension.scale.min_value, titem.survey_item.item_dimension.scale.max_value)
                     titem = survey_logic.answer_item(titem, answer_value)
-            survey_instance.check_completed()
-
+                tsinstance.check_completed()
 
             #close survey
-            logger.warning(".-..closing survey")
-            tsurvey = survey_logic.close_survey(tsurvey)
-            logger.warning("Done!")
+            logger.warning("...moving survey back in time")
 
-        #move them back in time
-        logger.warning("Moving surveys back in time....")
-        current_date = date.today()
-        while len(survey_list) > 1:
-                current_survey = survey_list.pop(0)
-                current_date += timedelta(days=-90)
-                current_survey.date_close = current_date
-                current_survey.save()
+            current_date += timedelta(days=-90)
+            tsurvey.date_close = current_date
+            tsurvey.date_open = current_date + timedelta(days=-10)
+            tsurvey.save()
+            logger.warning("...done.")
+            logger.warning("...closing survey with id %s"%(tsurvey.id))
+            survey_logic.close_survey_if_date_close_has_passed(tsurvey)
+            logger.warning("...done.")
+
+        #update survey setting
         tsurvey_setting.check_last_survey_dates()
-        logger.warning("...done!")
 
         logger.warning("All done!")
