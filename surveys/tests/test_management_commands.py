@@ -22,10 +22,12 @@ import datetime
 #from django.contrib.auth.models import AnonymousUser, User
 #from django.contrib import auth
 
+
 #set up logging
 import logging
 logger = logging.getLogger('__name__')
-
+logging.disable(logging.CRITICAL)
+#logging.disable(logging.NOTSET)
 # Create your tests here.
 class ManagementCommandsTest(TestCase):
     ''' TESTS THAT THE ANSWER SURVEY VIEW BEHAVES PROPERLY '''
@@ -98,7 +100,7 @@ class ManagementCommandsTest(TestCase):
         self.assertEqual(len(scale_list), 1)
         self.assertEqual(len(item_list), 17)
 
-        logging.disable(logging.NOTSET)
+        #logging.disable(logging.NOTSET)
 
     def test_dailysurveytasks(self):
         logging.disable(logging.CRITICAL)
@@ -193,4 +195,4 @@ class ManagementCommandsTest(TestCase):
         call_command('dailysurveytasks')
         self.assertEqual(len(Survey.objects.filter(is_closed=True)), 1)
 
-        logging.disable(logging.NOTSET)
+        #logging.disable(logging.NOTSET)

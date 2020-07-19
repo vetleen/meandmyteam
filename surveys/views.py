@@ -170,21 +170,22 @@ def dashboard_view(request):
             #sort out open surveys
             open_survey=None
             closed_surveys=None
-            for survey_data_point in latest_instrument_data['surveys']:
-                if survey_data_point['survey'].is_closed == False:
-                    open_survey=survey_data_point['survey']
+            if latest_instrument_data is not None:
+                for survey_data_point in latest_instrument_data['surveys']:
+                    if survey_data_point['survey'].is_closed == False:
+                        open_survey=survey_data_point['survey']
 
-                else:
-                    if closed_surveys is None:
-                        closed_surveys = []
-                    closed_surveys.append(survey_data_point)
+                    else:
+                        if closed_surveys is None:
+                            closed_surveys = []
+                        closed_surveys.append(survey_data_point)
 
-            #append data
-            active_instrument_data.append({
-                'instrument':instrument,
-                'closed_surveys': closed_surveys,
-                'open_survey': open_survey
-            })
+                #append data
+                active_instrument_data.append({
+                    'instrument':instrument,
+                    'closed_surveys': closed_surveys,
+                    'open_survey': open_survey
+                })
 
     #collect all the info that the dashboard needs (and maybe then some?)
     context = {

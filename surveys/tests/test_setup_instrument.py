@@ -21,6 +21,11 @@ from datetime import date, timedelta
 #FIRST, SOME DATA TO TEST ON!
 #instrument
 
+#set up logging
+import logging
+logger = logging.getLogger('__name__')
+logging.disable(logging.CRITICAL)
+#logging.disable(logging.NOTSET)
 
 def print_rti(rti):
     print('#########################')

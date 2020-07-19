@@ -19,6 +19,12 @@ from datetime import date, timedelta
 #from django.contrib.auth.models import AnonymousUser, User
 #from django.contrib import auth
 
+#set up logging
+import logging
+logger = logging.getLogger('__name__')
+logging.disable(logging.CRITICAL)
+#logging.disable(logging.NOTSET)
+
 # Create your tests here.
 class FormsTest(TestCase):
     ''' TESTS THAT THE ANSWER SURVEY VIEW BEHAVES PROPERLY '''
