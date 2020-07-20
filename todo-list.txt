@@ -2,10 +2,11 @@
 
 #dev
 add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages.
-update subscription quantity with stripe on login/logout // WHEN do we sync with stripe? Probs when sending survey? like, invitations = quantity?
+can we start id indexing at higher numbers for some models? smoother urls
 
 # TODO before launch
 Double check that the django secret variable is the one set in os.environ
+Change payments so that verification is disconnectedfrom payment method
 
 SEO
 
@@ -14,7 +15,7 @@ Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#cus
 password validation for signup
 contact us page and link in footer
 
-dadd about us explaining scientific background of test (if any...)
+add 'about us' explaining scientific background of test (if any...)
 
 more data in sign-up, incl. check "accept terms". Consider also edit profile for this.
 add a terms-accepted checkbox to sign-up
@@ -29,7 +30,7 @@ add report-generator (https://www.google.com/search?client=ubuntu&channel=fs&q=d
 chat-box
 
 #nice-to-haves
-can we start id indexing at higher numbers for some models? smoother urls
+
 add support for None in answers to surveys - "i dont want to answr/dont know"
 Blog / "science" / "research" / "knowledge"
 Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)
@@ -39,3 +40,6 @@ make a switch for toggeling products, and make it toggleable from dashboard.
 Add *automatic* country selection in Organization set-up: https://docs.djangoproject.com/en/3.0/ref/contrib/gis/geoip2/
 pricing add impact stories to front page, and possibly own page
 add impact stories to front page, and possibly own page
+
+#long term
+What happens to emails that are sent?
