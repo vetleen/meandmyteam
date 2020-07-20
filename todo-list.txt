@@ -1,15 +1,11 @@
 ##MeAndMyTeam
 
 #dev
-"daily" logic - run proper functions daily
-automate setup product or add to readme how to get this app started from scratch
-add support for None in answers to surveys - "i dont want to answr/dont know"
 
 # TODO before launch
 Double check that the django secret variable is the one set in os.environ
 
 SEO
-
 
 add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages.
 
@@ -32,6 +28,7 @@ add report-generator (https://www.google.com/search?client=ubuntu&channel=fs&q=d
 chat-box
 
 #nice-to-haves
+add support for None in answers to surveys - "i dont want to answr/dont know"
 Blog / "science" / "research" / "knowledge"
 Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)
 When visiting add employees for the first time, it would be neat if user was already added
