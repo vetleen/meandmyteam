@@ -1,13 +1,14 @@
 ##MeAndMyTeam
 
 #dev
+add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages.
+update subscription quantity with stripe on login/logout // WHEN do we sync wiuth stripe? Probs when sending survey? like, invitations = quantity?
 
 # TODO before launch
 Double check that the django secret variable is the one set in os.environ
 
 SEO
 
-add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages.
 
 Custom heroku error pages: https://devcenter.heroku.com/articles/error-pages#customize-pages
 password validation for signup
@@ -35,9 +36,6 @@ Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct
 When visiting add employees for the first time, it would be neat if user was already added
 When 3 surveys have been completed, a line chart may be a better way to present data
 make a switch for toggeling products, and make it toggleable from dashboard.
-progress bar for question pages
 Add *automatic* country selection in Organization set-up: https://docs.djangoproject.com/en/3.0/ref/contrib/gis/geoip2/
 pricing add impact stories to front page, and possibly own page
 add impact stories to front page, and possibly own page
-support fopr viewing older surveys than 3 surveys ago
-update subscription quantity with stripe on login/logout // WHEN do we sync wiuth stripe? Probs when sending survey? like, invitations = quantity?

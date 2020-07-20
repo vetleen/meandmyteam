@@ -93,7 +93,7 @@
                   {% else %}{# if active_instrument.closed_surveys is not None #}
                   <h5 class="card-title text-left">No measurements yet!</h5>
                   <p class="card-text">
-                    The {{ active_instrument.instrument.name }} Tracking has not yet finished collecting your first set of data.
+                    The {{ active_instrument.instrument.name }} Tracking tool has not yet finished collecting your first set of data.
                       {% if active_instrument.open_survey is not None %}
                         But fear not, we are currently collecting data, and it will be available for review {{ active_instrument.open_survey.date_close }}.
                       {% else %}{# if active_instrument.open_survey is not None #}

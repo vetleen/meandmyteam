@@ -15,6 +15,8 @@ class DimensionInline(admin.StackedInline): #for use in UserAdmin
     model = Dimension
     can_delete = False
 
+
+
 @admin.register(Instrument)
 class InstrumentAdmin(admin.ModelAdmin):
         inlines = (DimensionInline, )
@@ -46,6 +48,10 @@ class RatioSurveyItemInline(admin.StackedInline): #for use in UserAdmin
 @admin.register(Survey)
 class SurveyAdmin(admin.ModelAdmin):
         inlines = (RatioScaleDimensionResultInline, RatioSurveyItemInline, SurveyInstanceInline)
+
+@admin.register(Respondent)
+class Respondent(admin.ModelAdmin):
+        inlines = (SurveyInstanceInline, )
 
 @admin.register(RespondentEmail)
 class RespondentEmail(admin.ModelAdmin):
