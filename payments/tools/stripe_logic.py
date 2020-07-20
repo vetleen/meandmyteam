@@ -189,16 +189,18 @@ def modify_stripe_subscription(stripe_subscription_id, **kwargs):
         print('modify_stripe_subscription() returned an error: %s: %s.'%(type(err), err))
         return None
 
-def change_stripe_subscription_price(stripe_subscription_id, stripe_price_id):
+def change_stripe_subscription_price(stripe_subscription_id, stripe_price_id, quantity):
     try:
         subscription = stripe.Subscription.retrieve(stripe_subscription_id)
         s = stripe.Subscription.modify(
             subscription.id,
             cancel_at_period_end=False,
+
             proration_behavior='create_prorations',
             items=[{
                 'id': subscription['items']['data'][0].id,
                 'price': stripe_price_id,
+                'quantity': quantity,
             }]
         )
         return s

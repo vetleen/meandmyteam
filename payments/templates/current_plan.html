@@ -51,7 +51,7 @@ function stripeRedirect(){
                   {% endif %}
                 </h5>
                 <h3 class="card-subtitle text-info text-center">${{ stripe_subscription.plan_total }} {{ stripe_subscription.plan_currency|upper }}/{{ stripe_subscription.plan_interval }}* </h3>
-                <span class="text-muted"><center><small>total for  {{ stripe_subscription.quantity }} co-worker billed {{ stripe_subscription.plan_name|lower }}</small></center></span>
+                <span class="text-muted"><center><small>total for  {{ stripe_subscription.quantity }} employee{% if stripe_subscription.quantity > 1 %}s{% endif %} billed {{ stripe_subscription.plan_name|lower }}</small></center></span>
                   <!--<span class="text-muted"><span class="lead">${{ stripe_subscription.plan_interval_amount }} <small></small>{{ stripe_subscription.plan_currency|upper }} / {{ stripe_subscription.plan_interval }} </span>per co-worker</span><br />-->
                 <p class="text-center">
                   <span class="text-muted lead">Subscription is <span class="text-success font-weight-bold">{{ stripe_subscription.status }}</span>
@@ -66,7 +66,7 @@ function stripeRedirect(){
                     <span class="text-success"> (renews automatically!)</span>
                   {% endif %}
                 </p>
-                <p class="card-text">* The plan scales automatically to the number of surveyed co-workers, and bills {{ stripe_subscription.plan_name|lower }}. </p>
+                <p class="card-text">* The plan scales automatically to the number of surveyed employees, and bills {{ stripe_subscription.plan_name|lower }}. </p>
 
               </div> <!-- card-body -->
               <div class="text-center card-footer">

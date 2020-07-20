@@ -60,6 +60,7 @@ def add_or_remove_employee_view(request):
 
             #also update stripe subscription quantity
             q = request.user.organization.update_stripe_subscription_quantity()
+            stripe_logic.modify_stripe_subscription(request.user.organization.stripe_subscription_id, quantity=q)
 
             #declare success and make a new form for the next employee
             messages.success(request, 'You have added a coworker (%s)! You can continue to add more below.'%(form.cleaned_data['email']), extra_tags='alert alert-success')
@@ -132,6 +133,8 @@ def delete_employee_view(request, **kwargs):
         respondent.delete()
         #also update stripe subscription quantity
         q = request.user.organization.update_stripe_subscription_quantity()
+        stripe_logic.modify_stripe_subscription(request.user.organization.stripe_subscription_id, quantity=q)
+        
         return HttpResponseRedirect(request.GET.get('next', reverse('surveys-add-or-remove-employees')))
 
 @login_required

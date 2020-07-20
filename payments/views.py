@@ -48,6 +48,7 @@ def current_plan_view(request):
     #if there is a sub_id, get the subscription object from Stripe,
     stripe_subscription = None
     if stripe_subscription_id is not None and stripe_subscription_id != '':
+        #UPDATE QUANTITY HERE?
         stripe_subscription = retrieve_stripe_subscription(stripe_subscription_id)
     if stripe_subscription_id is not None and stripe_subscription is None:
         logger.warning("%s %s: current_plan_view: Unable to get a Subscription object from Stripe for user %s, and sub_id %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user, stripe_subscription_id))
@@ -370,7 +371,7 @@ def change_subscription_price_view(request, **kwargs):
     """View function for ..."""
     price_id = kwargs.get('price_id', None)
     try:
-        s = change_stripe_subscription_price(request.user.organization.stripe_subscription_id, price_id)
+        s = change_stripe_subscription_price(request.user.organization.stripe_subscription_id, price_id, quantity=request.user.organization.update_stripe_subscription_quantity())
         if s is not None:
             messages.success(request, 'Your subscription was updated with the chosen plan!', extra_tags='alert alert-success')
         else:

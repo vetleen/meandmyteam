@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from django.conf import settings
 
-
+#third party
 import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 import datetime

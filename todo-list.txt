@@ -2,7 +2,7 @@
 
 #dev
 add a consent-was-given attribute to every survey instance. check in view if it was given before the paginated pages.
-update subscription quantity with stripe on login/logout // WHEN do we sync wiuth stripe? Probs when sending survey? like, invitations = quantity?
+update subscription quantity with stripe on login/logout // WHEN do we sync with stripe? Probs when sending survey? like, invitations = quantity?
 
 # TODO before launch
 Double check that the django secret variable is the one set in os.environ
