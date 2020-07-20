@@ -28,7 +28,7 @@ class HandleSubscribersTest(TestCase):
         #clean up
         ds = delete_stripe_customer(s.id)
 
-    def test_retrieve_customer(self):
+    def test_retrieve_stripe_customer(self):
         o = Organization.objects.get(pk=1)
         s = create_stripe_customer(o)
         rs = retrieve_stripe_customer(s.id)
@@ -37,7 +37,7 @@ class HandleSubscribersTest(TestCase):
         #clean up
         ds = delete_stripe_customer(rs.id)
 
-    def test_delete_customer(self):
+    def test_delete_stripe_customer(self):
         o = Organization.objects.get(pk=1)
         s = create_stripe_customer(o)
         ds = delete_stripe_customer(s.id)
@@ -69,7 +69,7 @@ class HandleSubscribersTest(TestCase):
         #clean up
         dc = delete_stripe_customer(c.id)
 
-    def test_create_stripe_subscription(self): #FAILING LINE 82 -> reate_stripe_subscription() missing 1 required positional argument: 'price_id'
+    def test_create_stripe_subscription(self):
         o = Organization.objects.get(pk=1)
         c = create_stripe_customer(o)
         card ={
@@ -79,7 +79,7 @@ class HandleSubscribersTest(TestCase):
             "cvc": "314",
         }
         pm = create_stripe_payment_method(card, c.id)
-        s = create_stripe_subscription(stripe_customer_id=c.id, quantity=25)
+        s = create_stripe_subscription(stripe_customer_id=c.id, price_id="price_HMsTwnoxZyRP4F", quantity=25)
         #Test that a subscription was created and that trial period was set correctly
         self.assertEqual(s.object, "subscription")
         self.assertEqual(s.quantity, 25)
@@ -87,7 +87,22 @@ class HandleSubscribersTest(TestCase):
         #clean up
         dc = delete_stripe_customer(c.id)
 
-    def test_retrieve_stripe_subscription(self): #FAILING LINE 100:  create_stripe_subscription() missing 1 required positional argument: 'price_id'
+    def test_set_default_stripe_payment_method(self):
+        pass
+
+    def test_retrieve_stripe_payment_method(self):
+        pass
+
+    def test_list_stripe_payment_methods(self):
+        pass
+
+    def test_delete_stripe_payment_method(self):
+        pass
+
+    def test_create_stripe_subscription(self):
+        pass
+
+    def test_delete_stripe_subscription(self):
         o = Organization.objects.get(pk=1)
         c = create_stripe_customer(o)
         card ={
@@ -97,26 +112,7 @@ class HandleSubscribersTest(TestCase):
             "cvc": "314",
         }
         pm = create_stripe_payment_method(card, c.id)
-        s = create_stripe_subscription(stripe_customer_id=c.id, quantity=25)
-        rs = retrieve_stripe_subscription(s.id)
-        #Test that a subscription was created and that trial period was set correctly
-        self.assertEqual(s.id, rs.id)
-
-
-        #clean up
-        dc = delete_stripe_customer(c.id)
-
-    def test_delete_stripe_subscription(self):# FAILING LINE 119: create_stripe_subscription() missing 1 required positional argument: 'price_id'
-        o = Organization.objects.get(pk=1)
-        c = create_stripe_customer(o)
-        card ={
-            "number": "4242424242424242",
-            "exp_month": 5,
-            "exp_year": 2021,
-            "cvc": "314",
-        }
-        pm = create_stripe_payment_method(card, c.id)
-        s = create_stripe_subscription(stripe_customer_id=c.id)
+        s = create_stripe_subscription(stripe_customer_id=c.id, price_id="price_HMsTwnoxZyRP4F",)
         #Test that a subscription was created and that trial period was set correctly
         self.assertEqual(s.object, "subscription")
         self.assertNotEqual(s.status, "canceled")
@@ -126,7 +122,13 @@ class HandleSubscribersTest(TestCase):
         #clean up
         dc = delete_stripe_customer(c.id)
 
-    def test_modify_stripe_subscription(self): #FAILING LINE 139: create_stripe_subscription() missing 1 required positional argument: 'price_id'
+    def test_cancel_stripe_subscription(self):
+        pass
+
+    def test_restart_cancelled_stripe_subscription(self):
+        pass
+
+    def test_retrieve_stripe_subscription(self):
         o = Organization.objects.get(pk=1)
         c = create_stripe_customer(o)
         card ={
@@ -136,7 +138,26 @@ class HandleSubscribersTest(TestCase):
             "cvc": "314",
         }
         pm = create_stripe_payment_method(card, c.id)
-        s = create_stripe_subscription(stripe_customer_id=c.id, quantity=25)
+        s = create_stripe_subscription(stripe_customer_id=c.id, quantity=25,  price_id="price_HMsTwnoxZyRP4F",)
+        rs = retrieve_stripe_subscription(s.id)
+        #Test that a subscription was created and that trial period was set correctly
+        self.assertEqual(s.id, rs.id)
+
+
+        #clean up
+        dc = delete_stripe_customer(c.id)
+
+    def test_modify_stripe_subscription(self):
+        o = Organization.objects.get(pk=1)
+        c = create_stripe_customer(o)
+        card ={
+            "number": "4242424242424242",
+            "exp_month": 5,
+            "exp_year": 2021,
+            "cvc": "314",
+        }
+        pm = create_stripe_payment_method(card, c.id)
+        s = create_stripe_subscription(stripe_customer_id=c.id, quantity=25,  price_id="price_HMsTwnoxZyRP4F",)
         #Test that a subscription was created and that trial period was set correctly
         self.assertEqual(s.object, "subscription")
         self.assertEqual(s.quantity, 25)
@@ -148,3 +169,18 @@ class HandleSubscribersTest(TestCase):
         self.assertEqual(s.quantity, 10)
         #clean up
         dc = delete_stripe_customer(c.id)
+
+    def test_change_stripe_subscription_price(self):
+        pass
+
+    def test_list_stripe_products(self):
+        pass
+
+    def test_retrieve_stripe_product(self):
+        pass
+
+    def test_list_stripe_plans(self):
+        pass
+
+    def test_list_stripe_invoices(self):
+        pass
