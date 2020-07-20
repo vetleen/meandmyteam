@@ -28,6 +28,7 @@ add report-generator (https://www.google.com/search?client=ubuntu&channel=fs&q=d
 chat-box
 
 #nice-to-haves
+can we start id indexing at higher numbers for some models? smoother urls
 add support for None in answers to surveys - "i dont want to answr/dont know"
 Blog / "science" / "research" / "knowledge"
 Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)

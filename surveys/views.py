@@ -153,7 +153,6 @@ def dashboard_view(request):
     for isetting in instrument_settings_list:
         if isetting.is_active == True:
             active_instrument_list.append(isetting.instrument)
-    print(active_instrument_list)
 
     #find inactive_instrument_list
     inactive_instrument_list = [i for i in Instrument.objects.all() if i not in active_instrument_list]

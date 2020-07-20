@@ -40,10 +40,10 @@
       </div>
       {% else %}
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-lg-6">
           {% if active_instrument_data is not None %}
             {% for active_instrument in active_instrument_data %}
-              <div class="card">
+              <div class="card mb-4">
                 <div class="card-header text-center">
                    {{ active_instrument.instrument.name }}
                 </div><!-- card-header -->
@@ -90,12 +90,12 @@
 
                     <!-- done showing results -->
 
-                  {% else %}{# if active_instrument.latest_instrument_data is not None #}
+                  {% else %}{# if active_instrument.closed_surveys is not None #}
                   <h5 class="card-title text-left">No measurements yet!</h5>
                   <p class="card-text">
                     The {{ active_instrument.instrument.name }} Tracking has not yet finished collecting your first set of data.
                       {% if active_instrument.open_survey is not None %}
-                        But fear not, we are currently collecting data, and it will be available for review{{ active_instrument.open_survey.date_close }}.
+                        But fear not, we are currently collecting data, and it will be available for review {{ active_instrument.open_survey.date_close }}.
                       {% else %}{# if active_instrument.open_survey is not None #}
                         We have not yet begun collecting data either, but will usually do that within a few hours of you activating the product. So make sure you have added all the employees you want to track, sit back and relax while we do all the hard work!
                       {% endif %}{# if active_instrument.open_survey is not None #}
@@ -104,20 +104,20 @@
 
                   <p class="card-text">
                     <center>
-                      {% if active_instrument.latest_instrument_data is not None %}
+                      {% if active_instrument.closed_surveys is not None %}
                         <a href="{% url 'surveys-survey-details' active_instrument.closed_surveys.0.survey.uidb64 active_instrument.instrument.slug_name %}" class="btn btn-info">View details</a>
                       {% endif %}{# if active_instrument.latest_instrument_data is not None #}
                       <a href="{% url 'surveys-setup-instrument' active_instrument.instrument.slug_name %}" class="btn btn-info">Review settings</a>
                     </center>
                   </p>
-                  {% if active_instrument.latest_instrument_data is not None %}
+                  {% if active_instrument.closed_surveys is not None %}
                     <h5 class="card-title text-left mt-4">{{ active_instrument.instrument.name }} measurements</h5>
                     <ul>
                       {% for survey in active_instrument.closed_surveys %}
                         <li><a href="{% url 'surveys-survey-details' survey.survey.uidb64 active_instrument.instrument.slug_name %}">{{ survey.survey.date_close }}</a>{% if forloop.counter == 1 %} (latest){% endif %}</li>
                       {% endfor %}
                     </ul>
-                  {% endif %}{# if active_instrument.latest_instrument_data is not None #}
+                  {% endif %}{# if active_instrument.closed_surveys is not None #}
 
                 </div><!-- card-body -->
 
@@ -127,7 +127,7 @@
                   </p>
                 </div><!-- card-footer -->
               </div><!-- card -->
-            {% endfor %}  {# for ... in active_instrument_data #}
+            {% endfor %}  {# for active_instrument in active_instrument_data #}
           {% endif %} {# if active_instrument_data is not None #}
 
 
@@ -162,7 +162,7 @@
 
 
         </div><!-- col -->
-        <div class="col-sm-6">
+        <div class="col-lg-6">
           <div class="card">
             <div class="card-header text-center">
               Organization
@@ -186,7 +186,7 @@
                     <div class="d-flex justify-content-between">
                       <div>{{ iai.name }} tracking:</div>
                       <div>
-                        <a href="{% url 'surveys-setup-instrument' iai.name %}" class="badge badge-warning align-self-end">OFF</a>
+                        <a href="{% url 'surveys-setup-instrument' iai.slug_name %}" class="badge badge-warning align-self-end">OFF</a>
                       </div>
                     </div>
                   </li>
