@@ -1,13 +1,12 @@
 ##MeAndMyTeam
 
 #dev
-
+Change payments so that verification is disconnected from payment method
 
 # BEFORE LAUNCH
 add support for None in answers to surveys - "i dont want to answer/don't know"
-Change payments so that verification is disconnected from payment method
-password validation for signup
-search engine optimization
+
+search engine optimization including analytics
 
 #AFTER LAUNCH
 tests for payments
