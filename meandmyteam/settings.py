@@ -25,7 +25,6 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '2#q*c)!_g3tw2vj_p%7+rjyq+taizi
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'meandmyteam.herokuapp.com']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -98,6 +97,8 @@ if os.environ.get('DJANGO_DEBUG') == 'False':
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+#Phonumber-config
+PHONENUMBER_DEFAULT_REGION = "NO"
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

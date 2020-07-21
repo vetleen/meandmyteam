@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+from django.conf import settings
 #from django.db import IntegrityError
 
 from website.forms import *
@@ -111,9 +112,8 @@ class FormsTest(TestCase):
         self.assertTrue(test_form.has_error('phone'))
         self.assertIn("Enter a valid phone number (e.g. +12125552368).", test_form.errors['phone']) #I am unable to change this error mesage, should be revisited in the next five years or so...
 
-        #reset data for future tests
+        #reset data
         data.update({
-            'phone': "+47 99999999"
+            'phone': "+4799999999"
             })
         test_form = SignUpForm(data=data)
-        self.assertTrue(test_form.is_valid())

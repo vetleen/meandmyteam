@@ -25,6 +25,7 @@ class TestModels(TestCase):
             "+1 650-326-0983",
             "+1 650 326 0984",
             "+16503260985",
+            "99999995", #so long as NO is default, this should work            
         ]
         for n, number in enumerate(valid_phone_number_list):
             user = User(username="testuser%s@tt.tt"%(n), email="testuser%s@tt.tt"%(n), password="password")

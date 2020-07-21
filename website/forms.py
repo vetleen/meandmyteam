@@ -10,7 +10,7 @@ from website.models import Organization
 from django_countries.widgets import CountrySelectWidget
 from django_countries.fields import CountryField
 from phonenumber_field.formfields import PhoneNumberField
-from phonenumber_field.widgets import PhoneNumberPrefixWidget
+from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from phonenumber_field.validators import validate_international_phonenumber
 
 class SignUpForm(forms.Form):
@@ -21,7 +21,7 @@ class SignUpForm(forms.Form):
 
     #Organization
     name = forms.CharField(max_length = 255, label="Organization name*", widget=forms.TextInput(attrs={}))
-    phone = PhoneNumberField(max_length=30, required=False, label="Phone incl.country code (e.g. +01 for USA)", widget=forms.TextInput(attrs={'placeholder':'[+][country code][your number]'}))
+    phone = PhoneNumberField(max_length=30, required=False, label="Phone number", widget=PhoneNumberInternationalFallbackWidget(attrs={'placeholder':'(e.g. +12125552368 or +1 212 555 2368)'})) #widget=forms.TextInput(attrs={'placeholder':'[+][country code][your number]'}) #incl.country code (e.g. +01 for USA)
     address_line_1 = forms.CharField(max_length = 255, label="Street address*", widget=forms.TextInput(attrs={}))
     address_line_2 =forms.CharField(max_length = 255, label="", required=False, widget=forms.TextInput(attrs={}))
     zip_code = forms.CharField(max_length = 20, label="Zip*", widget=forms.TextInput(attrs={}))
