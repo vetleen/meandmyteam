@@ -5,7 +5,7 @@ from website.models import Organization
 from surveys.models import *
 from django.contrib.auth.models import User
 
-from phonenumber_field.validators import validate_international_phonenumber
+#from phonenumber_field.validators import validate_international_phonenumber
 from phonenumber_field import phonenumber
 # Create your tests here.
 class TestModels(TestCase):

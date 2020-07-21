@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from django.contrib import messages
+from django.contrib.auth import password_validation
 
 from website.models import Organization
 
@@ -9,6 +11,7 @@ from django_countries.widgets import CountrySelectWidget
 from django_countries.fields import CountryField
 from phonenumber_field.formfields import PhoneNumberField
 from phonenumber_field.widgets import PhoneNumberPrefixWidget
+from phonenumber_field.validators import validate_international_phonenumber
 
 class SignUpForm(forms.Form):
     #User
@@ -18,7 +21,7 @@ class SignUpForm(forms.Form):
 
     #Organization
     name = forms.CharField(max_length = 255, label="Organization name*", widget=forms.TextInput(attrs={}))
-    phone = PhoneNumberField(max_length=30, required=False, label="Phone incl.country code (e.g. +01)", widget=forms.TextInput(attrs={'placeholder':'Example: +12125552368'}))
+    phone = PhoneNumberField(max_length=30, required=False, label="Phone incl.country code (e.g. +01 for USA)", widget=forms.TextInput(attrs={'placeholder':'[+][country code][your number]'}))
     address_line_1 = forms.CharField(max_length = 255, label="Street address*", widget=forms.TextInput(attrs={}))
     address_line_2 =forms.CharField(max_length = 255, label="", required=False, widget=forms.TextInput(attrs={}))
     zip_code = forms.CharField(max_length = 20, label="Zip*", widget=forms.TextInput(attrs={}))
@@ -26,20 +29,9 @@ class SignUpForm(forms.Form):
     country = CountryField(blank_label='(Select country)').formfield(label="Country*")
     accepted_terms_and_conditions = forms.BooleanField(
         label="I accept the terms and conditions and the privacy policy.",
-        required=True,
+        required=False,
         widget=forms.CheckboxInput(attrs={'default': 'false'})
     )
-
-    def clean_name(self):
-        if User.objects.filter(organization__name=self.cleaned_data['name']).exists():
-            if not User.objects.get(organization__name=self.cleaned_data['name']).owner == self.user:
-                #print ('Compared %s with %s'%(User.objects.get(organization__name=self.cleaned_data['name']).owner, self.user))
-                raise forms.ValidationError(
-                    "An organization with that name already exists (%(taken_name)s).",
-                    code='invalid',
-                    params={'taken_name': self.cleaned_data['name']}
-                )
-        return self.cleaned_data['name']
 
     def clean_username(self):
         if User.objects.filter(username=self.cleaned_data['username']).exists():
@@ -51,21 +43,36 @@ class SignUpForm(forms.Form):
         return self.cleaned_data['username']
 
     def clean_password(self):
-        #logic to validate password. Length and comp?
-        if len(self.cleaned_data['password']) < 3:
-           raise forms.ValidationError(
-                "The password must be atleast 3 characters long. Please try again.",
-               code='invalid',
-                )
+        #clean password
+        try:
+            password_validation.validate_password(self.cleaned_data['password'])
+        except ValidationError as err:
+            raise forms.ValidationError(err)
         return self.cleaned_data['password']
 
     def clean_confirm_password(self):
-        if self.cleaned_data['password'] != self.cleaned_data['confirm_password']:
+        if self.data.get('password') != self.cleaned_data['confirm_password']:
            raise forms.ValidationError(
                 "The second password you entered did not match the first. Please try again.",
                code='invalid',
                 )
         return self.cleaned_data['confirm_password']
+
+    def clean_name(self):
+        if Organization.objects.filter(name=self.cleaned_data['name']).exists():
+            raise forms.ValidationError(
+                "An organization with that name already exists (%(taken_name)s).",
+                code='invalid',
+                params={'taken_name': self.cleaned_data['name']}
+            )
+        return self.cleaned_data['name']
+
+    def clean_phone(self):
+        try:
+            validate_international_phonenumber(self.cleaned_data['phone'])
+        except ValidationError as err:
+            raise forms.ValidationError(err)
+        return self.cleaned_data['phone']
 
     def clean_accepted_terms_and_conditions(self):
         if self.cleaned_data['accepted_terms_and_conditions'] != True:
@@ -75,6 +82,9 @@ class SignUpForm(forms.Form):
                 params={'accepted_terms_and_conditions': self.cleaned_data['accepted_terms_and_conditions']}
             )
         return self.cleaned_data['accepted_terms_and_conditions']
+
+
+
 
 class ChangePasswordForm(forms.Form):
     def __init__(self, *args, **kwargs):

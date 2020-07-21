@@ -2,16 +2,17 @@
 
 #dev
 
-add a terms-accepted checkbox to sign-up
 
 # BEFORE LAUNCH
 add support for None in answers to surveys - "i dont want to answer/don't know"
 Change payments so that verification is disconnected from payment method
 password validation for signup
-tests for payments
-SEO
+search engine optimization
 
 #AFTER LAUNCH
+tests for payments
+tests for website
+
 contact us page and about us page
 add 'about us' explaining scientific background of test (if any...)
 chat-box
