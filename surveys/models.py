@@ -337,11 +337,11 @@ class DimensionResult(PolymorphicModel):
 class RatioScaleDimensionResult(DimensionResult):
     average = models.FloatField(default=None, blank=True, null=True, help_text='Average of scores for this dimension in this survey')
 
-
 #SURVEY INSTANCE COMPONENTS (SurveyInstance, SurveyInstanceItem(s))
 class SurveyInstance(models.Model):
     respondent = models.ForeignKey(Respondent, blank=True, null=True, on_delete=models.SET_NULL, help_text='')
     survey = models.ForeignKey(Survey, on_delete=models.PROTECT, help_text='')
+    consent_was_given = models.BooleanField(default=False, help_text='')
     completed = models.BooleanField(default=False, help_text='')
     started = models.BooleanField(default=False, help_text='')
 
@@ -374,7 +374,7 @@ class SurveyInstance(models.Model):
         return was_completed
 
     def get_hash_string(self):
-        
+
         hash_string = salted_hmac(
             "django.contrib.auth.tokens.PasswordResetTokenGenerator",
             urlsafe_base64_encode(force_bytes(10*self.respondent.email+str(self.pk+self.survey.pk+self.survey.owner.pk)+self.respondent.email)),

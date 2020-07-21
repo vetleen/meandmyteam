@@ -150,12 +150,14 @@ def sign_up(request):
             user.save()
             organization = Organization(
                 owner=user,
+                phone = form.cleaned_data['phone'],
                 name = form.cleaned_data['name'],
                 address_line_1 = form.cleaned_data['address_line_1'],
                 address_line_2 = form.cleaned_data['address_line_2'],
                 zip_code = form.cleaned_data['zip_code'],
                 city = form.cleaned_data['city'],
                 country = form.cleaned_data['country'],
+                accepted_terms_and_conditions = form.cleaned_data['accepted_terms_and_conditions'],
                 )
             organization.save()
             messages.success(request, 'Welcome aboard. Let\'s pick a plan.', extra_tags='alert alert-success')
@@ -226,6 +228,7 @@ def logout_view(request):
 def edit_account_view(request):
     """View function for editing account"""
     if request.user.is_authenticated:
+        print(request.user.organization.phone)
         form = EditAccountForm(initial={
                 #User model
                 'username': request.user,
@@ -240,6 +243,9 @@ def edit_account_view(request):
                 },
             user=request.user
             )
+        #print(type(request.user.organization.phone))
+        #print(request.user.organization.phone)
+        #print(dir(request.user.organization.phone))
         #If we receive POST data
         context = {
             'form': form,

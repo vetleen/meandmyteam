@@ -61,7 +61,10 @@ class TestViews(TestCase):
         )
         #create a survey and instance
         s = survey_logic.create_survey(owner=o, instrument_list=[i, ])
-        si_list = survey_logic.survey_instances_from_survey(s)
+        survey_instance_list = survey_logic.survey_instances_from_survey(s)
+        for survey_instance in survey_instance_list:
+            survey_instance.consent_was_given = True
+            survey_instance.save()
 
     def test_add_or_remove_employee_view(self):
         user = User.objects.get(id=1)
@@ -72,7 +75,7 @@ class TestViews(TestCase):
         self.assertRedirects(response, reverse('loginc')+"?next="+reverse('surveys-add-or-remove-employees'), 302, 200)
         self.assertTemplateNotUsed(response, 'add_or_remove_employees.html')
 
-        #test that we get the correct page when we log in and GET this page
+        #test GET workls for logged in user
         self.client.force_login(user=user)
         response = self.client.get(reverse('surveys-add-or-remove-employees'), follow=True, secure=True)
         self.assertTemplateUsed(response, 'add_or_remove_employees.html')
@@ -457,14 +460,35 @@ class TestViews(TestCase):
         survey_instance = SurveyInstance.objects.get(id=1)
         survey = Survey.objects.get(id=1)
 
-        #test that we can reach the page without pagination
+        #test that we can reach the non-paginated page by "just clicking the link" the first time
+        survey_instance.consent_was_given = False
+        survey_instance.save()
         response = self.client.get(reverse('surveys-answer-survey', args=[survey_instance.get_url_token()]), follow=True, secure=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'answer_survey.html')
         self.assertIn("Thank you for taking the time to answer this survey", response.content.decode())
         self.assertNotIn("item_1", response.content.decode())
 
-        #test that we can reach the page with pagination
+        #test that we are redirected to paginated pages when trying to go to non-paginated, if consent was given already
+        survey_instance.consent_was_given = True
+        survey_instance.save()
+        response = self.client.get(reverse('surveys-answer-survey', args=[survey_instance.get_url_token()]), follow=True, secure=True)
+        self.assertRedirects(response, reverse('surveys-answer-survey-pages', args=[survey_instance.get_url_token(), 1]), 302, 200)
+        self.assertNotIn("Thank you for taking the time to answer this survey", response.content.decode())
+        self.assertNotIn("Please indicate that you consent to answer the survey to continue", response.content.decode())
+        self.assertIn("Welcome back! We saved your place, so you can continue where you left off.", response.content.decode())
+
+        #test that we can NOT reach the page with pagination BEFORE consent is given
+        survey_instance.consent_was_given = False
+        survey_instance.save()
+        response = self.client.get(reverse('surveys-answer-survey-pages', args=[survey_instance.get_url_token(), 1]), follow=True, secure=True)
+        self.assertRedirects(response, reverse('surveys-answer-survey', args=[survey_instance.get_url_token()]), 302, 200)
+        self.assertIn("Thank you for taking the time to answer this survey", response.content.decode())
+        self.assertIn("Please indicate that you consent to answer the survey to continue", response.content.decode())
+
+        #test that we can reach the page with pagination AFTER consent is given
+        survey_instance.consent_was_given = True
+        survey_instance.save()
         response = self.client.get(reverse('surveys-answer-survey-pages', args=[survey_instance.get_url_token(), 1]), follow=True, secure=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'answer_survey.html')

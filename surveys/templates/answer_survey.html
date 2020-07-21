@@ -38,7 +38,7 @@
       </div>
     </div>
   </div>
-  {% else %}
+  {% else %} {# survey_instance.check_completed == True #}
   <div class="row justify-content-center">
     <div class="col-sm-8">
       <div class="card text-center">
@@ -48,29 +48,57 @@
         <div class="card-body">
           <h5 class="card-title">Thank you for taking the time to answer this survey</h5>
           <p class="card-text">
-The personal data we collect in this survey will be used to provide your
-organization with a picture of its strong and weak points regarding your
-well-being and motivation. We maintain your anonymity in the following manner:
-<br />
-            </p>
-            <p class="card-text">
-We do not directly tell your organization (or anyone else) WHO has answered WHAT
-to these questions. Yet, in some case, it may be possible to to guess. For
-example if everyone in your organization gives the same answer to a particular question.
+            The data we collect in this survey will be used to provide your
+            organization with a picture of its strong and weak points regarding your
+            well-being and motivation. We maintain your anonymity in the following manner:
+            <br />
           </p>
           <p class="card-text">
-Read our full <a href="{% url 'privacy-policy' %}" target="_blank">privacy policy&#11016;</a>.
+            We do not directly tell your organization (or anyone else) WHO has answered WHAT
+            to these questions. Yet, in some case, it may be possible to to guess. For
+            example if everyone in your organization gives the same answer to a particular question.
           </p>
-
-
-          <a href="{% url 'surveys-answer-survey-pages' survey_instance.get_url_token 1 %}" class="btn btn-info">Consent to gathering of personal data and start survey</a>
+          <p class="card-text">
+            Read our full <a href="{% url 'privacy-policy' %}" target="_blank">privacy policy&#11016;</a>.
+            <form method="post">
+              {% csrf_token %}
+              {% for hidden_field in form.hidden_fields %}
+                {{ hidden_field }}
+              {% endfor %}
+              <div class="form-group row">
+              <div class="col justify-content-right">
+              {% if form.is_bound %}
+                {% if form.consent_to_answer.errors %}
+                  {% render_field form.consent_to_answer class="form-control is-invalid" %}
+                  {% for error in form.consent_to_answer.errors %}
+                    <div class="invalid-feedback">
+                      {{ error }}
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  {% render_field form.consent_to_answer class="form-control is-valid" %}
+                {% endif %}
+              {% else %}
+                {% render_field form.consent_to_answer class="form-control" %}
+              {% endif %}
+              {% if consent_to_answer.help_text %}
+                <small class="form-text text-muted">{{ form.consent_to_answer.help_text }}</small>
+              {% endif %}
+        
+                {{ form.consent_to_answer.label_tag }}
+              </div>
+            </div><!-- form group row -->
+            <center><button type="submit" class="btn btn-info ">Start survey </button></center>
+          </form>
+          </p>
+          <!-- <a href="{% url 'surveys-answer-survey-pages' survey_instance.get_url_token 1 %}" class="btn btn-info">Consent to gathering of personal data and start survey</a> -->
         </div>
       </div>
     </div>
   </div>
-  {% endif %}
+  {% endif %} {# survey_instance.check_completed == True #}
 
-{% else %}
+{% else %} {# if page is None #}
 <div class="col-lg-6 offset-lg-3">
   <center>Progress: {{progress|floatformat:"0"}} %</center>
   <div class="progress" style="height: 20px;">

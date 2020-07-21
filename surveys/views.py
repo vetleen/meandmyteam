@@ -19,7 +19,7 @@ from surveys.core import survey_logic
 from payments.tools import stripe_logic
 
 #custom forms and models
-from surveys.forms import AddRespondentForm, EditRespondentForm, EditSurveySettingsForm, AnswerSurveyForm
+from surveys.forms import *
 from surveys.models import Respondent
 
 
@@ -60,7 +60,8 @@ def add_or_remove_employee_view(request):
 
             #also update stripe subscription quantity
             q = request.user.organization.update_stripe_subscription_quantity()
-            stripe_logic.modify_stripe_subscription(request.user.organization.stripe_subscription_id, quantity=q)
+            if request.user.organization.stripe_subscription_id is not None:
+                stripe_logic.modify_stripe_subscription(request.user.organization.stripe_subscription_id, quantity=q)
 
             #declare success and make a new form for the next employee
             messages.success(request, 'You have added a coworker (%s)! You can continue to add more below.'%(form.cleaned_data['email']), extra_tags='alert alert-success')
@@ -133,8 +134,9 @@ def delete_employee_view(request, **kwargs):
         respondent.delete()
         #also update stripe subscription quantity
         q = request.user.organization.update_stripe_subscription_quantity()
-        stripe_logic.modify_stripe_subscription(request.user.organization.stripe_subscription_id, quantity=q)
-        
+        if request.user.organization.stripe_subscription_id is not None:
+            stripe_logic.modify_stripe_subscription(request.user.organization.stripe_subscription_id, quantity=q)
+
         return HttpResponseRedirect(request.GET.get('next', reverse('surveys-add-or-remove-employees')))
 
 @login_required
@@ -339,8 +341,21 @@ def answer_survey_view(request, **kwargs):
 
     #if this view was requested without a page argument, we can skip forward a bit
     if page is None:
-        #Go directly to first unanswered item if survey was started but not completed:
-        if survey_instance.check_completed() == False and survey_instance.started == True:
+        #First check if method was post, and maybe update the consent variable
+        if request.method == 'POST':
+            form=ConsentToAnswerForm(request.POST)
+            context.update({'form': form})
+            #deal with data if it's valid
+            if form.is_valid():
+                survey_instance.consent_was_given = form.cleaned_data['consent_to_answer']
+                survey_instance.started = True
+                survey_instance.save()
+        #If its not post and we havent givent consent, we need to provide that form
+        if request.method != 'POST' and survey_instance.consent_was_given != True:
+            form = ConsentToAnswerForm()
+            context.update({'form': form})
+        #if consent was given, and if survey was started but not completed, go directly to where the respondent left off:
+        elif request.method != 'POST' and survey_instance.consent_was_given == True and survey_instance.check_completed() == False:
             items = survey_instance.surveyinstanceitem_set.all().order_by('pk')
             answered_item_counter = 0
             for item in items:
@@ -349,10 +364,17 @@ def answer_survey_view(request, **kwargs):
                     current_page = math.ceil((answered_item_counter/page_size))
                     messages.info(request, "Welcome back! We saved your place, so you can continue where you left off.", extra_tags='alert alert-info')
                     return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(url_token, current_page)))
+        #finally, R has given consent, but not started or completed the survey, send him to first page
+        elif request.method == 'POST' and survey_instance.consent_was_given == True and survey_instance.check_completed() == False:
+            return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(url_token, 1)))
 
-        #otherwise show a pretty plain view
+        #finally/otherwise show a plain welcoming view, or a thank you
         return render(request, 'answer_survey.html', context)
-
+    #if page is not none, make sure consent was given
+    else:
+        if survey_instance.consent_was_given != True:
+            messages.info(request, "Thank you for taking the time to answer this survey! Please indicate that you consent to answer the survey to continue.", extra_tags='alert alert-info')
+            return HttpResponseRedirect(reverse('surveys-answer-survey', args=[url_token]))
     #Show questions now that we know we are in the paginated part
     #make a list 'item_list' containing exactly the items the user should be asked
     all_survey_instance_items_list=survey_instance.surveyinstanceitem_set.all().order_by('pk')

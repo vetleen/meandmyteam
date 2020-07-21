@@ -281,7 +281,7 @@ class SurveyLogicTest(TestCase):
         #check that it worked
         survey_instances = SurveyInstance.objects.all()
         for si in survey_instances:
-            self.assertEqual(si.started, True)
+            #self.assertEqual(si.started, True) # -> removed the code that marks survey as started while answering questions, this is now handled by view
             self.assertEqual(si.completed, False)
             items = si.get_items()
             for i in items:

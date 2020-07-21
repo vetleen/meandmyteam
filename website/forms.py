@@ -24,11 +24,16 @@ class SignUpForm(forms.Form):
     zip_code = forms.CharField(max_length = 20, label="Zip*", widget=forms.TextInput(attrs={}))
     city = forms.CharField(max_length = 255, label="City", required=False, widget=forms.TextInput(attrs={}))
     country = CountryField(blank_label='(Select country)').formfield(label="Country*")
+    accepted_terms_and_conditions = forms.BooleanField(
+        label="I accept the terms and conditions and the privacy policy.",
+        required=True,
+        widget=forms.CheckboxInput(attrs={'default': 'false'})
+    )
 
     def clean_name(self):
         if User.objects.filter(organization__name=self.cleaned_data['name']).exists():
             if not User.objects.get(organization__name=self.cleaned_data['name']).owner == self.user:
-                print ('Compared %s with %s'%(User.objects.get(organization__name=self.cleaned_data['name']).owner, self.user))
+                #print ('Compared %s with %s'%(User.objects.get(organization__name=self.cleaned_data['name']).owner, self.user))
                 raise forms.ValidationError(
                     "An organization with that name already exists (%(taken_name)s).",
                     code='invalid',
@@ -61,6 +66,15 @@ class SignUpForm(forms.Form):
                code='invalid',
                 )
         return self.cleaned_data['confirm_password']
+
+    def clean_accepted_terms_and_conditions(self):
+        if self.cleaned_data['accepted_terms_and_conditions'] != True:
+            raise forms.ValidationError(
+                "Please indicate that you accept the terms and conditions.",
+                code='invalid',
+                params={'accepted_terms_and_conditions': self.cleaned_data['accepted_terms_and_conditions']}
+            )
+        return self.cleaned_data['accepted_terms_and_conditions']
 
 class ChangePasswordForm(forms.Form):
     def __init__(self, *args, **kwargs):

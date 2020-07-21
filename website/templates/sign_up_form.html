@@ -245,7 +245,31 @@
           {% endif %}
         </div>
 
+        <hr>
 
+        <div class="form-check my-3">
+
+          {% if form.is_bound %}
+            {% if form.accepted_terms_and_conditions.errors %}
+              {% render_field form.accepted_terms_and_conditions class="form-check-input is-invalid" %}
+              {% for error in form.accepted_terms_and_conditions.errors %}
+                <div class="invalid-feedback">
+                  {{ error }}
+                </div>
+              {% endfor %}
+            {% else %}
+              {% render_field form.accepted_terms_and_conditions class="form-check-input is-valid" %}
+            {% endif %}
+          {% else %}
+            {% render_field form.accepted_terms_and_conditions class="form-check-input" %}
+          {% endif %}
+          {% if accepted_terms_and_conditions.help_text %}
+            <small class="form-text text-muted">{{ form.accepted_terms_and_conditions.help_text }}</small>
+          {% endif %}
+          <label class="form-check-label" for="defaultCheck1">
+            I accept the <a href="{% url 'terms-and-conditions' %}" target="_blank">terms and conditions&#11016;</a> and the <a href="{% url 'privacy-policy' %}" target="_blank">privacy policy&#11016;</a>.
+          </label>
+        </div>
 
 
         <button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button>

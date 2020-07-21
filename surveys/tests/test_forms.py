@@ -12,8 +12,6 @@ from surveys.core import survey_logic
 #third party
 from datetime import date, timedelta
 
-
-
 #from django.urls import reverse
 #from django.test import Client
 #from django.contrib.auth.models import AnonymousUser, User
@@ -183,3 +181,18 @@ class FormsTest(TestCase):
     def test_AnswerSurveyForm(self):
         #test: make and test a simple valid form
         pass
+
+    def test_ConsentToAnswerForm(self):
+        #test: make and test a simple valid form
+        data = {
+            'consent_to_answer': True,
+                    }
+        test_form = ConsentToAnswerForm(data=data)
+        self.assertTrue(test_form.is_valid())
+
+        #test: make and test a simple invalid form
+        data = {
+            'consent_to_answer': False,
+                    }
+        test_form = ConsentToAnswerForm(data=data)
+        self.assertFalse(test_form.is_valid())

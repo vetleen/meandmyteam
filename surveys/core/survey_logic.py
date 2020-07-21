@@ -239,11 +239,6 @@ def answer_item(survey_instance_item, answer):
     survey_instance_item.answered = True
     survey_instance_item.save()
 
-    #make sure the survey instance is marked as started
-    if survey_instance_item.survey_instance.started==False:
-        survey_instance_item.survey_instance.started=True
-        survey_instance_item.survey_instance.save()
-
     #return it for future use
     return survey_instance_item
 

@@ -6,7 +6,6 @@ from django_countries.fields import CountryField
 from surveys.models import SurveyInstanceItem, RatioSurveyInstanceItem
 
 
-
 class AddRespondentForm(forms.Form):
     email = forms.EmailField(max_length = 150, label="Email address", widget=forms.TextInput(attrs={'placeholder': 'Required'}))
     first_name = forms.CharField(max_length = 255, label="First name", required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
@@ -70,6 +69,23 @@ class CustomChoiceField(forms.ChoiceField):
         self.min_value_description = kwargs.pop('min_value_description', 'Disagree')
         self.max_value_description = kwargs.pop('max_value_description', 'Agree')
         super(CustomChoiceField, self).__init__(*args, **kwargs)
+
+
+class ConsentToAnswerForm(forms.Form):
+    consent_to_answer = forms.BooleanField(
+        label="I consent to the collection of information in this survey",
+        required=True,
+        widget=forms.CheckboxInput(attrs={'default': 'false'})
+    )
+    def clean_consent_to_answer(self):
+        if self.cleaned_data['consent_to_answer'] != True:
+            raise forms.ValidationError(
+                "Please indicate that you consent to answer this survey to continue.",
+                code='invalid',
+                params={'consent_to_answer': self.cleaned_data['consent_to_answer']}
+            )
+        return self.cleaned_data['consent_to_answer']
+
 
 class AnswerSurveyForm(forms.Form):
 
