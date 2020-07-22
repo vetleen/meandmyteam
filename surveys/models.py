@@ -411,6 +411,7 @@ class SurveyInstance(models.Model):
 class SurveyInstanceItem(PolymorphicModel):
     survey_instance = models.ForeignKey(SurveyInstance, on_delete=models.PROTECT, help_text='')
     answered = models.BooleanField(default=False, help_text='')
+    chose_to_not_answer = models.BooleanField(default=False, help_text='')
 
     def survey(self):
         return self.survey_instance.survey
@@ -440,15 +441,28 @@ class RatioSurveyInstanceItem(SurveyInstanceItem):
         return self.survey_item.item_dimension
 
     def answer_item(self, value):
-        #answer the item
-        self.answer = value
         self.answered = True
+        if value == "chose_to_not_answer":
+            self.chose_to_not_answer = True
+        else:
+            try:
+                int(value)
+            except Exception as err:
+                raise ValidationError(
+                    "Was unable to convert an answer ('%(value)s') to a ratiosurveyInstanceItem into type int. Got error: %(err)s",
+                    code='invalid',
+                    params={
+                        'value': value,
+                        'error': err
+                        }
+                )
+            self.answer = value
         self.save()
-        #update status of survey_instance
-        self.survey_instance.check_completed()
-        if self.survey_instance.started == False:
-            self.survey_instance.started == True
-            self.survey_instance.save()
+        #update status of survey_instance # -> this is now handled in view
+        #self.survey_instance.check_completed()
+        #if self.survey_instance.started == False:
+        #    self.survey_instance.started = True
+        #    self.survey_instance.save()
 
     def save(self, *args, **kwargs):
         ##Ensure some parameters cannot be changed

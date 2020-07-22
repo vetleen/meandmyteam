@@ -275,7 +275,7 @@ class ModelsTest(TestCase):
 
         self.assertEqual(si.check_completed(), False)
         self.assertEqual(si.completed, False)
-        survey_logic.answer_item(rsii, 2)
+        rsii.answer_item(2)
         survey_logic.close_survey(su)
         self.assertEqual(si.check_completed(), True)
         self.assertEqual(si.completed, True)

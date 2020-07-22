@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 
@@ -179,8 +180,57 @@ class FormsTest(TestCase):
 
 
     def test_AnswerSurveyForm(self):
-        #test: make and test a simple valid form
-        pass
+        #some setup
+        call_command('setupinstruments')
+        self.assertEqual(len(Instrument.objects.all()), 1)
+        self.assertEqual(len(Dimension.objects.all()), 3)
+        self.assertEqual(len(Scale.objects.all()), 1)
+        self.assertEqual(len(Item.objects.all()), 17)
+
+        organization = Organization.objects.get(id=1)
+        instrument = Instrument.objects.get(id=1)
+        user = User(username="myformuser@motpanel.com", password="ksjdhf65&6")
+        user.save()
+        organization.owner=user
+        organization.save()
+
+        survey_setting = survey_logic.configure_survey_setting(
+            organization=organization,
+            instrument=instrument,
+            is_active=True
+        )
+
+        call_command('dailysurveytasks')
+        si_list = SurveyInstance.objects.all()
+        self.assertEqual(len(si_list), 1)
+        survey_instance = si_list[0]
+
+        all_survey_instance_items_list=survey_instance.surveyinstanceitem_set.all().order_by('pk')
+        item_list = []
+        last_item_id = 5
+        for count, item in enumerate(all_survey_instance_items_list):
+            if count < last_item_id and count >= (last_item_id-5):
+                item_list.append(item)
+
+        #Test that we can make a valid form with normal numbers
+        test_form=AnswerSurveyForm(items=item_list)
+        data={}
+        for field in test_form.visible_fields():
+            data.update({field.name: 1})
+        test_form=AnswerSurveyForm(items=item_list, data=data)
+        self.assertTrue(test_form.is_valid())
+
+        #Test that we can choose not to answer
+        for field in test_form.visible_fields():
+            data.update({field.name: "chose_to_not_answer"})
+        test_form=AnswerSurveyForm(items=item_list, data=data)
+        self.assertTrue(test_form.is_valid())
+
+        #test that other answers are not approved
+        for field in test_form.visible_fields():
+            data.update({field.name: "Yes"})
+        test_form=AnswerSurveyForm(items=item_list, data=data)
+        self.assertFalse(test_form.is_valid())
 
     def test_ConsentToAnswerForm(self):
         #test: make and test a simple valid form

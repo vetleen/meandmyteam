@@ -240,7 +240,7 @@ class SurveyLogicTest(TestCase):
             for i in items:
                 self.assertEqual(i.answer, None)
                 self.assertEqual(i.answered, False)
-                survey_logic.answer_item(i, 4)
+                i.answer_item(4)
 
         #check that it worked
         for si in survey_instances:
@@ -276,7 +276,7 @@ class SurveyLogicTest(TestCase):
             for i in items:
                 self.assertEqual(i.answer, None)
                 self.assertEqual(i.answered, False)
-                survey_logic.answer_item(i, 3)
+                i.answer_item(3)
 
         #check that it worked
         survey_instances = SurveyInstance.objects.all()

@@ -114,7 +114,7 @@ class Command(BaseCommand):
                     logger.info("... ...  %s is answering..."%(tsinstance.respondent))
                     for titem in tsinstance.get_items():
                         answer_value = random.randint(titem.survey_item.item_dimension.scale.min_value, titem.survey_item.item_dimension.scale.max_value)
-                        titem = survey_logic.answer_item(titem, answer_value)
+                        titem.answer_item(answer_value)
                 survey_instance.check_completed()
 
             #close survey

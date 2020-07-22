@@ -521,17 +521,35 @@ class TestViews(TestCase):
         #test that we are redirected to the first page with an unanswered question if survey is started, but not completed, and we follow the link again
         si_items = survey_instance.get_items()
         self.assertEqual(len(si_items), 6)
-        survey_logic.answer_item(si_items[0], 3)
+        si_items[0].answer_item(3)
         response = self.client.get(reverse('surveys-answer-survey', args=[survey_instance.get_url_token()]), follow=True, secure=True)
         self.assertRedirects(response, reverse('surveys-answer-survey-pages', args=[survey_instance.get_url_token(), 1]), 302, 200)
         self.assertIn("Welcome back! We saved your place, so you can continue where you left off.", response.content.decode())
-        survey_logic.answer_item(si_items[1], 3)
-        survey_logic.answer_item(si_items[2], 3)
-        survey_logic.answer_item(si_items[3], 3)
-        survey_logic.answer_item(si_items[4], 3)
+        si_items[1].answer_item(3)
+        si_items[2].answer_item("chose_to_not_answer")
+        si_items[3].answer_item(3)
+        si_items[4].answer_item(3)
         response = self.client.get(reverse('surveys-answer-survey', args=[survey_instance.get_url_token()]), follow=True, secure=True)
         self.assertRedirects(response, reverse('surveys-answer-survey-pages', args=[survey_instance.get_url_token(), 2]), 302, 200)
         self.assertIn("Welcome back! We saved your place, so you can continue where you left off.", response.content.decode())
+
+        #test that we are given the option not to answer
+        #print(response.content.decode())
+        self.assertIn("I don&#39;t know, or I don&#39;t want to answer", response.content.decode())
+        self.assertIn("value=\"chose_to_not_answer\"", response.content.decode())
+
+        #test that we can post answers successfully
+        valid_data = {
+            'item_5': "chose_to_not_answer",
+            'item_6': 2
+            }
+        response = self.client.post(reverse('surveys-answer-survey-pages', args=[survey_instance.get_url_token(), 2]), valid_data, follow=True, secure=True)
+        self.assertRedirects(response, reverse('surveys-answer-survey', args=[survey_instance.get_url_token()]), 302, 200)
+        self.assertIn("The survey has been successfully completed, and your answers saved.", response.content.decode())
+
+        si_items = survey_instance.get_items()
+        for item in si_items:
+            self.assertTrue(item.answered)
 
         #test closed survey is 404-ed
         survey = survey_logic.close_survey(survey)

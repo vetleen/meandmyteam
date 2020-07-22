@@ -84,7 +84,7 @@
               {% if consent_to_answer.help_text %}
                 <small class="form-text text-muted">{{ form.consent_to_answer.help_text }}</small>
               {% endif %}
-        
+
                 {{ form.consent_to_answer.label_tag }}
               </div>
             </div><!-- form group row -->
@@ -112,44 +112,45 @@
           {{ hidden_field }}
         {% endfor %}
 {% for field in form.visible_fields %}
-<div class="card mb-4
-{% if form.is_bound %}
-  {% if field.errors %}
-border-danger
-  {% else %}
-border-success
-  {% endif %}
-{% endif %}
-">
-  <div class="card-header text-muted">
-    {% if field.help_text %}
-      <span class="form-text text-muted">{{ field.help_text }}</span>
-    {% endif %}
-  </div> <!-- card header -->
-  <div class="card-body">
-  <h4>{{ field.label_tag }}</h4>
-  {{ field.field.min_value_description|capfirst }}
-  {% for radio in field %}
-  <div class="form-check form-check-inline">
-    {{ radio.tag }}
-    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-  </div>
-  {% endfor %}
+  <div class="card mb-4 {% if form.is_bound %}{% if field.errors %}border-danger{% else %}border-success{% endif %}{% endif %}">
+    <div class="card-header text-muted">
+      {% if field.help_text %}
+        <span class="form-text text-muted">{{ field.help_text }}</span>
+      {% endif %}
+    </div> <!-- card header -->
+    <div class="card-body">
+    <h4>{{ field.label_tag }}</h4>
 
-  {{ field.field.max_value_description|capfirst }}
-
-  {% if form.is_bound %}
-    {% if field.errors %}
-      {% for error in field.errors %}
-        <div class="invalid-feedback">
-          {{ error }}
+      {% for radio in field %}
+        {% if forloop.counter == 1 %}
+          {{ field.field.min_value_description|capfirst }}
+        {% endif %}
+        {% if forloop.revcounter == 1 and field.field.opt_out == True %}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        {% endif %}
+        <div class="form-check form-check-inline">
+          {{ radio.tag }}
+          <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
         </div>
+        {% if forloop.revcounter == 2 and field.field.opt_out == True %}
+          {{ field.field.max_value_description|capfirst }}
+        {% elif forloop.revcounter == 1 and field.field.opt_out == False %}
+          {{ field.field.max_value_description|capfirst }}
+        {% endif %}
       {% endfor %}
-    {% endif %}
-  {% endif %}
+      <br>
 
+      {% if form.is_bound %}
+        {% if field.errors %}
+          {% for error in field.errors %}
+            <div class="invalid-feedback">
+              {{ error }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endif %}
     </div> <!-- card body -->
-</div> <!-- card -->
+  </div> <!-- card -->
 {% endfor %}
 
 <center><button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button></center>

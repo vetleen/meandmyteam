@@ -226,21 +226,22 @@ def survey_instances_from_survey(survey):
     survey.save()
     return si_list
 
-def answer_item(survey_instance_item, answer):
-    #validate input
-    assert isinstance(survey_instance_item, SurveyInstanceItem), \
-        "'survey_instance_item' must be a SurveyInstanceItem object, but was %s"%(type(survey_instance_item))
-    if isinstance(survey_instance_item, RatioSurveyInstanceItem):
-        assert isinstance(answer, int), \
-            "'answer' to a RatioSurveyInstanceItem must be an int, but was %s"%(type(answer))
-
-    #answer the item
-    survey_instance_item.answer = answer
-    survey_instance_item.answered = True
-    survey_instance_item.save()
-
-    #return it for future use
-    return survey_instance_item
+#dealt with in model
+#def answer_item(survey_instance_item, answer):
+#    #validate input
+#    assert isinstance(survey_instance_item, SurveyInstanceItem), \
+#        "'survey_instance_item' must be a SurveyInstanceItem object, but was %s"%(type(survey_instance_item))
+#    if isinstance(survey_instance_item, RatioSurveyInstanceItem):
+#        assert isinstance(answer, int), \
+#            "'answer' to a RatioSurveyInstanceItem must be an int, but was %s"%(type(answer))
+#
+#    #answer the item
+#    survey_instance_item.answer = answer
+#    survey_instance_item.answered = True
+#    survey_instance_item.save()
+#
+#    #return it for future use
+#    return survey_instance_item
 
 def close_survey(survey):
     #validate input
@@ -317,22 +318,24 @@ def close_survey(survey):
                 rsitem_total = 0
                 rsitem_n = 0
                 rsitem_avg = 0
+                rs_item_blank_answers = 0
                 #go through and grab the numbers needed to close the item
                 for sii in sii_list:
                     if sii.answered==True:
-                        #only count answered
-                        rsitem_total += sii.answer
-                        rsitem_n += 1
+                        if sii.answer is not None:
+                            rsitem_total += sii.answer
+                            rsitem_n += 1
+                        else:
+                            rs_item_blank_answers+=1
                 #find the average for the SurveyItem
                 if rsitem_n > 0:
                     rsitem_avg = (rsitem_total/rsitem_n)
                 #save the average if this SurveyItem to the db
                 rsitem.average = rsitem_avg
-                rsitem.n_answered = rsitem_n
+                rsitem.n_answered = rsitem_n + rs_item_blank_answers
                 rsitem.save()
 
             #Calculate avergaes and completed-states for each dimension
-
             #initiate counters
             rsdr_total = 0
             rsdr_n = 0
@@ -350,8 +353,9 @@ def close_survey(survey):
                 for rsii in rsii_list:
                     if rsii.dimension() == dr.dimension:
                         if rsii.answered == True:
-                            sinstance_dimension_total += rsii.answer
-                            sinstance_dimension_n += 1
+                            if rsii.answer is not None:
+                                sinstance_dimension_total += rsii.answer
+                                sinstance_dimension_n += 1
                         else:
                             dimension_completed = False
                             break

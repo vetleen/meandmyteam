@@ -426,8 +426,8 @@ def answer_survey_view(request, **kwargs):
 
                 # find the value that has been provided as the answer
                 if isinstance(item, RatioSurveyInstanceItem):
-                    value=int(posted_form.cleaned_data[answer])
-
+                    value=posted_form.cleaned_data[answer]
+                    
                 #elif other types of scales
                 else:
                     logger.warning(

@@ -1,12 +1,12 @@
 ##MeAndMyTeam
 
 #dev
-Change payments so that verification is disconnected from payment method
+full test of close_survey(survey) in survey logic, are results, n-completed etc. calculated correctly?
+
 
 # BEFORE LAUNCH
-add support for None in answers to surveys - "i dont want to answer/don't know"
-
-search engine optimization including analytics
+Change payments so that verification is disconnected from payment method
+search engine optimization including analytics -> https://bhoey.com/blog/adding-google-analytics-to-django-templates/
 
 #AFTER LAUNCH
 tests for payments
