@@ -608,7 +608,56 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
 
         #check that trying to close it AGAIN raises assertion error
         self.assertRaises(AssertionError, try_close_w_is_close_true)
+        
 
+    def test_close_survey_and_check_if_correct_sums(self):
+        organization = Organization.objects.get(id=1)
+        instrument = Instrument.objects.get(id=1)
+        #create little employees
+        employee_target = 7
+        existing_employees = Respondent.objects.filter(organization=organization)
+        if len(existing_employees) < employee_target:
+            for e in range(employee_target-len(existing_employees)):
+                email = "testemployee" + str(e+1+len(existing_employees)) + "@aa.aa"
+                employee = Respondent(organization=organization, email=email)
+                employee.save()
+        self.assertEqual(len(Respondent.objects.all()), employee_target)
+
+        #start a survey, make instances and answer
+        survey = survey_logic.create_survey(owner=organization, instrument_list=[instrument, ])
+        survey_instance_list = survey_logic.survey_instances_from_survey(survey)
+        for survey_instance in survey_instance_list:
+                for item in survey_instance.get_items():
+                    answer_value = 3 #random.randint(titem.survey_item.item_dimension.scale.min_value, titem.survey_item.item_dimension.scale.max_value)
+                    if survey_instance.id == 1:
+                        answer_value = "chose_to_not_answer"
+                    item.answer_item(answer_value)
+                    item = SurveyInstanceItem.objects.get(id=item.id)
+                survey_instance.check_completed()
+                
+        self.assertEqual(len(Survey.objects.all()), 1)
+        self.assertEqual(len(SurveyInstance.objects.all()), employee_target)
+        for survey_instance in survey_instance_list:
+            for item in survey_instance.get_items():
+                self.assertEqual(item.answered, True)
+                if item.survey_instance.id == 1:
+                    self.assertEqual(item.answer, None)
+                else:
+                    self.assertEqual(item.answer, 3)
+        
+        #close survey
+        self.assertEqual(len(Survey.objects.filter(is_closed=True)), 0)
+        survey_logic.close_survey(survey)
+        self.assertEqual(len(Survey.objects.filter(is_closed=True)), 1)
+        
+        #test that the SurveyItems and DimensionResults were calculated correctly
+        survey = Survey.objects.get(id=1)
+        survey_items = survey.get_items()
+        for item in survey_items:
+            self.assertEqual(item.average, 3)
+        for dimension_result in survey.dimensionresult_set.all():
+            self.assertEqual(dimension_result.average, 3)
+                
 
     def test_send_email_for_survey_instance(self):
         o=Organization.objects.get(id=1)

@@ -1,0 +1,68 @@
+
+#VBOX guest additions
+sudo apt update
+sudo apt upgrade
+sudo apt install build-essential dkms linux-headers-$(uname -r)
+Devices => click on Insert Guest Additions CD image => Run => enter when done
+Restart
+
+#Chrome
+google and install
+
+#python
+python3 -V #confirms python
+sudo apt install python3-pip
+
+#venv
+sudo pip3 install virtualenvwrapper
+
+#.bashrc - PS1 aliases
+find PS1 in .bashrc, fix it
+
+add:
+alias python="python3"
+alias pip="pip3"
+export WORKON_HOME=$HOME/.virtualenvs
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+export VIRTUALENVWRAPPER_VIRTUALENV_ARGS=' -p /usr/bin/python3 '
+export PROJECT_HOME=$HOME/Devel
+source /usr/local/bin/virtualenvwrapper.sh
+
+run:
+source ~/.bashrc
+
+#setup venv
+mkvirtualenv myenv
+
+#git
+sudo apt-get install git
+which git #confirm
+git config --global user.name "Your name here"
+git config --global user.email "your_email@example.com"
+git config --global color.ui true
+
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+eval "$(ssh-agent -s)" #-> Agent pid 59566
+ssh-add ~/.ssh/id_rsa
+sudo apt-get install xclip
+xclip -sel clip < ~/.ssh/id_rsa.pub
+-> now paste that into github settings
+ssh -vT git@github.com #verifies that we're authenticated
+
+#grab an IDE
+have tried: visual studio code, atom
+#VS Code
+https://stackoverflow.com/questions/43454967/disable-wavy-underline-in-vs-code
+
+
+#clone repo
+cd into repo
+sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
+pip3 install -r requirements.txt 
+python manage.py migrate
+python manage.py collectstatic
+python manage.py runserver
+
+
+
+
