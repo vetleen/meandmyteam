@@ -24,7 +24,7 @@ class Command(BaseCommand):
     def handle(*args, **kwargs):
         logger.warning("\nCreating someone to test on...")
         #create a test organization (after running this command, you can log in with these credentials)
-        tusername = "testuser4@aa.aa"
+        tusername = "testuser@aa.aa"
         tuser = None
         try:
             tuser = User.objects.get(username=tusername)
@@ -118,7 +118,7 @@ class Command(BaseCommand):
                 logger.warning("... ...  %s is answering..."%(tsinstance.respondent))
                 for titem in tsinstance.get_items():
                     answer_value = random.randint(titem.survey_item.item_dimension.scale.min_value, titem.survey_item.item_dimension.scale.max_value)
-                    titem = survey_logic.answer_item(titem, answer_value)
+                    titem.answer_item(answer_value)
                 tsinstance.check_completed()
 
             #close survey

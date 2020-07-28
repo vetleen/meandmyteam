@@ -269,11 +269,12 @@ def close_survey(survey):
         sii_list = si.get_items()
 
         #make up status of entire SurveyInstance, to be counted further down...
-        was_began = False
+        was_begun = False
         was_completed = True
+        #check if this item was answered, if so the survey was started, if not, it cannot have been completed
         for sii in sii_list:
             if sii.answered == True:
-                was_began=True
+                was_begun=True
             else:
                 was_completed=False
 
@@ -282,14 +283,14 @@ def close_survey(survey):
             si.completed = True
             si.started = True
             n_completed += 1
-        elif was_began == True:
+        elif was_begun == True:
             si.completed = False
             si.started = True
             n_incomplete += 1
         else:
             si.completed = False
             si.started = False
-            n_incomplete += 1
+            n_not_started += 1 
         #save survey_instance
         si.save()
 

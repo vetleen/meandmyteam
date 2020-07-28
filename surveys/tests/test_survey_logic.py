@@ -32,7 +32,7 @@ logging.disable(logging.CRITICAL)
 #logging.disable(logging.NOTSET)
 
 # Create your tests here.
-
+'''
 class SurveyLogicTest(TestCase):
 
     def setUp(self):
@@ -363,7 +363,7 @@ class SurveyLogicTest(TestCase):
         self.assertEqual(data['instrument'], i)
         self.assertEqual(len(data['surveys']), 3)
         self.assertEqual(data['surveys'][0], gfrs_data)
-
+    '''
 
 class SurveyLogicTest_dailytaskfunctions(TestCase):
 
@@ -388,7 +388,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         ss = survey_logic.configure_survey_setting(organization=o, instrument=i, is_active=True)
         ss.save()
 
-
+    '''
     def test_create_survey_if_due(self):
         o=Organization.objects.get(id=1)
         i=Instrument.objects.get(id=1)
@@ -609,7 +609,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         #check that trying to close it AGAIN raises assertion error
         self.assertRaises(AssertionError, try_close_w_is_close_true)
         
-
+    '''
     def test_close_survey_and_check_if_correct_sums(self):
         organization = Organization.objects.get(id=1)
         instrument = Instrument.objects.get(id=1)
@@ -624,26 +624,46 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         self.assertEqual(len(Respondent.objects.all()), employee_target)
 
         #start a survey, make instances and answer
+        # id #1  choses not to answer any questions
+        # id #2 never opened the survey
+        # id #3 only answered a few questions
+        # the rest answers 3 to every question
         survey = survey_logic.create_survey(owner=organization, instrument_list=[instrument, ])
         survey_instance_list = survey_logic.survey_instances_from_survey(survey)
         for survey_instance in survey_instance_list:
-                for item in survey_instance.get_items():
-                    answer_value = 3 #random.randint(titem.survey_item.item_dimension.scale.min_value, titem.survey_item.item_dimension.scale.max_value)
-                    if survey_instance.id == 1:
-                        answer_value = "chose_to_not_answer"
-                    item.answer_item(answer_value)
-                    item = SurveyInstanceItem.objects.get(id=item.id)
+                if survey_instance.id != 2:
+                    for id, item in enumerate(survey_instance.get_items()):
+                        answer_value = 3 #random.randint(titem.survey_item.item_dimension.scale.min_value, titem.survey_item.item_dimension.scale.max_value)
+                        if survey_instance.id == 1:
+                            answer_value = "chose_to_not_answer"
+                        if survey_instance.id == 3:
+                            if id == 1 or id == 2 or id == 3:
+                                item.answer_item(answer_value)
+                                #print("answered %s to question %s in survey_instance %s."%(answer_value, id, survey_instance.id))
+                        else:
+                            item.answer_item(answer_value)
+                            #print("answered %s to question %s in survey_instance %s."%(answer_value, id, survey_instance.id))
+                        item = SurveyInstanceItem.objects.get(id=item.id)
                 survey_instance.check_completed()
                 
         self.assertEqual(len(Survey.objects.all()), 1)
         self.assertEqual(len(SurveyInstance.objects.all()), employee_target)
         for survey_instance in survey_instance_list:
-            for item in survey_instance.get_items():
-                self.assertEqual(item.answered, True)
-                if item.survey_instance.id == 1:
+            if survey_instance.id != 2 and survey_instance.id != 3:
+                for item in survey_instance.get_items():
+                    self.assertEqual(item.answered, True)
+                    if item.survey_instance.id == 1:
+                        self.assertEqual(item.answer, None)
+                    else:
+                        self.assertEqual(item.answer, 3)
+            elif survey_instance.id == 2:
+                for item in survey_instance.get_items():
+                    self.assertEqual(item.answered, False)
                     self.assertEqual(item.answer, None)
-                else:
-                    self.assertEqual(item.answer, 3)
+            elif survey_instance.id == 3:
+                self.assertEqual(survey_instance.check_completed(), False)
+                for item in survey_instance.get_items():
+                    pass
         
         #close survey
         self.assertEqual(len(Survey.objects.filter(is_closed=True)), 0)
@@ -657,6 +677,12 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
             self.assertEqual(item.average, 3)
         for dimension_result in survey.dimensionresult_set.all():
             self.assertEqual(dimension_result.average, 3)
+        
+        #test that n-answered is correct
+        self.assertEqual(survey.n_invited, 7)
+        self.assertEqual(survey.n_completed, 5)
+        self.assertEqual(survey.n_incomplete, 1)
+        self.assertEqual(survey.n_not_started, 1)
                 
 
     def test_send_email_for_survey_instance(self):
