@@ -160,7 +160,7 @@ def sign_up(request):
                 accepted_terms_and_conditions = form.cleaned_data['accepted_terms_and_conditions'],
                 )
             organization.save()
-            messages.success(request, 'Welcome aboard. Let\'s pick a plan.', extra_tags='alert alert-success')
+            messages.success(request, "Welcome aboard. Let's start by adding some employees to survey!", extra_tags='alert alert-success')
             send_mail(
                 '[www] New user: %s!'%(user.username),
                 'User: %s has signed up!'%(user.username),
@@ -185,7 +185,7 @@ def login_view(request):
 
     #If we receive POST data
     if request.method == 'POST':
-        # Create a form instance and populate it with data from the request (binding):
+        # Create a form instance and populate it with data from the request (binding it):
         form = LoginForm(request.POST)
         context = {
             'submit_button_text': 'Login',
@@ -193,22 +193,16 @@ def login_view(request):
             }
         # Check if the form is valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+            # process the data in form.cleaned_data as required
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            #print("username was: %s and password: " % username, password)
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                #print("user was not none")
+                request.user.organization.update_subscription_paid_until()
                 auth.login(request, user)
-                #print("user is: %s" % request.user)
-                #print("user is authenticated?: %s" % request.user.is_authenticated)
                 messages.success(request, 'You have logged in.', extra_tags='alert alert-success')
 
                 return HttpResponseRedirect(request.GET.get('next', '/'))
-            else:
-                #I don't see this happening, as my form validation should take care of this
-                messages.error(request, "Username and password did not match, please try again.", extra_tags='alert alert-warning')
     else:
         #make context
         form = LoginForm
@@ -243,9 +237,7 @@ def edit_account_view(request):
                 },
             user=request.user
             )
-        #print(type(request.user.organization.phone))
-        #print(request.user.organization.phone)
-        #print(dir(request.user.organization.phone))
+
         #If we receive POST data
         context = {
             'form': form,

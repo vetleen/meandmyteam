@@ -48,7 +48,7 @@ def current_plan_view(request):
     #if there is a sub_id, get the subscription object from Stripe,
     stripe_subscription = None
     if stripe_subscription_id is not None and stripe_subscription_id != '':
-        #UPDATE QUANTITY HERE?
+        #UPDATE QUANTITY HERE? -> No, this should be handled in the add/delete employee views now
         stripe_subscription = retrieve_stripe_subscription(stripe_subscription_id)
     if stripe_subscription_id is not None and stripe_subscription is None:
         logger.warning("%s %s: current_plan_view: Unable to get a Subscription object from Stripe for user %s, and sub_id %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user, stripe_subscription_id))
@@ -313,12 +313,19 @@ def create_subscription_view(request, **kwargs):
 
         #get the Customer object ID
         stripe_id = request.user.organization.stripe_id
+
+        #create subscription with stripe
         s = create_stripe_subscription(stripe_id, subscription_id, trial_from_plan=True, quantity=quantity)
         request.user.organization.stripe_subscription_id=s.id
         request.user.organization.save()
+        #check if succeeded
         if s is not None:
+            #declare success
             messages.success(request, 'Your subscription was started!', extra_tags='alert alert-success')
+            #update payment status
+            request.user.organization.update_subscription_paid_until()
         else:
+            #log failure
             logger.warning("%s %s: create_subscription_view: Tried to start subscription for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
             messages.warning(request, 'We tried to start your subscription, but something went wrong. You can try again, and we\'ll make sure you don\'t get charged twice!', extra_tags='alert alert-warning')
 
@@ -337,6 +344,8 @@ def cancel_subscription_view(request, **kwargs):
             cs = cancel_stripe_subscription(subscription_id)
             if cs is not None:
                 messages.success(request, 'Your subscription was cancelled, it will not renew next billing cycle.', extra_tags='alert alert-success')
+                #update payment status
+                request.user.organization.update_subscription_paid_until()
             else:
                 logger.warning("%s %s: cancel_subscription_view: Tried to cancel subscription for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
                 messages.warning(request, 'We tried to cancel your subscription, but it may not have work.Try again later, or contact support.', extra_tags='alert alert-warning')
@@ -356,6 +365,8 @@ def restart_cancelled_subscription_view(request, **kwargs):
             rs = restart_cancelled_stripe_subscription(subscription_id)
             if rs is not None:
                 messages.success(request, 'Your subscription was restarted!', extra_tags='alert alert-success')
+                #update payment status
+                request.user.organization.update_subscription_paid_until()
             else:
                 logger.warning("%s %s: restart_cancelled_subscription_view: Tried to restart subscription for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
                 messages.warning(request, 'We tried to restart your subscription, but it may not have worked. Try again later, or contact support.', extra_tags='alert alert-warning')
@@ -374,6 +385,8 @@ def change_subscription_price_view(request, **kwargs):
         s = change_stripe_subscription_price(request.user.organization.stripe_subscription_id, price_id, quantity=request.user.organization.update_stripe_subscription_quantity())
         if s is not None:
             messages.success(request, 'Your subscription was updated with the chosen plan!', extra_tags='alert alert-success')
+            #update payment status
+            request.user.organization.update_subscription_paid_until()
         else:
             logger.warning("%s %s: change_subscription_price_view: Tried to changet subscription Price for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
             messages.warning(request, 'We tried to update your subscription, but it may not have worked. Try again later, or contact support.', extra_tags='alert alert-warning')

@@ -271,7 +271,7 @@ class TestViews(TestCase):
         self.assertEqual(response.context['employee_count'], 1)
         self.assertEqual(len(response.context['employee_list']), 1)
         self.assertEqual(response.context['employee_list'][0], employee)
-        self.assertEqual(response.context['stripe_subscription'], None)
+        self.assertEqual(response.context['subscription_paid'], False)
         self.assertEqual(response.context['inactive_instrument_list'], [])
         self.assertEqual(response.context['active_instrument_data'][0]['instrument'], instrument)
         self.assertEqual(response.context['active_instrument_data'][0]['closed_surveys'], None)
@@ -317,6 +317,23 @@ class TestViews(TestCase):
         self.assertEqual(response.context['active_instrument_data'][0]['closed_surveys'][0]['survey'], survey)
         self.assertEqual(len(response.context['active_instrument_data'][0]['closed_surveys'][0]['dimension_results']), 3)
         self.assertEqual(len(response.context['active_instrument_data'][0]['closed_surveys'][0]['item_results']), 6)
+        #test that we are stopped due to not paid subscription
+        self.assertIn("To get started with our employee engagement software, you first need to pick a plan", response.content.decode())
+        self.assertNotIn("Latest measurements", response.content.decode())
+        self.assertNotIn("<a href=\"/surveys/survey-details/MQ/employee_engagement/#vigor\">Vigor</a>\n", response.content.decode())
+        self.assertNotIn("<div>Employee Engagement tracking:</div>", response.content.decode())
+        self.assertNotIn("<h3 class=\"card-title\">Co-workers at TestOrg</h3>", response.content.decode())
+        #test that we move past block if organization has_free_access
+        organization.has_free_access = True
+        organization.save()
+        response = self.client.get(reverse('surveys-dashboard'), follow=True, secure=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'dashboard.html')
+        self.assertNotIn("To get started with our employee engagement software, you first need to pick a plan", response.content.decode())
+        self.assertIn("Latest measurements", response.content.decode())
+        self.assertIn("<a href=\"/surveys/survey-details/MQ/employee_engagement/#vigor\">Vigor</a>\n", response.content.decode())
+        self.assertIn("<div>Employee Engagement tracking:</div>", response.content.decode())
+        self.assertIn("<h3 class=\"card-title\">Co-workers at TestOrg</h3>", response.content.decode())
 
     def test_setup_instrument_view(self):
         user = User.objects.get(id=1)

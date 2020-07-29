@@ -5,6 +5,11 @@ from website.models import Organization
 from surveys.models import *
 from django.contrib.auth.models import User
 
+#MY STUFF
+from payments.tools import stripe_logic
+
+
+#third party
 #from phonenumber_field.validators import validate_international_phonenumber
 from phonenumber_field import phonenumber
 # Create your tests here.
@@ -150,18 +155,69 @@ class TestModels(TestCase):
         organization.update_stripe_subscription_quantity()
         self.assertEqual(organization.stripe_subscription_quantity, 0)
 
+    def test_organization_update_subscription_paid_until(self):
+        user = User(username="testuser_for_stripe@tt.tt", email="testuser@tt.tt", password="password")
+        user.save()
+        organization = Organization(
+                owner=user,
+                name="TestOrg Stripe",
+                phone=None,
+                address_line_1="Test st. 77",
+                address_line_2=None,
+                zip_code="7777",
+                city="Test Town",
+                country='NO'
+            )
+        organization.save()
 
+        #test that default subscription_paid_until is None and has_free_access is False
+        self.assertIsNone(organization.subscription_paid_until)
+        self.assertFalse(organization.has_free_access)
 
+        #test that update_subscription_paid_until() does not change paid_until with NO subscription and NO free user
+        exp_date = organization.update_subscription_paid_until()
+        self.assertIsNone(exp_date)
+        organization = Organization.objects.get(id=organization.id)
+        self.assertIsNone(organization.subscription_paid_until)
 
+        #test that a free user gets 30 days from today
+        organization.has_free_access = True
+        organization.save()
+        exp_date = organization.update_subscription_paid_until()
+        self.assertEqual(datetime.date.today()+datetime.timedelta(days=30), exp_date)
+        organization = Organization.objects.get(id=organization.id)
+        self.assertEqual(datetime.date.today()+datetime.timedelta(days=30), organization.subscription_paid_until)
 
-
-
-
-
-
-
-
-
-
-
-#
+        #test that stripe subscriber gets the appropriate amount of days
+        #reset
+        organization.has_free_access = False
+        organization.subscription_paid_until = None
+        organization.save()
+        self.assertIsNone(organization.subscription_paid_until)
+        #create customer with stripe
+        subscriber = stripe_logic.create_stripe_customer(organization)
+        self.assertNotEqual(subscriber, None)
+        self.assertEqual(subscriber.object, "customer")
+        #create subscription
+        card ={
+            "number": "4242424242424242",
+            "exp_month": 5,
+            "exp_year": 2021,
+            "cvc": "314",
+        }
+        pm = stripe_logic.create_stripe_payment_method(card, subscriber.id)
+        subscription = stripe_logic.create_stripe_subscription(stripe_customer_id=subscriber.id, price_id="price_HMsTwnoxZyRP4F", quantity=25)
+        self.assertEqual(subscription.object, "subscription")
+        self.assertEqual(subscription.quantity, 25)
+        #update organization object
+        organization.stripe_id = subscriber.id
+        organization.stripe_subscription_id = subscription.id
+        organization.save()
+        #test
+        exp_date = organization.update_subscription_paid_until()
+        self.assertEqual(datetime.date.today()+datetime.timedelta(days=30), exp_date)
+        organization = Organization.objects.get(id=organization.id)
+        self.assertEqual(datetime.date.today()+datetime.timedelta(days=30), organization.subscription_paid_until)
+        #clean up
+        ds = stripe_logic.delete_stripe_customer(subscriber.id)
+        

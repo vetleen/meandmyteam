@@ -148,9 +148,17 @@ def dashboard_view(request):
     employee_count = employee_list.count()
 
     #get the Stripe subscription
-    stripe_subscription = None
-    if request.user.organization.stripe_subscription_id is not None:
-            stripe_subscription = stripe_logic.retrieve_stripe_subscription(request.user.organization.stripe_subscription_id)
+    #stripe_subscription = None
+    #if request.user.organization.stripe_subscription_id is not None:
+    #        stripe_subscription = stripe_logic.retrieve_stripe_subscription(request.user.organization.stripe_subscription_id)
+
+    #Check if this organziatiuon has an active subscription
+    #update payment status
+    paid_until = request.user.organization.update_subscription_paid_until()
+    subscription_paid = False
+    if paid_until is not None:
+        if paid_until >= datetime.date.today():
+            subscription_paid = True
 
     #find list of active instruments
     active_instrument_list = []
@@ -198,12 +206,13 @@ def dashboard_view(request):
                     'open_survey': None
                 })
 
-    #collect all the info that the dashboard needs (and maybe then some?)
+    #collect all the info that the dashboard needs
     context = {
+        'subscription_paid': subscription_paid,
         'todays_date': datetime.date.today(),
         'employee_count': employee_count,
         'employee_list': employee_list,
-        'stripe_subscription': stripe_subscription,
+        #'stripe_subscription': stripe_subscription,
         'inactive_instrument_list': inactive_instrument_list,
         'active_instrument_data': active_instrument_data,
     }
