@@ -50,7 +50,9 @@ class Command(BaseCommand):
                 address_line_2="",
                 zip_code="9999",
                 city="Testcity",
-                country="NO"
+                country="NO",
+                accepted_terms_and_conditions=True,
+                has_free_access=True
             )
             torganization.save()
             logger.warning("...created organization: %s."%(torganization))

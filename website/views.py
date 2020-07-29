@@ -198,8 +198,8 @@ def login_view(request):
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                request.user.organization.update_subscription_paid_until()
                 auth.login(request, user)
+                request.user.organization.update_subscription_paid_until()
                 messages.success(request, 'You have logged in.', extra_tags='alert alert-success')
 
                 return HttpResponseRedirect(request.GET.get('next', '/'))
