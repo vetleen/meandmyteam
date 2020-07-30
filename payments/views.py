@@ -7,8 +7,11 @@ from django.http import HttpResponseRedirect, HttpResponseServerError, HttpRespo
 
 from django.urls import reverse
 from django.contrib import messages
-#from surveys.models import Employee
 
+#
+from website.models import Event
+
+#
 from payments.tools.stripe_logic import *
 from operator import itemgetter
 import datetime
@@ -33,6 +36,9 @@ def current_plan_view(request):
     if stripe_id is not None and stripe_id != '':
         stripe_customer = retrieve_stripe_customer(stripe_id)
     if stripe_customer == None:
+        #mark an event - someone visited for the first time
+        event = Event(category='visited_pick_a_plan_first_time', user=request.user, comment=None)
+        event.save()        
         #Try make a customer
         stripe_customer = create_stripe_customer(request.user.organization)
         #if it wasnt made, error connecting to Stripe
@@ -158,6 +164,10 @@ def current_plan_view(request):
 @login_required
 def set_up_payment_view(request):
     """View function for ..."""
+    #mark an event - someone clicked pick a plan or add payment method - who knows which?
+    event = Event(category='created_stripe_checkout_session', user=request.user, comment=None)
+    event.save()
+
     #get the customer object id from DB, if any
     stripe_id = request.user.organization.stripe_id
     #get the subscription object id from DB, if any
@@ -218,6 +228,11 @@ def set_up_payment_view(request):
 @login_required
 def set_up_payment_method_cancel(request):
     "a view for receiving error message from stripe"
+    #mark an event 
+    event = Event(category='failed_to_set_up_payment_method', user=request.user, comment=None)
+    event.save()
+
+    #do things
     messages.error(request, 'The subscription setup process was cancelled. Try again?', extra_tags='alert alert-warning')
     logger.warning("%s %s: set_up_payment_method_cancel: Stripe returned a failed payment attempt for user %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
     return HttpResponseRedirect(reverse('payments-set-up-payment-method'))
@@ -225,6 +240,10 @@ def set_up_payment_method_cancel(request):
 @login_required
 def set_up_payment_method_success(request):
     "a view for receiving success message from stripe"
+    #mark an event 
+    event = Event(category='successfully_set_up_payment_method', user=request.user, comment=None)
+    event.save()
+
     # GET stripes session-id and retrieve the session,
     stripe_session_id = request.GET['stripe_session_id']
     try:
@@ -324,10 +343,16 @@ def create_subscription_view(request, **kwargs):
             messages.success(request, 'Your subscription was started!', extra_tags='alert alert-success')
             #update payment status
             request.user.organization.update_subscription_paid_until()
+            #mark an event 
+            event = Event(category='succesfully_set_up_subscription', user=request.user, comment=None)
+            event.save()
         else:
             #log failure
             logger.warning("%s %s: create_subscription_view: Tried to start subscription for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
             messages.warning(request, 'We tried to start your subscription, but something went wrong. You can try again, and we\'ll make sure you don\'t get charged twice!', extra_tags='alert alert-warning')
+            #mark an event 
+            event = Event(category='failed_to_set_up_subscription', user=request.user, comment=None)
+            event.save()
 
     except Exception as err:
         logger.exception("%s %s: create_subscription_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
@@ -346,9 +371,15 @@ def cancel_subscription_view(request, **kwargs):
                 messages.success(request, 'Your subscription was cancelled, it will not renew next billing cycle.', extra_tags='alert alert-success')
                 #update payment status
                 request.user.organization.update_subscription_paid_until()
+                #mark an event 
+                event = Event(category='succesfully_cancel_subscription', user=request.user, comment=None)
+                event.save()
             else:
                 logger.warning("%s %s: cancel_subscription_view: Tried to cancel subscription for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
                 messages.warning(request, 'We tried to cancel your subscription, but it may not have work.Try again later, or contact support.', extra_tags='alert alert-warning')
+                #mark an event 
+                event = Event(category='failed_to_cancel_subscription', user=request.user, comment=None)
+                event.save()
         else:
             return HttpResponseForbidden()
     except Exception as err:
@@ -367,9 +398,15 @@ def restart_cancelled_subscription_view(request, **kwargs):
                 messages.success(request, 'Your subscription was restarted!', extra_tags='alert alert-success')
                 #update payment status
                 request.user.organization.update_subscription_paid_until()
+                #mark an event 
+                event = Event(category='succesfully_restarted_subscription', user=request.user, comment=None)
+                event.save()
             else:
                 logger.warning("%s %s: restart_cancelled_subscription_view: Tried to restart subscription for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
                 messages.warning(request, 'We tried to restart your subscription, but it may not have worked. Try again later, or contact support.', extra_tags='alert alert-warning')
+                #mark an event 
+                event = Event(category='failed_to_restart_subscription', user=request.user, comment=None)
+                event.save()
         else:
             return HttpResponseForbidden()
     except Exception as err:

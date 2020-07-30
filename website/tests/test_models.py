@@ -1,10 +1,10 @@
 import datetime
 
 from django.test import TestCase
-from website.models import Organization
+from website.models import Organization, Event
 from surveys.models import *
 from django.contrib.auth.models import User
-
+from django.core.exceptions import ValidationError
 #MY STUFF
 from payments.tools import stripe_logic
 
@@ -220,4 +220,25 @@ class TestModels(TestCase):
         self.assertEqual(datetime.date.today()+datetime.timedelta(days=30), organization.subscription_paid_until)
         #clean up
         ds = stripe_logic.delete_stripe_customer(subscriber.id)
+        
+class TestEvents(TestCase):
+    def setUp(self):
+        pass
+
+    def test_events(self):
+        #test that we can create events
+        for event_number, event_category in enumerate(Event.ALLOWED_CATEGORIES):
+            e = Event(category=event_category)
+            e.save()
+            self.assertEqual(event_number+1, e.id)
+            self.assertIn(e.category, Event.ALLOWED_CATEGORIES)
+        event_list = Event.objects.all()
+        self.assertEqual(len(Event.ALLOWED_CATEGORIES), len(event_list))
+        #test that we CAN  also create non-specified types of categories
+        nse = Event(category="non-specified_category")
+        nse.save()
+        event_list = Event.objects.all()
+        self.assertEqual(len(Event.ALLOWED_CATEGORIES)+1, len(event_list))
+
+        
         

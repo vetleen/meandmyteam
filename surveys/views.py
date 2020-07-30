@@ -17,6 +17,7 @@ from django.utils.encoding import force_bytes, force_text
 from surveys.models import *
 from surveys.core import survey_logic
 from payments.tools import stripe_logic
+from website.models import Event
 
 #custom forms and models
 from surveys.forms import *
@@ -71,6 +72,19 @@ def add_or_remove_employee_view(request):
                     'form': form, 
                     'show_back_button': False,
                 })
+            #mark an event - user added an employee 
+            comment = "Employee: %s."%(r)
+            event = Event(category='successfully_add_employee', user=request.user, comment=comment)
+            event.save()
+        else:
+            #mark an event - someone failed to add an employee
+            comment = ""
+            for field in form.visible_fields():
+                field_data = "%s: %s \n"%(field.field.label, field.data)
+                comment+=(field_data)
+            event = Event(category='failed_to_add_employee', user=request.user, comment=comment)
+            event.save()
+
     #finally, return the prepared view
     return render(request, 'add_or_remove_employees.html', context)
 
@@ -259,9 +273,15 @@ def setup_instrument_view(request, **kwargs):
             if survey_setting.is_active == True:
                 success_string = "Your settings were updated successfully, %s tracking is ACTIVE!"%(survey_setting.instrument.name)
                 messages.success(request, success_string, extra_tags='alert alert-success')
+                #mark an event 
+                event = Event(category='started_tracking_with_an_instrument', user=request.user, comment=None)
+                event.save()
             else:
                 success_string = "Your settings were updated successfully, %s tracking is INACTIVE!"%(survey_setting.instrument.name)
                 messages.success(request, success_string, extra_tags='alert alert-warning')
+                #mark an event 
+                event = Event(category='stopped_tracking_with_an_instrument', user=request.user, comment=None)
+                event.save()
 
             #redirect to dashboard
             return HttpResponseRedirect(reverse('surveys-dashboard'))
@@ -335,6 +355,11 @@ def answer_survey_view(request, **kwargs):
             "This survey has already closed, closed %s."%(survey_instance.survey.date_close)
 
     except (AssertionError, SurveyInstance.DoesNotExist, DjangoUnicodeDecodeError) as err:
+        #mark an event 
+        comment = "url-token: %s"%(url_token)
+        event = Event(category='failed_to_open_survey_instance_link', comment=comment)
+        event.save()
+        #log and redirect
         logger.exception("%s %s: answer_survey_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         raise Http404("The survey you asked for does not exist. If you pasted a link, make sure you got the entire link.")
 
@@ -365,10 +390,16 @@ def answer_survey_view(request, **kwargs):
                 survey_instance.consent_was_given = form.cleaned_data['consent_to_answer']
                 survey_instance.started = True
                 survey_instance.save()
+                #mark an event 
+                event = Event(category='accepted_terms_and_conditions', comment="%s"%(survey_instance))
+                event.save()
         #If its not post and we havent givent consent, we need to provide that form
         if request.method != 'POST' and survey_instance.consent_was_given != True:
             form = ConsentToAnswerForm()
             context.update({'form': form})
+            #mark an event 
+            event = Event(category='opened_survey_instance_link', comment="%s"%(survey_instance))
+            event.save()
         #if consent was given, and if survey was started but not completed, go directly to where the respondent left off:
         elif request.method != 'POST' and survey_instance.consent_was_given == True and survey_instance.check_completed() == False:
             items = survey_instance.surveyinstanceitem_set.all().order_by('pk')
@@ -460,6 +491,9 @@ def answer_survey_view(request, **kwargs):
                 return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(url_token, page+1)))
 
             #else, we are done answering, and redirect to thank you message
+            #mark an event 
+            event = Event(category='completed_survey_instance', comment="%s"%(survey_instance))
+            event.save()
             return HttpResponseRedirect(reverse('surveys-answer-survey', args=(url_token, )))
 
     return render(request, 'answer_survey.html', context)

@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from website.forms import ChangePasswordForm, SignUpForm, LoginForm, EditAccountForm, ChoosePlanForm, CancelPlanForm, ResetPasswordForm
-from website.models import Organization
+from website.models import Organization, Event
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView #dont think this is needed anymore
 from payments.tools.stripe_logic import *
@@ -134,6 +134,11 @@ def sign_up(request):
         messages.error(request, 'You are already signed in, and can\'t make a new account until you sign out.', extra_tags='alert alert-warning')
         return render(request, 'you_did_something.html')
 
+    #mark an event - someone visited this site
+    event = Event(category='visited_sign_up_view')
+    event.save()
+
+    #create the form
     form = SignUpForm
     context = {
         'form': form,
@@ -147,6 +152,7 @@ def sign_up(request):
         context.update({'form': form})
         # Check if the form is valid:
         if form.is_valid():
+            
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
             user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data['username'], form.cleaned_data['password'])
             user.save()
@@ -172,10 +178,22 @@ def sign_up(request):
             )
             if user is not None:
                 auth.login(request, user)
+
+            #mark an event - someone signed up successfully
+            event = Event(category='completed_sign_up', user=user)
+            event.save()
+
             # redirect to a new URL:
-
             return HttpResponseRedirect(reverse('surveys-dashboard'))
-
+        else:
+            #mark an event - someone failed to sign up
+            comment = ""
+            for field in form.visible_fields():
+                if field.field.label != "Choose a password" and field.field.label != "Confirm password":
+                    field_data = "%s: %s \n"%(field.field.label, field.data)
+                    comment+=(field_data)
+            event = Event(category='failed_sign_up', comment=comment)
+            event.save()
     return render(request, 'sign_up_form.html', context)
 
 def login_view(request):
@@ -205,6 +223,9 @@ def login_view(request):
                 auth.login(request, user)
                 request.user.organization.update_subscription_paid_until()
                 messages.success(request, 'You have logged in.', extra_tags='alert alert-success')
+                #mark an event - user logged in
+                event = Event(category='completed_log_in', user=request.user, comment=None)
+                event.save()
 
                 return HttpResponseRedirect(request.GET.get('next', '/'))
     else:

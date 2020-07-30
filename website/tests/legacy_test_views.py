@@ -21,32 +21,6 @@ def yellow(message):
 
 
 # Create your tests here.
-class TestThatUrlsExist(TestCase):
-    """
-    Test that URLs yield expected response
-    """
-    def test_url_status(self):
-        """
-        TEST THAT ALL URLS LEAD SOMEWHERE
-        """
-        ## Set the conditions for URL-testing
-        self.urls_to_test = [
-            '/',
-            '/sign-up/',
-            '/change-password/',
-            '/login/',
-            '/logout/',
-            '/edit-account/',
-            '/dashboard/',
-
-            ]
-        self.acceptable_url_statuses = [200]
-
-        #test that URLs exist
-        for url in self.urls_to_test:
-            response = self.client.get(url, follow=True, secure=True)
-            my_message = 'TestThatUrlsExist: the url: \'%s\' gave the wrong status code (%s).'%(url, response.status_code)
-            self.assertIn(response.status_code, self.acceptable_url_statuses, yellow(my_message))
 
 class DashboardViewTest(TestCase):
     ''' TESTS THAT THE DASHBOARD BEHAVES PROPERLY '''

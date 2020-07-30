@@ -25,7 +25,7 @@ logger = logging.getLogger('__name__')
 class Organization(models.Model):
     owner = models.OneToOneField(User, blank=True, null=True, on_delete=models.SET_NULL, help_text='User who owns this Organization')
     name = models.CharField(max_length=255, blank=True, null=True, help_text='Name of the Organization')
-    phone = PhoneNumberField(null=True, blank=True, unique=True) #o.phone.as_e164
+    phone = PhoneNumberField(null=True, blank=True) #o.phone.as_e164
     address_line_1 = models.CharField(max_length=255, blank=True, null=True, help_text='Adress of the Organization')
     address_line_2 = models.CharField(max_length=255, blank=True, null=True, help_text='Address contd.')
     zip_code =  models.CharField(max_length=255, blank=True, null=True, help_text='Zip code of the Organization')
@@ -115,3 +115,55 @@ class Organization(models.Model):
             return self.name
         else:
             return "Organization object owned by %s."%(self.owner)
+
+class Event(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, help_text='')
+    ALLOWED_CATEGORIES = [
+        #anonymous user
+        #'visited_privacy_policy',
+        #'visited_terms_and_conditions',
+        'visited_sign_up_view',
+
+        #signed-up user
+        'completed_sign_up', 
+        'failed_sign_up', 
+        'completed_log_in', 
+        #'clicked_log_out', 
+        'successfully_add_employee',
+        'failed_to_add_employee',
+        #'click_set_up_plan_from_dashboard', #in wizard
+        'visited_pick_a_plan_first_time',
+        'created_stripe_checkout_session', #picked a plan OR added another payment method
+        #'clicked_set_up_payment_method', #continued on to stripe
+        'successfully_set_up_payment_method', #returned successfully from stripe after setting up PM
+        'failed_to_set_up_payment_method', #returned un-successfully from stripe after trying to set up PM
+        'succesfully_set_up_subscription', #was able to create stripe subscription with provided payment method
+        'failed_to_set_up_subscription', #was unable
+        #'clicked_change_payment_method',
+        #'clicked_cancel_subscription',
+        'succesfully_cancel_subscription',
+        'failed_to_cancel_subscription',
+        'succesfully_restarted_subscription',
+        'failed_to_restart_subscription',
+        #'clicked_change_plan',
+        #'clicked_dashboard_start_tracking_button',
+        #'clicked_dashboard_OFF_button', #turns tracking ON
+        #'clicked_dashboard_ON_button', #turns tracking OFF
+        #'clicked_dashboard_add_employees_button',
+        'started_tracking_with_an_instrument',
+        'stopped_tracking_with_an_instrument',
+
+        #respondent
+        'opened_survey_instance_link',
+        'failed_to_open_survey_instance_link',
+        'accepted_terms_and_conditions',
+        #'clicked_continue_button_on_answer_survey_view',
+        'completed_survey_instance',
+    ]
+    category = models.CharField(
+        max_length=255,
+        help_text='What was the event?'
+    )
+    comment = models.TextField(blank=True, null=True, help_text='More info on event')
+    time = models.DateTimeField(auto_now_add=True, editable=False, help_text='Time of event')
+

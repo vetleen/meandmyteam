@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from .models import Organization
+from .models import Organization, Event
 
 
 #class SalesArgumentInline(admin.StackedInline): #for use in PlanAdmin
@@ -10,12 +10,12 @@ from .models import Organization
 #    verbose_name_plural = 'sales arguments'
 
 #admin.site.register(Plan)
-'''
-@admin.register(Plan)
-class PlanAdmin(admin.ModelAdmin):
-        list_display = ('name', 'description', 'monthly_price', 'yearly_price')
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+        list_display = ('category', 'user', 'comment', 'time')
         #inlines = (SalesArgumentInline,)
-'''
+
 '''
 @admin.register(SalesArgument)
 class SalesArgumentAdmin(admin.ModelAdmin):
