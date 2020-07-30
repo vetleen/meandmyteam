@@ -1,18 +1,20 @@
 ##MeAndMyTeam
 
 #dev
-search engine optimization
+
 
 # BEFORE LAUNCH
 
 change stripe_api_keys -> test with my credit card
 make the go to payments-page pretty
-
+switch out the screenshot that shown employee satifaction tracking dashboar on index
 actually launch
 
 #AFTER LAUNCH
 tests for payments
 tests for website
+
+search engine optimization
 
 translation
 contact us page and about us page
