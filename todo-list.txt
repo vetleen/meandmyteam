@@ -1,10 +1,12 @@
 ##MeAndMyTeam
 
 #dev
-Change payments so that verification of active account is disconnected from payment method
+Random order on items per survey (create_survey)
+more intuitive navigatenm (i.e. "Back"-buttons and stuff)
 
 # BEFORE LAUNCH
 
+change stripe_api_keys -> test with my credit card
 search engine optimization including analytics -> https://bhoey.com/blog/adding-google-analytics-to-django-templates/
 add funnel stages to organization model: Signed up -> added employee -> added payment method -> activated survey -> came back -> came back and saw results
 add some dates (signed up... ) -> actually for each funnel event

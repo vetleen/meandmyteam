@@ -32,7 +32,7 @@ logging.disable(logging.CRITICAL)
 #logging.disable(logging.NOTSET)
 
 # Create your tests here.
-'''
+
 class SurveyLogicTest(TestCase):
 
     def setUp(self):
@@ -138,8 +138,10 @@ class SurveyLogicTest(TestCase):
         si_formulation_list = []
         for si in surveyitems:
             si_formulation_list.append(si.item_formulation)
+           
         for item in i.get_items():
             self.assertIn(item.formulation, si_formulation_list)
+            
 
         ss = SurveySetting.objects.get(id=1)
         self.assertEqual(ss.last_survey_open, datetime.date.today())
@@ -363,7 +365,7 @@ class SurveyLogicTest(TestCase):
         self.assertEqual(data['instrument'], i)
         self.assertEqual(len(data['surveys']), 3)
         self.assertEqual(data['surveys'][0], gfrs_data)
-    '''
+    
 
 class SurveyLogicTest_dailytaskfunctions(TestCase):
 
@@ -388,7 +390,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         ss = survey_logic.configure_survey_setting(organization=o, instrument=i, is_active=True)
         ss.save()
 
-    '''
+    
     def test_create_survey_if_due(self):
         o=Organization.objects.get(id=1)
         i=Instrument.objects.get(id=1)
@@ -609,7 +611,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         #check that trying to close it AGAIN raises assertion error
         self.assertRaises(AssertionError, try_close_w_is_close_true)
         
-    '''
+    
     def test_close_survey_and_check_if_correct_sums(self):
         organization = Organization.objects.get(id=1)
         instrument = Instrument.objects.get(id=1)

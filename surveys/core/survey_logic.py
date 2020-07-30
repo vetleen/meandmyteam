@@ -4,6 +4,7 @@ from django.template.loader import render_to_string
 
 import datetime
 import os
+import random
 
 #set up logging
 import logging
@@ -142,7 +143,9 @@ def create_survey(owner, instrument_list, **kwargs):
 
     #create the SurveyItems that go with this object
     for instrument in instrument_list:
-        for i in instrument.get_items():
+        item_list = instrument.get_items()
+        random.shuffle(item_list)
+        for i in item_list:
 
             #Create RatioSurveyItem when RatioScale is in use
             if isinstance(i.dimension.scale, RatioScale):
