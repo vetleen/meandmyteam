@@ -25,6 +25,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '2#q*c)!_g3tw2vj_p%7+rjyq+taizi
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'meandmyteam.herokuapp.com']
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,6 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'website.context_processors.google_analytics'
             ],
         },
     },
@@ -181,3 +183,6 @@ STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'pk_test_hCfN7
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
+
+#Google analytics
+GOOGLE_ANALYTICS_KEY = os.environ.get("GOOGLE_ANALYTICS_KEY", None)

@@ -324,8 +324,6 @@ def create_subscription_view(request, **kwargs):
             messages.success(request, 'Your subscription was started!', extra_tags='alert alert-success')
             #update payment status
             request.user.organization.update_subscription_paid_until()
-            #redirect ot dashboard?
-            return HttpResponseRedirect(reverse('surveys-dashboard'))
         else:
             #log failure
             logger.warning("%s %s: create_subscription_view: Tried to start subscription for user %s, but was unsuccessful."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))

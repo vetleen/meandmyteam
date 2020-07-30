@@ -15,6 +15,7 @@ search engine optimization including analytics -> https://bhoey.com/blog/adding-
 tests for payments
 tests for website
 
+translation
 contact us page and about us page
 add 'about us' explaining scientific background of test (if any...)
 chat-box
