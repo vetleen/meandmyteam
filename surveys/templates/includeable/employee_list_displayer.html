@@ -2,9 +2,9 @@
 {% for employee in employee_list %}
   <li class="list-group-item">
     <div class="d-flex justify-content-between">
-      <div>{{ employee.email|truncatechars:30 }}</div>
+      <div>{{ employee.email|truncatechars:40 }}</div>
       <div>
-      <a href="{% url 'surveys-delete-employee' employee.uidb64 %}" class="badge badge-danger align-self-end">Delete</a>
+      <a href="{% url 'surveys-delete-employee' employee.uidb64 %}?next={{ request.path }}" class="badge badge-danger align-self-end">Delete</a>
       <a href="{% url 'surveys-edit-employee' employee.uidb64 %}?next={{ request.path }}" class="badge badge-success align-self-end">Edit</a>
       </div>
     </div>

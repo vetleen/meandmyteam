@@ -8,22 +8,22 @@
     </div>
   </div> <!-- row -->
 
-  <div class="row justify-content-center pt-2">
+  <div class="row justify-content-center">
   {% include "includeable/message_displayer.html" %}
   </div><!-- row -->
 
 
 
   <div class="row">
-    <div class="col-sm-6">
-      <h4>Register employees</h4>
+    <div class="col-lg-6 py-2">
+      <h4>Add employees</h4>
         {% include "includeable/render_add_or_remove_employee_form.html" %}
       <div class="w-100"></div>
       <a href="{% url 'surveys-dashboard' %}">I'm done adding employees</a>
     </div><!-- col -->
-    <div class="col-sm-6">
+    <div class="col-lg-6 py-2">
       {% if employee_list %}
-        <h4>Registered employees</h4>
+        <h4>Employees at {{ request.user.organization.name }}</h4>
         {% include "includeable/employee_list_displayer.html" %}
       {% else %}
 

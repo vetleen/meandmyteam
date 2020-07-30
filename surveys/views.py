@@ -41,6 +41,7 @@ def add_or_remove_employee_view(request):
     context = {
         'form': form,
         'submit_button_text': 'Add employee',
+        'show_back_button': True,
         'employee_list': employee_list,
     }
     # If this is a POST request, then process the Form bfore showing the view
@@ -66,7 +67,10 @@ def add_or_remove_employee_view(request):
             #declare success and make a new form for the next employee
             messages.success(request, 'You have added a coworker (%s)! You can continue to add more below.'%(form.cleaned_data['email']), extra_tags='alert alert-success')
             form = AddRespondentForm()
-            context.update({'form': form})
+            context.update({
+                    'form': form, 
+                    'show_back_button': False,
+                })
     #finally, return the prepared view
     return render(request, 'add_or_remove_employees.html', context)
 
@@ -94,6 +98,8 @@ def edit_employee_view(request, **kwargs):
     context = {
         'form': form,
         'submit_button_text': 'Update',
+        'show_back_button': True,
+        'back_button_text': 'Cancel',
         }
 
     #Check if POST, and deal with it:

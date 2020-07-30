@@ -1,14 +1,14 @@
 ##MeAndMyTeam
 
 #dev
-more intuitive navigation (i.e. "Back"-buttons and stuff)
+add funnel stages to organization model: Signed up -> added employee -> added payment method -> activated survey -> came back -> came back and saw results
+add some dates (signed up... ) -> actually for each funnel event
+
 
 # BEFORE LAUNCH
 
 change stripe_api_keys -> test with my credit card
 search engine optimization including analytics -> https://bhoey.com/blog/adding-google-analytics-to-django-templates/
-add funnel stages to organization model: Signed up -> added employee -> added payment method -> activated survey -> came back -> came back and saw results
-add some dates (signed up... ) -> actually for each funnel event
 
 
 #AFTER LAUNCH
@@ -21,6 +21,7 @@ chat-box
 When 3 surveys have been completed, a line chart may be a better way to present data
 add report-generator (https://www.google.com/search?client=ubuntu&channel=fs&q=django+create+pdf&ie=utf-8&oe=utf-8#kpvalbx=_PDbJXo7qCNGXmwX_jbeQDQ28)
 
+on signup, when you add plan, make it easier to get back to the dashboard/wizard
 
 #LONG TERM
 Get someone to help get tests to work on Heorku CI (step 1 - is app.json correct)
