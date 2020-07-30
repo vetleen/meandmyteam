@@ -70,6 +70,8 @@ def change_password(request):
     context = {
         'form': form,
         'submit_button_text': 'Update password',
+        'back_button_text': 'Cancel',
+        'show_back_button': True,
     }
     # If this is a POST request then process the Form data
     if request.method == 'POST':
@@ -189,6 +191,8 @@ def login_view(request):
         form = LoginForm(request.POST)
         context = {
             'submit_button_text': 'Login',
+            'back_button_text': 'Cancel',
+            'show_back_button': False,
             'form': form,
             }
         # Check if the form is valid:
@@ -208,6 +212,8 @@ def login_view(request):
         form = LoginForm
         context = {
             'submit_button_text': 'Login',
+            'back_button_text': 'Cancel',
+            'show_back_button': False,
             'form': form,
             }
     return render(request, 'login_form.html', context)

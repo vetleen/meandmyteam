@@ -1,8 +1,7 @@
 ##MeAndMyTeam
 
 #dev
-Random order on items per survey (create_survey)
-more intuitive navigatenm (i.e. "Back"-buttons and stuff)
+more intuitive navigation (i.e. "Back"-buttons and stuff)
 
 # BEFORE LAUNCH
 

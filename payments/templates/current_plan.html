@@ -106,12 +106,12 @@ function stripeRedirect(){
                     <p class="card-text">{{ product.description }}.</p>
                   </div> <!-- card-body -->
                   <div class="text-center card-footer">
-                    <a href="{% url 'payments-create-subscription' plan.id %}" class="btn btn-success text-center my-2">Start subscription</a>
+                    <a href="{% url 'payments-create-subscription' plan.id %}" class="btn btn-success text-center my-2">{% if request.user.organization.stripe_subscription_id == "" or  request.user.organization.stripe_subscription_id is None %}Try for free{% else %}Pick plan{% endif %}</a>
                   </div> <!-- card-footer -->
                 </div><!-- card -->
                 {% endfor %}
                 </div><!-- card group-->
-              <center><span class="text-muted">(We only have one plan, so it's an easy choice, right?)</span></center>
+              <center><span class="text-muted"></span></center>
         </div><!-- col -->
             {% endif %}
 
