@@ -2,7 +2,6 @@
 
 #dev
 change stripe_api_keys -> test with my credit card
-make the go to payments-page pretty
 
 # BEFORE LAUNCH
 
