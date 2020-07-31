@@ -70,7 +70,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'website.context_processors.google_analytics'
+                'website.context_processors.google_analytics',
+                'website.context_processors.page_title',
             ],
         },
     },
@@ -179,10 +180,15 @@ SECURE_CONTENT_TYPE_NOSNIFF= os.environ.get('SECURE_CONTENT_TYPE_NOSNIFF', False
 # Stripe
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_KSHWYtZDDXM7JyT3bYh7FwFo00DLnvv5oo')
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'pk_test_hCfN72HDs7hq5Vi5B1puaMnR00GhpS0vZN')
-STRIPE_STANDARD_PLAN = "prod_HkMGfIrtqy0NGr"
+STRIPE_STANDARD_PLAN = os.environ.get("STRIPE_STANDARD_PLAN", "prod_HLqVCyWrjJFx6v")
+
+
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
 
 #Google analytics
 GOOGLE_ANALYTICS_KEY = os.environ.get("GOOGLE_ANALYTICS_KEY", None)
+
+#page title
+PAGE_TITLE = "Employee Engagement Tracking | Motpanel"

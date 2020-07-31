@@ -6,3 +6,8 @@ def google_analytics(request: HttpRequest):
     return {
         'GA_KEY': settings.GOOGLE_ANALYTICS_KEY,
     }
+#Get the page title
+def page_title(request: HttpRequest): 
+    return {
+        'PAGE_TITLE': settings.PAGE_TITLE,
+    }

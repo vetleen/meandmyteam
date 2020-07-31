@@ -1,13 +1,12 @@
 ##MeAndMyTeam
 
 #dev
-change stripe_api_keys -> test with my credit card
+test payment with my credit card
+titles on each page
 
 # BEFORE LAUNCH
 
 
-switch out the screenshot that shown employee satifaction tracking dashboard on index
-actually launch
 
 #AFTER LAUNCH
 tests for payments
@@ -33,3 +32,5 @@ make a switch for toggeling products, and make it toggleable from dashboard.
 Add default country in signup: https://docs.djangoproject.com/en/3.0/ref/contrib/gis/geoip2/
 What happens to emails that are sent?
 add impact stories to public facing pages
+switch out the screenshot that show employee satifaction tracking dashboard on index
+
