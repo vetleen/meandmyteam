@@ -188,7 +188,7 @@ def set_up_payment_view(request):
         request.user.organization.stripe_id = stripe_id
         request.user.organization.save()
 
-    #catch cases where we have subscription id, but are not able to get the Subscriber object from stripe
+    #catch cases where we have subscription id, but are not able to get the corresponding object from stripe
     if stripe_subscription_id is not None and stripe_subscription_id is not '':
         stripe_subscription = retrieve_stripe_subscription(stripe_subscription_id)
         if stripe_subscription is None:
@@ -213,14 +213,23 @@ def set_up_payment_view(request):
         success_url=success_url,
         cancel_url=request.build_absolute_uri(reverse('payments-set-up-payment-method-cancel'))
         )
-    messages.info(request, 'Use this credit card in testing: Visa: 4242 4242 4242 4242', extra_tags='alert alert-info')
-    messages.info(request, 'Use this credit card in testing: American Express: 3782 822463 10005', extra_tags='alert alert-info')
-    messages.info(request, 'Use this credit card in testing: Mastercard: 5555 5555 5555 4444', extra_tags='alert alert-info')
+    if settings.DEBUG == True:
+        messages.info(request, 'Use this credit card in testing: Visa: 4242 4242 4242 4242', extra_tags='alert alert-info')
+        messages.info(request, 'Use this credit card in testing: American Express: 3782 822463 10005', extra_tags='alert alert-info')
+        messages.info(request, 'Use this credit card in testing: Mastercard: 5555 5555 5555 4444', extra_tags='alert alert-info')
 
+    #Ensure we have a stripe_subscriptiuon variable
+    try:
+        stripe_subscription
+    except UnboundLocalError as err:
+        stripe_subscription = None
+     
     #initiate context variable to send to view
     context = {
         'stripe_session': stripe_session,
         'stripe_pk': settings.STRIPE_PUBLISHABLE_KEY,
+        'stripe_subscription': stripe_subscription,
+       
     }
 
     return render(request, 'set_up_payment_method.html', context=context)

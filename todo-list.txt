@@ -1,13 +1,13 @@
 ##MeAndMyTeam
 
 #dev
-
+change stripe_api_keys -> test with my credit card
+make the go to payments-page pretty
 
 # BEFORE LAUNCH
 
-change stripe_api_keys -> test with my credit card
-make the go to payments-page pretty
-switch out the screenshot that shown employee satifaction tracking dashboar on index
+
+switch out the screenshot that shown employee satifaction tracking dashboard on index
 actually launch
 
 #AFTER LAUNCH

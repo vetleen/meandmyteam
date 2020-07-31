@@ -1,5 +1,5 @@
 {% extends "base_generic.html" %}
-
+{% load static %}
 {% block extrascripts %}
 <script src="https://js.stripe.com/v3/"></script>
 <script>
@@ -27,17 +27,27 @@ function stripeRedirect(){
 {% block content %}
 <div class="container">
   <div class="row pt-4">
-    <div class="col-12">
-      <h3> Add payment method</h3>
+    <div class="col-12 text-center">
+      <h3> Add credit card </h3>
     </div>
   </div> <!-- row -->
   <div class="row justify-content-center pt-2">
   {% include "includeable/message_displayer.html" %}
   </div><!-- row -->
   <div class="row">
-    <div class="col-sm-12 text-center">
-      This button will take you to our payemts provider:<br />
-      <button class="btn btn-info" onclick="stripeRedirect()">Set up payment method</button>
+    <div class="col-sm-12 text-center mt-4">
+      <img src="{% static 'images/payment_method_card.svg' %}" class="img-fluid" alt="Pay with credit card" style="height: 10rem;">
+      {% if stripe_subscription is None %}
+        <p>
+          We need to collect your credit card details to set up your chosen plan.<br />
+          Don't worry though - we won't charge you until your trial runs out!
+        </p>
+      {% else %}
+        <p>
+          We currently only support payments with credit cards.
+        </p>
+      {% endif %}
+      <button class="btn btn-info" onclick="stripeRedirect()">Add credit card</button>
     </div> <!-- col -->
     <div id="error-message" class="col-sm-12 text-center"></div>
     <div class="w-100"></div>
