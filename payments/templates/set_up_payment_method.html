@@ -1,4 +1,5 @@
 {% extends "base_generic.html" %}
+{% load i18n %}
 {% load static %}
 {% block extrascripts %}
 <script src="https://js.stripe.com/v3/"></script>
@@ -23,12 +24,12 @@ function stripeRedirect(){
 </script>
 {% endblock %}
 
-{% block title %}<title>Add a card | {{ PAGE_TITLE }} </title>{% endblock %}
+{% block title %}<title>{% trans "Add a card" %} | {{ PAGE_TITLE }} </title>{% endblock %}
 {% block content %}
 <div class="container">
   <div class="row pt-4">
     <div class="col-12 text-center">
-      <h3> Add credit card </h3>
+      <h3> {% trans "Add credit card" %} </h3>
     </div>
   </div> <!-- row -->
   <div class="row justify-content-center pt-2">
@@ -36,18 +37,20 @@ function stripeRedirect(){
   </div><!-- row -->
   <div class="row">
     <div class="col-sm-12 text-center mt-4">
-      <img src="{% static 'images/payment_method_card.svg' %}" class="img-fluid" alt="Pay with credit card" style="height: 10rem;">
+      <img src="{% static 'images/payment_method_card.svg' %}" class="img-fluid" alt="{% trans "Pay with credit card" %}" style="height: 10rem;">
       {% if stripe_subscription is None %}
         <p>
+          {% blocktrans %}
           We need to collect your credit card details to set up your chosen plan.<br />
           Don't worry though - we won't charge you until your trial runs out!
+          {% endblocktrans %}
         </p>
       {% else %}
         <p>
-          We currently only support payments with credit cards.
+          {% trans "We currently only support payments with credit cards." %}
         </p>
       {% endif %}
-      <button class="btn btn-info" onclick="stripeRedirect()">Add credit card</button>
+      <button class="btn btn-info" onclick="stripeRedirect()">{% trans "Add credit card" %}</button>
     </div> <!-- col -->
     <div id="error-message" class="col-sm-12 text-center"></div>
     <div class="w-100"></div>

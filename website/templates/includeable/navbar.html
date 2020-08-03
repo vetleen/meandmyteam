@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <!-- navbar begins -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light d-flex flex-column sticky-footer-wrapper">
   <div class="container">
@@ -13,42 +14,37 @@
           <ul class="navbar-nav">
             {% if user.is_authenticated %}
             <li class="nav-item {% if request.path == '/dashboard/' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'surveys-dashboard' %}"> Start here {% if request.path == '/dashboard/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+              <a class="nav-link" href="{% url 'surveys-dashboard' %}"> {% trans "Start here" %} {% if request.path == '/dashboard/' %}<span class="sr-only">{% trans "(current)" %}</span>{% endif %}</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Account
+                {% trans "Account" %}
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
 
-                <a class="dropdown-item" href="{% url 'edit-account' %}">Account details</a>
-                <a class="dropdown-item" href="{% url 'payments_current_plan' %}">Subscription details</a>
-                <a class="dropdown-item" href="{% url 'change-password' %}">Change password</a>
+                <a class="dropdown-item" href="{% url 'edit-account' %}">{% trans "Account details" %}</a>
+                <a class="dropdown-item" href="{% url 'payments_current_plan' %}">{% trans "Subscription details" %}</a>
+                <a class="dropdown-item" href="{% url 'change-password' %}">{% trans "Change password" %}</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">Log out</a>
+                <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">{% trans "Log out" %}</a>
               </div>
             </li>
             {% else %}
             <li class="nav-item {% if request.path == '/' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'index' %}">Home {% if request.path == '/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+              <a class="nav-link" href="{% url 'index' %}">{% trans "Home" %} {% if request.path == '/' %}<span class="sr-only">{% trans "(current)" %}</span>{% endif %}</a>
             </li>
             <li class="nav-item {% if request.path == '/accounts/login/' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'loginc'%}">Login {% if request.path == '/login/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+              <a class="nav-link" href="{% url 'loginc'%}">{% trans "Login" %} {% if request.path == '/login/' %}<span class="sr-only">({% trans "(current)" %}</span>{% endif %}</a>
             </li>
             <li class="nav-item {% if request.path == '/sign-up' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'sign-up'%}">Sign up{% if request.path == '/sign-up/' %}<span class="sr-only">(current)</span>{% endif %}</a>
+              <a class="nav-link" href="{% url 'sign-up'%}">{% trans "Sign up" %}{% if request.path == '/sign-up/' %}<span class="sr-only">{% trans "(current)" %}</span>{% endif %}</a>
             </li>
             {% endif %}
           </ul>
           <span class="navbar-text">
+            {# get_available_languages as LANGUAGES #} {#{ LANGUAGES #}
             {% if user.is_authenticated %}({{ user.get_username }}){% endif %}
           </span>
-          <!--
-          <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn my-2 my-sm-0" type="submit">Search</button>
-          </form>
-        -->
         </div><!-- navbar -->
   </div><!-- container -->
 </nav>

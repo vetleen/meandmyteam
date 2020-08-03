@@ -1,23 +1,24 @@
 {% extends "base_generic.html" %}
+{% load i18n %}
 {% block navbar %}
   {% include "includeable/empty_navbar.html" %}
 {% endblock %}
-{% block title %}<title>500 server error | {{ PAGE_TITLE }} </title>{% endblock %}
+{% block title %}<title>{% trans "500 server error" %} | {{ PAGE_TITLE }} </title>{% endblock %}
 {% load static %}
 {% block content %}
 <div class="container">
   <div class="row justify-content-center pt-4">
     <div  class="alert alert-warning col-sm-6 alert-dismissible fade show" role="alert">
-      <h4 class="alert-heading"> Server error </h4>
+      <h4 class="alert-heading"> {% trans "Server error" %} </h4>
       <hr>
-      <p> Oh no! Our server encountered an error.</p>
+      <p> {% trans "Oh no! Our server encountered an error." %} </p>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
     <div class="w-100"></div>
     <div class col-sm-6>
-      <img src="{% static 'images/generic-error.svg' %}" class="img-fluid" width="400" alt="404: Not found." />
+      <img src="{% static 'images/generic-error.svg' %}" class="img-fluid" width="400" alt="{% trans "500: Server error." %}" />
     </div><!-- col -->
   </div> <!-- row -->
 </div><!-- container -->

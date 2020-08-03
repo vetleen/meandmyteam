@@ -1,0 +1,794 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-08-03 15:14+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: meandmyteam/settings.py:204
+msgid "Employee Engagement Tracking | Motpanel"
+msgstr "Ansatteengasjement - Sporing | Motpanel "
+
+#: payments/templates/current_plan.html:26
+#, fuzzy
+#| msgid "Plans and pricing"
+msgid "Plans and payment"
+msgstr "Planer og prising"
+
+#: payments/templates/current_plan.html:31
+#, fuzzy
+#| msgid "Plans and pricing"
+msgid "Plans and payments"
+msgstr "Planer og prising"
+
+#: payments/templates/current_plan.html:41
+#, fuzzy
+#| msgid "Your subscription was started!"
+msgid "Your Subscription"
+msgstr "Abonnementet ble igangsatt!"
+
+#: payments/templates/current_plan.html:48
+msgid "CANCELLED"
+msgstr "STOPPET"
+
+#: payments/templates/current_plan.html:50
+msgid "ACTIVE"
+msgstr "AKTIV"
+
+#: payments/templates/current_plan.html:61
+#, python-format
+msgid ""
+"\n"
+"                  <h3 class=\"card-subtitle text-info text-center\">$"
+"%(plan_total)s %(plan_currency)s/%(plan_interval)s* </h3>\n"
+"                  \n"
+"                  <span class=\"text-muted\"><center><small>total for "
+"%(stripe_quantity)s employees billed %(plan_name)s</small></center></span>\n"
+"                  <p class=\"text-center\">\n"
+"                    \n"
+"                    <span class=\"text-muted lead\">Subscription is <span "
+"class=\"text-success font-weight-bold\">%(stripe_status)s</span>\n"
+"                  "
+msgstr ""
+"\n"
+"                  <h3 class=\"card-subtitle text-info text-center\">$"
+"%(plan_total)s %(plan_currency)s/%(plan_interval)s* </h3>\n"
+"                  \n"
+"                  <span class=\"text-muted\"><center><small>total for "
+"%(stripe_quantity)s ansatte fakturert %(plan_name)s</small></center></span>\n"
+"                  <p class=\"text-center\">\n"
+"                    \n"
+"                    <span class=\"text-muted lead\">Abbonnementet er <span "
+"class=\"text-success font-weight-bold\">%(stripe_status)s</span>\n"
+"                  "
+
+#: payments/templates/current_plan.html:71
+msgid "until"
+msgstr "frem til"
+
+#: payments/templates/current_plan.html:76
+msgid "(will not renew automatically!)"
+msgstr "(fornyes ikke automatisk!)"
+
+#: payments/templates/current_plan.html:78
+msgid "(renews automatically!)"
+msgstr "(fornyes automatisk!)"
+
+#: payments/templates/current_plan.html:82
+#, python-format
+msgid ""
+"\n"
+"                <p class=\"card-text\">* The plan scales automatically to "
+"the number of surveyed employees, and bills %(plan_name)s. </p>\n"
+"                "
+msgstr ""
+"\n"
+"                <p class=\"card-text\">* Planen skalerer automatisk til "
+"antall ansatte, og faktureres %(plan_name)s. </p>\n"
+"                "
+
+#: payments/templates/set_up_payment_method.html:27
+msgid "Add a card"
+msgstr "Legg til kort"
+
+#: payments/templates/set_up_payment_method.html:32
+#: payments/templates/set_up_payment_method.html:53
+msgid "Add credit card"
+msgstr "Legg til kredittkort"
+
+#: payments/templates/set_up_payment_method.html:40
+msgid "Pay with credit card"
+msgstr "Betal med kredittkort"
+
+#: payments/templates/set_up_payment_method.html:43
+msgid ""
+"\n"
+"          We need to collect your credit card details to set up your chosen "
+"plan.<br />\n"
+"          Don't worry though - we won't charge you until your trial runs "
+"out!\n"
+"          "
+msgstr ""
+"\n"
+"          For å sette opp planen du har valgt, må vi innhente "
+"kredittkortdetaljene dine.<br />\n"
+"          Vi belaster derimot ikke kortet før prøvetiden er gått ut!\n"
+"          "
+
+#: payments/templates/set_up_payment_method.html:50
+msgid "We currently only support payments with credit cards."
+msgstr "Vi støtter for tiden kun betaling med kredittkort."
+
+#: payments/views.py:68
+msgid "month"
+msgstr "måned"
+
+#: payments/views.py:70
+msgid "year"
+msgstr "år"
+
+#: payments/views.py:75
+#, fuzzy
+#| msgid "Standard Quarterly"
+msgid "Quarterly"
+msgstr "Kvartalsvis"
+
+#: payments/views.py:77
+msgid "Yearly"
+msgstr "Årlig"
+
+#: payments/views.py:260
+msgid "The subscription setup process was cancelled. Try again?"
+msgstr "Prosessen med å sette opp et abonnement ble avbrytt. Prøv på nytt?"
+
+#: payments/views.py:282
+msgid ""
+"Looks like you were able to set up a payment method, but we were unable to "
+"get data from our payment provider just now. Don't worry though, our support "
+"staff have been notified and will fix it!"
+msgstr ""
+"Det ser ut som om vi fikk til å sette opp betalingsmåte for deg, men vi "
+"klarte ikke å få dataene ut i fra betalingsløsningen vår akkurat nå. Men "
+"frykt ikke, supportavdelingen vår har fått beskjed, og fikser saken!"
+
+#: payments/views.py:291
+msgid "Payment method set up successfully!"
+msgstr "Oppsett av betalingsmåte var vellykket!"
+
+#: payments/views.py:305
+#, fuzzy
+#| msgid "Your profile details was updated."
+msgid "Your preferred payment method was updated!"
+msgstr "Den foretrukne betalingmåten din ble oppdatert!"
+
+#: payments/views.py:307
+msgid ""
+"We tried to change your payment method, but it may not have work. Feel free "
+"to try again!"
+msgstr ""
+"Vi forsøkte å endre betalingsmetoden din, men det kan hende det ikke "
+"fungerte. Prøv gjerne igjen!"
+
+#: payments/views.py:326
+msgid "The selected card was deleted!"
+msgstr "Det valgte kortet ble slettet!"
+
+#: payments/views.py:329
+msgid ""
+"We tried to delete your card, but it may not have work. Feel free to try "
+"again!"
+msgstr ""
+"Vi forsøkte å slette kortet ditt, men det kan hende at det ikke fungerte. "
+"Prøv gjerne igjen!"
+
+#: payments/views.py:372
+msgid "Your subscription was started!"
+msgstr "Abonnementet ble igangsatt!"
+
+#: payments/views.py:381
+msgid ""
+"We tried to start your subscription, but something went wrong. You can try "
+"again, and we'll make sure you don't get charged twice!"
+msgstr ""
+"Vi forsøkte å starte et abonnement, men noe gikk galt. Du kan prøve på nytt, "
+"og så skal vi sjekke manuelt at du ikke blir belastet dobbelt!"
+
+#: payments/views.py:400
+msgid "Your subscription was cancelled, it will not renew next billing cycle."
+msgstr ""
+"Abonnementet ditt ble kansellert, og vil dermed ikke fornyes ved neste "
+"fakturadato."
+
+#: payments/views.py:408
+msgid ""
+"We tried to cancel your subscription, but it may not have work. Try again "
+"later, or contact support."
+msgstr ""
+"Vi forsøkte å kansellere abonnementet ditt, men det kan hende det ikke "
+"fungerte. Prøv igjen senere, eller kontakt brukerstøtten vår."
+
+#: payments/views.py:427
+msgid "Your subscription was restarted!"
+msgstr "Abonnementet ditt ble gjenopptatt!"
+
+#: payments/views.py:435
+msgid ""
+"We tried to restart your subscription, but it may not have worked. Try again "
+"later, or contact support."
+msgstr ""
+"Vi forsøkte å gjennoppta abonnementet ditt, men det kan hende det ikke "
+"funket. Prøv igjen senere, eller kontakt brukerstøtten vår"
+
+#: payments/views.py:453
+msgid "Your subscription was updated with the chosen plan!"
+msgstr "Abonnementet ditt ble oppdatert med den valgte planen!"
+
+#: payments/views.py:458
+msgid ""
+"We tried to update your subscription, but it may not have worked. Try again "
+"later, or contact support."
+msgstr ""
+"Vi forsøkte å oppdatere abonnementet ditt, men det kan være at det ikke "
+"gikk. Prøv igjen senere, eller kontakt brukerstøtten vår"
+
+#: templates/400.html:6
+msgid "400 bad request"
+msgstr "400 ugyldig forespørsel"
+
+#: templates/400.html:12
+msgid "Bad request"
+msgstr "Ugyldig forespørsel"
+
+#: templates/400.html:14
+msgid "Our webserver thought there was something fishy about your request..."
+msgstr "Webserveren vår mente det var noe rart med denne forespørselen..."
+
+#: templates/400.html:21
+msgid "400: Fishy request."
+msgstr "400: Rar forespørsel"
+
+#: templates/403.html:6
+msgid "403 forbidden"
+msgstr "403 forbudt"
+
+#: templates/403.html:13
+msgid "Not allowed"
+msgstr "Ikke tillatt"
+
+#: templates/403.html:15
+#, python-format
+msgid ""
+" \n"
+"          It seems you are not allowed to see what (if anything) we are "
+"hiding at this address.The server gave the following error code: "
+"%(exception)s. </p>\n"
+"          "
+msgstr ""
+" \n"
+"          Du har visst ikke lov til å se hva (hvis noe) som gjemmer seg på "
+"denne addressen. Serveren oppgav følgende feil: %(exception)s. </p>\n"
+"          "
+
+#: templates/403.html:24
+msgid "403: Not allowed."
+msgstr "403: Ikke tillatt"
+
+#: templates/403_csrf.html:6
+msgid "403 CSRF error"
+msgstr "403 Feil med CSRF"
+
+#: templates/403_csrf.html:13
+msgid "Form error"
+msgstr "Skjemafeil"
+
+#: templates/403_csrf.html:15
+msgid "There was an error with the form you submitted."
+msgstr "Det var en feil med skjemaet du sendte inn."
+
+#: templates/403_csrf.html:22
+#, fuzzy
+#| msgid "400: Form error."
+msgid "403: Form error."
+msgstr "403: Skjemafeil"
+
+#: templates/404.html:6
+msgid "404 not found"
+msgstr "404 ikke funnet"
+
+#: templates/404.html:12
+msgid "Page not Found"
+msgstr "Finner ikke siden"
+
+#: templates/404.html:14
+msgid "Oh no! We could not find the page you requested at this url."
+msgstr "Å nei! Vi fant ikke siden du ba om."
+
+#: templates/404.html:21
+msgid "404: Not found."
+msgstr "404: Ikke funnet."
+
+#: templates/500.html:6
+msgid "500 server error"
+msgstr "500 serverfeil"
+
+#: templates/500.html:12
+msgid "Server error"
+msgstr "Serverfeil"
+
+#: templates/500.html:14
+msgid "Oh no! Our server encountered an error."
+msgstr "Å nei! Serveren vår gjorde en feil."
+
+#: templates/500.html:21
+msgid "500: Server error."
+msgstr "500: Server feil."
+
+#: website/templates/change_password_form.html:3
+#: website/templates/edit_account_form.html:67
+#: website/templates/includeable/navbar.html:27
+msgid "Change password"
+msgstr "Endre passord"
+
+#: website/templates/change_password_form.html:8
+#, fuzzy
+#| msgid "Change password"
+msgid "Change your password"
+msgstr "Endre passord"
+
+#: website/templates/edit_account_form.html:4
+#: website/templates/edit_account_form.html:9
+#: website/templates/includeable/navbar.html:25
+msgid "Account details"
+msgstr "Kontodetaljer"
+
+#: website/templates/edit_account_form.html:70
+msgid "Organization information:"
+msgstr "Info om organisasjonen"
+
+#: website/templates/edit_account_form.html:212
+#: website/templates/includeable/form_renderer.html:32
+#: website/templates/sign_up_form.html:280
+msgid "Submit"
+msgstr "Send"
+
+#: website/templates/edit_account_form.html:213
+msgid "Reset"
+msgstr "Nullstill"
+
+#: website/templates/edit_account_form.html:214
+#: website/templates/includeable/form_renderer.html:33
+msgid "Back"
+msgstr "Tilbake"
+
+#: website/templates/includeable/footer.html:6
+msgid ""
+"\n"
+"        <span class=\"text-muted\"><small>© 2020 <span class=\"text-info "
+"font-weight-bold\" style=\"font-family: serif;\">motpanel</span>, an "
+"Engesbak Promotions brand. All rights reserved.\" <br /><br />\n"
+"        "
+msgstr ""
+"\n"
+"        <span class=\"text-muted\"><small>© 2020 <span class=\"text-info "
+"font-weight-bold\" style=\"font-family: serif;\">motpanel</span>, en "
+"Engesbak Promotions merkevare. Alle rettigheter er reservert.\" <br /><br /"
+">\n"
+"        "
+
+#: website/templates/includeable/full_footer.html:6
+msgid "About us"
+msgstr "Om oss"
+
+#: website/templates/includeable/full_footer.html:8
+msgid ""
+" <span class=\"text-info font-weight-bold\" style=\"font-family: serif;"
+"\">motpanel</span> is employee engagement software. Specifically, <span "
+"class=\"text-info font-weight-bold\" style=\"font-family: serif;\">motpanel</"
+"span> is a service that lets you easily and recurringly survey employee "
+"engagement.\" "
+msgstr ""
+"<span class=\"text-info font-weight-bold\" style=\"font-family: serif;"
+"\">motpanel</span> er software for ansattengasjement. Kort fortal, lar<span "
+"class=\"text-info font-weight-bold\" style=\"font-family: serif;\">  "
+"motpanel</span> deg raskt og med jevne mellomrom sende undersøkelser som "
+"måler de ansattes engasjement."
+
+#: website/templates/includeable/full_footer.html:12
+msgid "Site"
+msgstr "Nettsted"
+
+#: website/templates/includeable/full_footer.html:15
+#: website/templates/includeable/navbar.html:40
+#: website/templates/sign_up_form.html:4 website/templates/sign_up_form.html:9
+msgid "Sign up"
+msgstr "Bli med"
+
+#: website/templates/includeable/full_footer.html:18
+#: website/templates/login_form.html:3 website/templates/login_form.html:8
+#, fuzzy
+#| msgid "Log out"
+msgid "Log in"
+msgstr "Logg ut"
+
+#: website/templates/includeable/full_footer.html:23
+msgid "Legal"
+msgstr "Formalia"
+
+#: website/templates/includeable/full_footer.html:26
+#: website/templates/privacy_policy_template.html:6
+msgid "Privacy policy"
+msgstr "Personvernerklæring"
+
+#: website/templates/includeable/full_footer.html:29
+msgid "Terms of use"
+msgstr "Vilkår for bruk"
+
+#: website/templates/includeable/full_footer.html:34
+msgid "Contact"
+msgstr "Kontakt"
+
+#: website/templates/includeable/full_footer.html:36
+msgid ""
+"\n"
+"          Engesbak promotions<br />\n"
+"          co. Vetle Engesbak<br />\n"
+"          Elgestergate 58B,\n"
+"          NO-7030 Trondheim\n"
+"          "
+msgstr ""
+"\n"
+"          Engesbak promotions<br />\n"
+"          co. Vetle Engesbak<br />\n"
+"          Elgestergate 58B,\n"
+"          7030 Trondheim\n"
+"          "
+
+#: website/templates/includeable/full_footer.html:44
+msgid ""
+"\n"
+"          Phone: +47 992 30 377 <br />\n"
+"          Email: <a href=\"mailto:contact@motpanel.com\"> contact@motpanel."
+"com </a>\n"
+"          "
+msgstr ""
+"\n"
+"          Telefon: +47 992 30 377 <br />\n"
+"          Epost: <a href=\"mailto:kontakt@motpanel.com\"> kontakt@motpanel."
+"com </a>\n"
+"          "
+
+#: website/templates/includeable/full_footer.html:53
+msgid ""
+"\n"
+"        <span class=\"text-muted\"><small>© 2020 <span class=\"text-info "
+"font-weight-bold\" style=\"font-family: serif;\">motpanel</span>, an "
+"Engesbak Promotions brand. All rights reserved.<br /><br />\n"
+"        "
+msgstr ""
+"\n"
+"        <span class=\"text-muted\"><small>© 2020 <span class=\"text-info "
+"font-weight-bold\" style=\"font-family: serif;\">motpanel</span>, en "
+"Engesbak Promotions merkevare. Alle rettigheter er reservert.<br /><br />\n"
+"        "
+
+#: website/templates/includeable/navbar.html:17
+msgid "Start here"
+msgstr "Start her"
+
+#: website/templates/includeable/navbar.html:17
+#: website/templates/includeable/navbar.html:34
+#: website/templates/includeable/navbar.html:37
+#: website/templates/includeable/navbar.html:40
+msgid "(current)"
+msgstr "(nåværende)"
+
+#: website/templates/includeable/navbar.html:21
+msgid "Account"
+msgstr "Konto"
+
+#: website/templates/includeable/navbar.html:26
+msgid "Subscription details"
+msgstr "Abonnementsdetaljer"
+
+#: website/templates/includeable/navbar.html:29
+msgid "Log out"
+msgstr "Logg ut"
+
+#: website/templates/includeable/navbar.html:34
+msgid "Home"
+msgstr "Hjem"
+
+#: website/templates/includeable/navbar.html:37 website/views.py:214
+#: website/views.py:238
+msgid "Login"
+msgstr "Log inn"
+
+#: website/templates/index.html:11
+msgid "Great leaders lead highly motivated employees."
+msgstr "Gode ledere leder høyt motiverte ansatte"
+
+#: website/templates/index.html:14
+msgid "Automatic employee engagement tracking, and more."
+msgstr "Autmatisk sporing av ansattes engasjement - og mer."
+
+#: website/templates/index.html:16 website/templates/index.html:101
+#: website/templates/index.html:117 website/templates/index.html:132
+#: website/templates/index.html:158 website/templates/index.html:172
+msgid "Try for free"
+msgstr "Prøv gratis"
+
+#: website/templates/index.html:17 website/templates/index.html:102
+#: website/templates/index.html:118 website/templates/index.html:133
+msgid "Pick a plan, cancel anytime."
+msgstr "Velg en plan, stopp når som helst."
+
+#: website/templates/index.html:43
+msgid "Show your employees that you care!"
+msgstr "Vis de ansatte at du bryr deg"
+
+#: website/templates/index.html:55
+msgid "How does it work?"
+msgstr "Hvordan virker det?"
+
+#: website/templates/index.html:60
+msgid "1. Add employees to track"
+msgstr "1. Legg til ansatte som skal spores"
+
+#: website/templates/index.html:64
+msgid ""
+"Add email addresses for the employees whos engagement you want to monitor. "
+"We'll send them a survey."
+msgstr ""
+"Legg til epost-addressene til de ansatte du vil spore.Så sender vi de en "
+"spørreundersøkelse."
+
+#: website/templates/index.html:70
+msgid "2. Employees answer regular surveys"
+msgstr "2. De ansatte svarer på regelmessige undersøkelser"
+
+#: website/templates/index.html:74
+msgid ""
+"Each employee receives a regular (e.g. quarterly) survey with scientifically "
+"vetted questions."
+msgstr ""
+"Hver ansatt mottar regelmessig (f.eks. kvartalsvis) et spørreskjema med "
+"vitenskapelig verifiserte spørsmål."
+
+#: website/templates/index.html:80
+msgid "3. You get the results"
+msgstr "3. Du får resultatene"
+
+#: website/templates/index.html:84
+msgid ""
+"Receive comprehensive reports showing employee engagement snap-shots and "
+"trends, learn what is working to improve engagement. </p>"
+msgstr ""
+"Motta utfyllende rapporter som viser ansatteengasjement og trender, lær hva "
+"som virker for å øke engasjementet. </p>"
+
+#: website/templates/index.html:97
+msgid "Easily add employees"
+msgstr "Legg til ansatte enkelt"
+
+#: website/templates/index.html:98
+msgid ""
+"You can easily add employees in a matter of seconds using our simple tool, "
+"or email us a list, and we'll add your employees for you."
+msgstr ""
+"Du kan selv enkelt legge til ansatte i løpet av sekunder, eller send oss en "
+"epost, så fikser vi det for deg"
+
+#: website/templates/index.html:113
+msgid "Get an overview from the dashboard"
+msgstr "Få oversikt på dashboardet"
+
+#: website/templates/index.html:114
+msgid ""
+"Clicking \"start here\" in the menu will always show you the next step to "
+"get started with employee engagement tracking. When all is set, it will show "
+"you to the dashboard, where you can access all settings and data."
+msgstr ""
+"Hvis du klikker \"Start her\" i menyen vil du alltid bli sendt til neste "
+"steg i prosessen med å komme i gang med sporing av ansatteengasjement. Når "
+"alt er satt opp og klart, blir du sendt til dashbordet, hvorfra du kan endre "
+"instillinger og de dataene dine."
+
+#: website/templates/index.html:128
+msgid "View data for your organization"
+msgstr "Se dataene for organisasjonen din"
+
+#: website/templates/index.html:129
+msgid ""
+"When data is in, meaning your employees have answered the survey we send "
+"them, the data will be made available for you. See your organization's "
+"strong and weak points, and get recommendations about how you can improve "
+"employee engagement."
+msgstr ""
+"Når datene er kommet inn, altså når de ansatte har svart på undersøkelsen vi "
+"sender dem, vil dataene bli tilgjengeliggjort på dashbordet. Her kan du se "
+"organisasjonens sterke og svake punkter, og få anbefalinger om hvordan å øke "
+"de ansattes engasjement."
+
+#: website/templates/index.html:143
+msgid "Plans and pricing"
+msgstr "Planer og prising"
+
+#: website/templates/index.html:151
+msgid "Standard Quarterly"
+msgstr "Standard Kvartalsvis"
+
+#: website/templates/index.html:152
+msgid "$3 USD/month"
+msgstr "NOK 30/måned"
+
+#: website/templates/index.html:153
+msgid "per employee billed quarterly"
+msgstr "per ansatt fakturert kvartalsvis"
+
+#: website/templates/index.html:154 website/templates/index.html:168
+msgid "30 days free trial!"
+msgstr "30 dager gratis prøvetid!"
+
+#: website/templates/index.html:155
+msgid "A standard subscription to Motpanel."
+msgstr "Et standard abonnement på Motpanel"
+
+#: website/templates/index.html:165
+msgid "Standard Yearly"
+msgstr "Standard Årlig"
+
+#: website/templates/index.html:166
+msgid "$30 USD/year"
+msgstr "NOK 30/år"
+
+#: website/templates/index.html:167
+msgid "per employee billed yearly"
+msgstr "per ansatt fakturert årlig"
+
+#: website/templates/index.html:169
+msgid "A standard subscription to Motpanel"
+msgstr "Et standard abonnement på Motpanel"
+
+#: website/templates/login_form.html:20
+#, fuzzy
+#| msgid "Change password"
+msgid "Forgot password"
+msgstr "Endre passord"
+
+#: website/templates/logout_complete.html:3
+#: website/templates/logout_complete.html:8
+#, fuzzy
+#| msgid "Log out"
+msgid "Logged out"
+msgstr "Logget ut"
+
+#: website/templates/sign_up_form.html:22
+msgid "You"
+msgstr "Du"
+
+#: website/templates/sign_up_form.html:110
+msgid "Your organization"
+msgstr "Organisasjonen din"
+
+#: website/templates/sign_up_form.html:273
+#, python-format
+msgid ""
+"\n"
+"            I accept the <a href=\"%(tandc_url)s\" target=\"_blank\">terms "
+"and conditions&#11016;</a> and the <a href=\"%(pp_url)s\" target=\"_blank"
+"\">privacy policy&#11016;</a>.\n"
+"            "
+msgstr ""
+"\n"
+"            Jeg aksepterer <a href=\"%(tandc_url)s\" target=\"_blank"
+"\">brukervilkårene&#11016;</a> og <a href=\"%(pp_url)s\" target=\"_blank"
+"\">personvernerklæringen&#11016;</a>.\n"
+"            "
+
+#: website/templates/terms_template.html:6
+msgid "Terms and conditions"
+msgstr "Vilkår og betingelser"
+
+#: website/views.py:75
+#, fuzzy
+#| msgid "Change password"
+msgid "Update password"
+msgstr "Endre passord"
+
+#: website/views.py:76 website/views.py:215 website/views.py:239
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: website/views.py:88
+msgid ""
+"Password was not changed! You typed your old password in incorrectly, please "
+"try again."
+msgstr ""
+"Passordet ble ikke endret fordi du skrev inn det gamle passordet feil. Du "
+"kan prøv på nytt."
+
+#: website/views.py:95
+msgid "Your password was changed."
+msgstr "Passordet ditt ble endret"
+
+#: website/views.py:114
+msgid "Send password reset link"
+msgstr "Send link for å nullstille passord"
+
+#: website/views.py:137
+msgid ""
+"You are already signed in, and can't make a new account until you sign out."
+msgstr "Du er allerede logget inn, og kan derfor ikke lage en ny konto."
+
+#: website/views.py:174
+msgid "Welcome aboard. Let's start by adding some employees to survey!"
+msgstr ""
+"Velkommen ombord. La oss begynne med å legge til noen ansatte å sende "
+"spørreskjema til!"
+
+#: website/views.py:195
+#, fuzzy
+#| msgid "Change password"
+msgid "Choose a password"
+msgstr "Velg passord"
+
+#: website/views.py:195
+#, fuzzy
+#| msgid "Change password"
+msgid "Confirm password"
+msgstr "Bekreft passord"
+
+#: website/views.py:206
+msgid "You are already logged in."
+msgstr "Du er allerede logget inn."
+
+#: website/views.py:228
+msgid "You have logged in."
+msgstr "Du har logget deg inn."
+
+#: website/views.py:248
+msgid "You have logged out successfully."
+msgstr "Du har logget deg ut."
+
+#: website/views.py:274
+#, fuzzy
+#| msgid "Account details"
+msgid "Update account details"
+msgstr "Kontodetaljer"
+
+#: website/views.py:294
+msgid "Your profile details was updated."
+msgstr "Profilen din ble oppdatert."
+
+#: website/views.py:301
+msgid "Can't edit profile when you are not logged in."
+msgstr "Du kan ikke endre profilen din når du ikke er logget inn."
+
+#~ msgid ""
+#~ "\n"
+#~ "                  <span class=\"text-muted lead\">Subscription is <span "
+#~ "class=\"text-success font-weight-bold\">%(stripe_subscription.status)s</"
+#~ "span>\n"
+#~ "                  "
+#~ msgstr ""
+#~ "\n"
+#~ "                  <span class=\"text-muted lead\">Abonnementet er <span "
+#~ "class=\"text-success font-weight-bold\">%(stripe_subscription.status)s</"
+#~ "span>\n"
+#~ "                  "
+
+#~ msgid ", an Engesbak Promotions brand. All rights reserved."
+#~ msgstr ", et Engesbak Promotions merkenavn. Alle rettigheter er reservert."

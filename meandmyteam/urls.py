@@ -18,9 +18,10 @@ from django.urls import path
 from django.urls import include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls.i18n import i18n_patterns
 #from surveys import views as survey_views
 
-urlpatterns = [
+urlpatterns = i18n_patterns(
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
 
@@ -28,7 +29,8 @@ urlpatterns = [
     path('surveys/', include('surveys.surveys_urls')),
     path('', include('website.urls')),
     path('payments/', include('payments.urls')),
+    prefix_default_language=True
 
-]
+)
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.http import HttpRequest
- 
+#from django.utils.translation import gettext as _
+
 #make sure we have the GA_KEY variable available in all templates 
 def google_analytics(request: HttpRequest): 
     return {

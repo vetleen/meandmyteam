@@ -1,51 +1,58 @@
+{% load i18n %}
 
   <div class="container pt-2">
     <div class="row">
       <div class="col-sm-4">
-        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">About us</h6>
+        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">{% trans "About us" %}</h6>
         <p style="font-size: 14px;" class="text-muted">
-          <span class="text-info font-weight-bold" style="font-family: serif;">motpanel</span> is employee engagement software. Specifically, <span class="text-info font-weight-bold" style="font-family: serif;">motpanel</span> is a service that lets you easily and recurringly survey employee engagement.</p>
+          {% blocktrans %} <span class="text-info font-weight-bold" style="font-family: serif;">motpanel</span> is employee engagement software. Specifically, <span class="text-info font-weight-bold" style="font-family: serif;">motpanel</span> is a service that lets you easily and recurringly survey employee engagement." {% endblocktrans %}</p>
 
       </div><!-- col -->
       <div class="col-sm">
-        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">Site</h6>
+        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">{% trans "Site" %}</h6>
         <ul class="list-unstyled">
           <li>
-            <a href="{% url 'sign-up'%}" style="font-size: 14px;" class="text-dark">Sign up</a>
+            <a href="{% url 'sign-up'%}" style="font-size: 14px;" class="text-dark">{% trans "Sign up" %}</a>
           </li>
           <li>
-            <a href="{% url 'loginc'%}" style="font-size: 14px;" class="text-dark">Log in</a>
+            <a href="{% url 'loginc'%}" style="font-size: 14px;" class="text-dark">{% trans "Log in" %}</a>
           </li>
         </ul>
       </div><!-- col -->
       <div class="col-sm">
-        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">Legal</h6>
+        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">{% trans "Legal" %}</h6>
         <ul class="list-unstyled">
           <li>
-            <a href="{% url 'privacy-policy' %}" style="font-size: 14px;" class="text-dark">Privacy policy</a>
+            <a href="{% url 'privacy-policy' %}" style="font-size: 14px;" class="text-dark">{% trans "Privacy policy" %}</a>
           </li>
           <li>
-            <a href="{% url 'terms-and-conditions' %}" style="font-size: 14px;" class="text-dark">Terms of use</a>
+            <a href="{% url 'terms-and-conditions' %}" style="font-size: 14px;" class="text-dark">{% trans "Terms of use" %}</a>
           </li>
         </ul>
       </div><!-- col -->
       <div class="col-sm">
-        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">Contact</h6>
+        <h6 class="font-weight-bold text-uppercase text-dark mt-3 mb-3">{% trans "Contact" %}</h6>
         <p style="font-size: 12px;" class="text-muted">
+          {% blocktrans %}
           Engesbak promotions<br />
           co. Vetle Engesbak<br />
           Elgestergate 58B,
           NO-7030 Trondheim
+          {% endblocktrans %}
         </p>
         <p style="font-size: 12px;" class="text-muted mb-0">
+          {% blocktrans %}
           Phone: +47 992 30 377 <br />
           Email: <a href="mailto:contact@motpanel.com"> contact@motpanel.com </a>
+          {% endblocktrans %}
         </p>
       </div><!-- col -->
     </div><!-- row -->
       <div class="row">
       <div class="col-sm-12 text-center">
+        {% blocktrans %}
         <span class="text-muted"><small>© 2020 <span class="text-info font-weight-bold" style="font-family: serif;">motpanel</span>, an Engesbak Promotions brand. All rights reserved.<br /><br />
+        {% endblocktrans %}
       </div><!-- col -->
     </div><!-- row -->
   </div><!-- container -->

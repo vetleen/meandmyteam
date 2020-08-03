@@ -1,5 +1,6 @@
 {% extends "base_generic.html" %}
 {% load static %}
+{% load i18n %}
 {% block extrascripts %}
 <script src="https://js.stripe.com/v3/"></script>
 <script>
@@ -22,12 +23,12 @@ function stripeRedirect(){
 }
 </script>
 {% endblock %}
-{% block title %}<title>Plans and payment | {{ PAGE_TITLE }} </title>{% endblock %}
+{% block title %}<title>{% trans "Plans and payment" %} | {{ PAGE_TITLE }} </title>{% endblock %}
 {% block content %}
 <div class="container">
   <div class="row pt-4">
     <div class="col">
-      <h3> Plans and payments</h3>
+      <h3> {% trans "Plans and payments" %}</h3>
     </div>
   </div> <!-- row -->
   <div class="row justify-content-center pt-2">
@@ -37,37 +38,51 @@ function stripeRedirect(){
 
             {% if stripe_subscription is not None and stripe_subscription.status != 'canceled' %}
         <div class="col-lg-6"><!-- Your subsciption -->
-            <h5>Your Subscription</h5>
+            <h5>{% trans "Your Subscription" %}</h5>
             <div class="card-group">
             <div class="card col-12 px-0">
               <img src="{% static 'images/basic-plan-1.svg' %}" class="card-img-top mt-2"  style="height: 20rem;" alt="{{ plan.name }} plan">
               <div class="card-body">
                 <h5 class="card-title text-center text-body">Standard {{ stripe_subscription.plan_name }}
                   {% if stripe_subscription.cancel_at_period_end == True %}
-                  <span class="badge badge-warning">CANCELLED</span>
+                  <span class="badge badge-warning">{% trans "CANCELLED" %}</span>
                   {% elif stripe_subscription.plan_active == True %}
-                  <span class="badge badge-success">ACTIVE</span>
+                  <span class="badge badge-success">{% trans "ACTIVE" %}</span>
                   {% else %}
                   {% endif %}
                 </h5>
-                <h3 class="card-subtitle text-info text-center">${{ stripe_subscription.plan_total }} {{ stripe_subscription.plan_currency|upper }}/{{ stripe_subscription.plan_interval }}* </h3>
-                <span class="text-muted"><center><small>total for  {{ stripe_subscription.quantity }} employee{% if stripe_subscription.quantity > 1 %}s{% endif %} billed {{ stripe_subscription.plan_name|lower }}</small></center></span>
-                  <!--<span class="text-muted"><span class="lead">${{ stripe_subscription.plan_interval_amount }} <small></small>{{ stripe_subscription.plan_currency|upper }} / {{ stripe_subscription.plan_interval }} </span>per co-worker</span><br />-->
-                <p class="text-center">
-                  <span class="text-muted lead">Subscription is <span class="text-success font-weight-bold">{{ stripe_subscription.status }}</span>
+                {% trans stripe_subscription.plan_total as plan_total %}
+                {% trans stripe_subscription.plan_currency|upper as plan_currency %}
+                {% trans stripe_subscription.plan_interval as plan_interval %}
+                {% trans stripe_subscription.plan_name|lower as plan_name %}
+                {% trans stripe_subscription.status as stripe_status %}
+                {% with stripe_subscription.quantity as stripe_quantity %}
+                
+                  {% blocktrans %}
+                  <h3 class="card-subtitle text-info text-center">${{ plan_total }} {{ plan_currency }}/{{ plan_interval }}* </h3>
+                  
+                  <span class="text-muted"><center><small>total for {{ stripe_quantity }} employees billed {{ plan_name }}</small></center></span>
+                  <p class="text-center">
+                    
+                    <span class="text-muted lead">Subscription is <span class="text-success font-weight-bold">{{ stripe_status }}</span>
+                  {% endblocktrans %}
+                {% endwith %}
                   {% if stripe_subscription.status == 'active' or stripe_subscription.status == 'trialing' %}
-                    until {{ stripe_subscription.current_period_end }}.</span><br />
+                  {% trans "until" %} {{ stripe_subscription.current_period_end }}.</span><br />
                   {% else %}
                     .<br />
                   {% endif %}
                   {% if stripe_subscription.cancel_at_period_end == True %}
-                    <span class="text-danger"> (will not renew automatically!)</span>
+                    <span class="text-danger"> {% trans "(will not renew automatically!)" %}</span>
                   {% else %}
-                    <span class="text-success"> (renews automatically!)</span>
+                    <span class="text-success"> {% trans "(renews automatically!)" %}</span>
                   {% endif %}
                 </p>
-                <p class="card-text">* The plan scales automatically to the number of surveyed employees, and bills {{ stripe_subscription.plan_name|lower }}. </p>
-
+                
+                {% blocktrans %}
+                <p class="card-text">* The plan scales automatically to the number of surveyed employees, and bills {{ plan_name }}. </p>
+                {% endblocktrans %}
+                
               </div> <!-- card-body -->
               <div class="text-center card-footer">
                 <center>

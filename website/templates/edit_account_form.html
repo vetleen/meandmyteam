@@ -1,11 +1,12 @@
 {% extends "base_generic.html" %}
 {% load widget_tweaks %}
-{% block title %}<title>Account details | {{ PAGE_TITLE }} </title>{% endblock %}
+{% load i18n %}
+{% block title %}<title>{% trans "Account details" %} | {{ PAGE_TITLE }} </title>{% endblock %}
 {% block content %}
 <div class="container">
   <div class="row pt-4">
     <div class="col-lg-6">
-      <h3> Account details </h3>
+      <h3> {% trans "Account details" %} </h3>
     </div>
   </div> <!-- row -->
   <div class="row justify-content-center pt-2">
@@ -63,10 +64,10 @@
             <small class="form-text text-muted">{{ form.phone.help_text }}</small>
           {% endif %}
         </div>
-        <a href="{% url 'change-password' %}">Change password</a>
+        <a href="{% url 'change-password' %}">{% trans "Change password" %}</a>
 
         <hr>
-        <h5 class="mt-4">Organization information:</h5>
+        <h5 class="mt-4">{% trans "Organization information:" %}</h5>
         <div class="form-group">
           {{ form.name.label_tag }}
           {% if form.is_bound %}
@@ -208,9 +209,9 @@
 
 
 
-        <button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button>
-        <input type="reset" value="Reset" class="btn btn-secondary" role="button">
-        <a href="javascript:history.back()" class="btn btn-warning" role="button">Back</a>
+        <button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} {% trans "Submit" %} {% endif %} </button>
+        <input type="reset" value="{% trans "Reset" %}" class="btn btn-secondary" role="button">
+        <a href="javascript:history.back()" class="btn btn-warning" role="button">{% trans "Back" %}</a>
       </form>
       
 

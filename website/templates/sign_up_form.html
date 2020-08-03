@@ -1,11 +1,12 @@
 {% extends "base_generic.html" %}
+{% load i18n %}
 {% load widget_tweaks %}
-{% block title %}<title>Sign up | {{ PAGE_TITLE }} </title>{% endblock %}
+{% block title %}<title>{% trans "Sign up" %} | {{ PAGE_TITLE }} </title>{% endblock %}
 {% block content %}
 <div class="container">
   <div class="row pt-4">
     <div class="col-lg-12">
-      <h3> Sign up </h3>
+      <h3> {% trans "Sign up" %} </h3>
     </div>
   </div> <!-- row -->
   <div class="row justify-content-center pt-2">
@@ -18,7 +19,7 @@
         {% for hidden_field in form.hidden_fields %}
           {{ hidden_field }}
         {% endfor %}
-        <h5>You:</h5>
+        <h5>{% trans "You" %}:</h5>
 
         <div class="form-group">
           {{ form.username.label_tag }}
@@ -106,7 +107,7 @@
 
 
         <hr>
-        <h5 class="mt-4">Your organization:</h5>
+        <h5 class="mt-4">{% trans "Your organization" %}:</h5>
         <div class="form-group">
           {{ form.name.label_tag }}
           {% if form.is_bound %}
@@ -267,12 +268,16 @@
             <small class="form-text text-muted">{{ form.accepted_terms_and_conditions.help_text }}</small>
           {% endif %}
           <label class="form-check-label" for="defaultCheck1">
-            I accept the <a href="{% url 'terms-and-conditions' %}" target="_blank">terms and conditions&#11016;</a> and the <a href="{% url 'privacy-policy' %}" target="_blank">privacy policy&#11016;</a>.
+            {% url 'terms-and-conditions' as tandc_url %}
+            {% url 'privacy-policy' as pp_url %}
+            {% blocktrans %}
+            I accept the <a href="{{tandc_url}}" target="_blank">terms and conditions&#11016;</a> and the <a href="{{pp_url}}" target="_blank">privacy policy&#11016;</a>.
+            {% endblocktrans %}
           </label>
         </div>
 
 
-        <button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button>
+        <button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} {% trans "Submit" %} {% endif %} </button>
       </form>
 
     </div><!-- col -->

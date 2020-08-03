@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 import django_heroku
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -103,6 +105,9 @@ else:
 #Phonumber-config
 PHONENUMBER_DEFAULT_REGION = "NO"
 
+#translation
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -125,7 +130,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+#LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'nb'
+LANGUAGES = [
+    ('en-us', 'English'), 
+    ('nb', 'Norsk'), 
+]
 
 TIME_ZONE = 'Europe/Oslo'
 
@@ -191,4 +201,4 @@ django_heroku.settings(locals())
 GOOGLE_ANALYTICS_KEY = os.environ.get("GOOGLE_ANALYTICS_KEY", None)
 
 #page title
-PAGE_TITLE = "Employee Engagement Tracking | Motpanel"
+PAGE_TITLE = _("Employee Engagement Tracking | Motpanel")

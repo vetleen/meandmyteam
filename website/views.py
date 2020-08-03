@@ -14,6 +14,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
+from django.utils.translation import gettext as _
 
 from django.views import generic
 from django.shortcuts import render
@@ -28,6 +29,8 @@ from django.contrib.auth import update_session_auth_hash, login, authenticate
 from django.contrib import auth
 from django.contrib import messages
 from django.core.mail import send_mail
+
+
 
 #class-based password reset views
 from django.contrib.auth import views as auth_views
@@ -69,8 +72,8 @@ def change_password(request):
     form = ChangePasswordForm(user=request.user)
     context = {
         'form': form,
-        'submit_button_text': 'Update password',
-        'back_button_text': 'Cancel',
+        'submit_button_text': _('Update password'),
+        'back_button_text': _('Cancel'),
         'show_back_button': True,
     }
     # If this is a POST request then process the Form data
@@ -82,14 +85,14 @@ def change_password(request):
         if form.is_valid():
             user = request.user
             if not user.check_password(form.cleaned_data['old_password']):
-                messages.error(request, 'Password was not changed! You typed your old password in incorrectly, please try again.', extra_tags='alert alert-warning')
+                messages.error(request, _('Password was not changed! You typed your old password in incorrectly, please try again.'), extra_tags='alert alert-warning')
             else:
                 # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
                 user.set_password(form.cleaned_data['new_password'])
                 user.save()
                 update_session_auth_hash(request, request.user)
                 # redirect to a new URL:
-                messages.success(request, 'Your password was changed.', extra_tags='alert alert-success')
+                messages.success(request, _('Your password was changed.'), extra_tags='alert alert-success')
             form = ChangePasswordForm(user=request.user)
             context.update({'form': form})
             return render(request, 'change_password_form.html', context)
@@ -108,7 +111,7 @@ class PasswordResetRequestView(auth_views.PasswordResetView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # Add in variables
-        context['submit_button_text'] = 'Send password reset link'
+        context['submit_button_text'] = _('Send password reset link')
         return context
 
 class PasswordResetRequestReceivedView(auth_views.PasswordResetDoneView):
@@ -131,7 +134,7 @@ def sign_up(request):
     """View function for signing up."""
     #logged in users are redirected
     if request.user.is_authenticated:
-        messages.error(request, 'You are already signed in, and can\'t make a new account until you sign out.', extra_tags='alert alert-warning')
+        messages.error(request, _('You are already signed in, and can\'t make a new account until you sign out.'), extra_tags='alert alert-warning')
         return render(request, 'you_did_something.html')
 
     #mark an event - someone visited this site
@@ -168,7 +171,7 @@ def sign_up(request):
                 accepted_terms_and_conditions = form.cleaned_data['accepted_terms_and_conditions'],
                 )
             organization.save()
-            messages.success(request, "Welcome aboard. Let's start by adding some employees to survey!", extra_tags='alert alert-success')
+            messages.success(request, _("Welcome aboard. Let's start by adding some employees to survey!"), extra_tags='alert alert-success')
             send_mail(
                 '[www] New user: %s!'%(user.username),
                 'User: %s has signed up!'%(user.username),
@@ -189,7 +192,7 @@ def sign_up(request):
             #mark an event - someone failed to sign up
             comment = ""
             for field in form.visible_fields():
-                if field.field.label != "Choose a password" and field.field.label != "Confirm password":
+                if field.field.label != _("Choose a password") and field.field.label != _("Confirm password"):
                     field_data = "%s: %s \n"%(field.field.label, field.data)
                     comment+=(field_data)
             event = Event(category='failed_sign_up', comment=comment)
@@ -200,7 +203,7 @@ def login_view(request):
     """View function for logging in."""
     #is user already logged in?
     if request.user.is_authenticated:
-        messages.error(request, 'You are already logged in.', extra_tags='alert alert-warning')
+        messages.error(request, _('You are already logged in.'), extra_tags='alert alert-warning')
         return HttpResponseRedirect(request.GET.get('next', reverse('surveys-dashboard')))
 
     #If we receive POST data
@@ -208,8 +211,8 @@ def login_view(request):
         # Create a form instance and populate it with data from the request (binding it):
         form = LoginForm(request.POST)
         context = {
-            'submit_button_text': 'Login',
-            'back_button_text': 'Cancel',
+            'submit_button_text': _('Login'),
+            'back_button_text': _('Cancel'),
             'show_back_button': False,
             'form': form,
             }
@@ -222,7 +225,7 @@ def login_view(request):
             if user is not None:
                 auth.login(request, user)
                 request.user.organization.update_subscription_paid_until()
-                messages.success(request, 'You have logged in.', extra_tags='alert alert-success')
+                messages.success(request, _('You have logged in.'), extra_tags='alert alert-success')
                 #mark an event - user logged in
                 event = Event(category='completed_log_in', user=request.user, comment=None)
                 event.save()
@@ -232,8 +235,8 @@ def login_view(request):
         #make context
         form = LoginForm
         context = {
-            'submit_button_text': 'Login',
-            'back_button_text': 'Cancel',
+            'submit_button_text': _('Login'),
+            'back_button_text': _('Cancel'),
             'show_back_button': False,
             'form': form,
             }
@@ -242,7 +245,7 @@ def login_view(request):
 def logout_view(request):
     """View function that logs userout and shows success message after logout."""
     auth.logout(request)
-    messages.info(request, 'You have logged out successfully.', extra_tags='alert alert-info')
+    messages.info(request, _('You have logged out successfully.'), extra_tags='alert alert-info')
     return render(request, 'logout_complete.html')
 
 @login_required
@@ -268,7 +271,7 @@ def edit_account_view(request):
         #If we receive POST data
         context = {
             'form': form,
-            'submit_button_text': 'Update account details'
+            'submit_button_text': _('Update account details')
         }
         if request.method == 'POST':
             # Create a form instance and populate it with data from the request (binding):
@@ -288,12 +291,12 @@ def edit_account_view(request):
 
                 request.user.save()
                 request.user.organization.save()
-                messages.success(request, 'Your profile details was updated.', extra_tags='alert alert-success')
+                messages.success(request, _('Your profile details was updated.'), extra_tags='alert alert-success')
 
         return render(request, 'edit_account_form.html', context)
     #if user not authenticated
     else:
         #this should never occcur
         logger.warning("%s %s: %s tried to edit someone else's account"%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
-        messages.error(request, "Can't edit profile when you are not logged in.", extra_tags='alert alert-danger')
+        messages.error(request, _("Can't edit profile when you are not logged in."), extra_tags='alert alert-danger')
         return HttpResponseRedirect(reverse('loginc'))

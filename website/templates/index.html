@@ -1,5 +1,6 @@
 {% extends "base_generic.html" %}
 {% load static %}
+{% load i18n %}
 {% block content %}
 <!-- Front page banner begins -->
 <div class="jumbotron jumbotron-fluid" style="">
@@ -7,13 +8,13 @@
     <div class="row">
       <div class="col-sm-12 text-center">
         <p>&nbsp;</p>
-        <h1 class="display-5 main-page-headline text-info" style="color: #94f1ff !important;">Great leaders lead highly motivated employees.</h1>
+        <h1 class="display-5 main-page-headline text-info" style="color: #94f1ff !important;">{% trans "Great leaders lead highly motivated employees." %}</h1>
           <p class="text-white">
             <!-- Software to help you increase employee satisfaction and loyalty. -->
-            Automatic employee engagement tracking, and more.
+            {% trans "Automatic employee engagement tracking, and more." %}
           </p><br />
-        <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">Try for free</a><br />
-        <a href="{% url 'sign-up' %}" class="text-white"><small>Pick a plan, cancel anytime.</small></a>
+        <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">{% trans "Try for free" %}</a><br />
+        <a href="{% url 'sign-up' %}" class="text-white"><small>{% trans "Pick a plan, cancel anytime." %}</small></a>
       </div> <!-- col -->
     </div><!-- row -->
   </div><!-- container -->
@@ -39,7 +40,7 @@
       </div>
       -->
       <div class="col-12 lead text-center align-self-center">
-        Show your employees that you care!
+        {% trans "Show your employees that you care!" %}
       </div>
 
     </div><!-- row -->
@@ -51,36 +52,36 @@
   <div class="row">
 
     <div class="col-12 text-center pt-3 pb-3">
-      <h3> How does it work?</h3>
+      <h3> {% trans "How does it work?" %}</h3>
     </div>
 
   <div class="col-md-4">
     <div class="col-12 text-center pb-4">
-      <h5>1. Add employees to track</h5>
+      <h5>{% trans "1. Add employees to track" %}</h5>
       <img src="{% static 'images/survey-employees.svg' %}" class="img-fluid" width="40%" alt="Add employees that you want to track." />
     </div>
     <div class="col-12 text-center pb-4">
-      <p>Add email addresses for the employees whos engagement you want to monitor. We'll send them a survey.</p>
+      <p>{% trans "Add email addresses for the employees whos engagement you want to monitor. We'll send them a survey." %}</p>
     </div>
   </div>
 
   <div class="col-md-4">
     <div class="col-12 text-center pb-4">
-      <h5>2. Employees answer regular surveys</h5>
+      <h5>{% trans "2. Employees answer regular surveys" %}</h5>
       <img src="{% static 'images/employees-respond-to-survey.svg' %}" class="img-fluid" width="40%" alt="Employees answer simple questions." />
     </div>
     <div class="col-12 text-center pb-4">
-      <p>Each employee receives a regular (e.g. quarterly) survey with scientifically vetted questions. </p>
+      <p>{% trans "Each employee receives a regular (e.g. quarterly) survey with scientifically vetted questions." %}</p>
     </div>
   </div>
 
   <div class="col-md-4">
     <div class="col-12 text-center pb-4">
-      <h5>3. You get the results </h5>
+      <h5>{% trans "3. You get the results" %} </h5>
       <img src="{% static 'images/analyze-employee-data.svg' %}" class="img-fluid" width="50%" alt="Access processed data about employee motivation." />
     </div>
     <div class="col-12 text-center pb-4">
-      <p>Receive comprehensive reports showing employee engagement snap-shots and trends, learn what is working to improve engagement. </p>
+      <p>{% trans "Receive comprehensive reports showing employee engagement snap-shots and trends, learn what is working to improve engagement. </p>" %}
     </div>
   </div>
   </div> <!-- row -->
@@ -93,12 +94,12 @@
         <img src="{% static 'images/add-and-remove-employees-screenshot.png' %}" class="img-fluid" alt="Easily add and remove co-workers.">
       </div>
       <div class="col-md-6 text-center text-light align-self-center">
-        <h3>Easily add employees</h3>
-        You can easily add employees in a matter of seconds using our simple tool, or email us a list, and we'll add your employees for you.
+        <h3>{% trans "Easily add employees" %}</h3>
+        {% trans "You can easily add employees in a matter of seconds using our simple tool, or email us a list, and we'll add your employees for you." %}
         <p>
           <br />
-          <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">Try for free</a><br />
-          <a href="{% url 'sign-up' %}" class="text-white"><small>Pick a plan, cancel anytime.</small></a>
+          <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">{% trans "Try for free" %}</a><br />
+          <a href="{% url 'sign-up' %}" class="text-white"><small>{% trans "Pick a plan, cancel anytime." %}</small></a>
         </p>
       </div>
     </div> <!-- row -->
@@ -109,12 +110,12 @@
         <img src="{% static 'images/dashboard-screenshot.png' %}" class="img-fluid" alt="Full overview from your dashboard.">
       </div>
       <div class="col-md-6 text-center text-light align-self-center order-md-first">
-        <h3>Get an overview from the dashboard </h3>
-        Clicking "start here" in the menu will always show you the next step to get started with employee engagement tracking. When all is set, it will show you to the dashboard, where you can access all settings and data.
+        <h3>{% trans "Get an overview from the dashboard" %} </h3>
+        {% trans 'Clicking "start here" in the menu will always show you the next step to get started with employee engagement tracking. When all is set, it will show you to the dashboard, where you can access all settings and data.' %}
         <p>
           <br />
-          <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">Try for free</a><br />
-          <a href="{% url 'sign-up' %}" class="text-white"><small>Pick a plan, cancel anytime.</small></a>
+          <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">{% trans "Try for free" %}</a><br />
+          <a href="{% url 'sign-up' %}" class="text-white"><small>{% trans "Pick a plan, cancel anytime." %}</small></a>
         </p>
       </div>
     </div> <!-- row -->
@@ -124,12 +125,12 @@
         <img src="{% static 'images/data-screenshot.png' %}" class="img-fluid" alt="View simple and meaningful data-graphics.">
       </div>
       <div class="col-md-6 text-center text-light align-self-center">
-        <h3>View data for your organization</h3>
-        When data is in, meaning your employees have answered the survey we send them, the data will be made available for you. See your organization's strong and weak points, and get recommendations about how you can improve employee engagement.
+        <h3>{% trans "View data for your organization" %}</h3>
+        {% trans "When data is in, meaning your employees have answered the survey we send them, the data will be made available for you. See your organization's strong and weak points, and get recommendations about how you can improve employee engagement." %}
         <p>
           <br />
-          <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">Try for free</a><br />
-          <a href="{% url 'sign-up' %}" class="text-white"><small>Pick a plan, cancel anytime.</small></a>
+          <a class="btn btn-info btn-lg" href="{% url 'sign-up'%}" role="button">{% trans "Try for free" %}</a><br />
+          <a href="{% url 'sign-up' %}" class="text-white"><small>{% trans "Pick a plan, cancel anytime." %}</small></a>
         </p>
       </div>
     </div> <!-- row -->
@@ -139,7 +140,7 @@
 <div class="container">
   <div class="row justify-content-center pt-2">
     <div class="col-12 pt-3 pb-3">
-      <h3 class="text-center"> Plans and pricing </h3>
+      <h3 class="text-center"> {% trans "Plans and pricing" %} </h3>
       <div class="card-group col-12 justify-content-center">
 
 
@@ -147,28 +148,28 @@
         <img src="{% static 'images/basic-plan-1.svg' %}" class="card-img-top mt-2" style="height: 10rem;" alt="Quarterly plan">
 
         <div class="card-body">
-          <h5 class="card-title text-center text-body"> Standard Quarterly</h5>
-          <h3 class="card-subtitle text-info text-center">$3 USD/month </h3>
-          <span class="text-muted"><center><small>per employee billed quarterly</small></center></span>
-          <center><span class="badge badge-success">30 days free trial!</span></center>
-            <p class="card-text">A standard subscription to Motpanel.</p>
+          <h5 class="card-title text-center text-body"> {% trans "Standard Quarterly" %}</h5>
+          <h3 class="card-subtitle text-info text-center">{% trans "$3 USD/month" %} </h3>
+          <span class="text-muted"><center><small>{% trans "per employee billed quarterly" %}</small></center></span>
+          <center><span class="badge badge-success">{% trans "30 days free trial!" %}</span></center>
+            <p class="card-text">{% trans "A standard subscription to Motpanel." %}</p>
         </div> <!-- card-body -->
         <div class="text-center card-footer">
-          <a href="{% url 'sign-up' %}" class="btn btn-info text-center my-2"> Try for free </a>
+          <a href="{% url 'sign-up' %}" class="btn btn-info text-center my-2"> {% trans "Try for free" %} </a>
         </div> <!-- card-footer -->
       </div><!-- card -->
 
       <div class="card col-sm-6 col-lg-4 px-0">
         <img src="{% static 'images/basic-plan-2.svg' %}" class="card-img-top mt-2" style="height: 10rem;" alt="Yearly plan">
         <div class="card-body">
-          <h5 class="card-title text-center text-body"> Standard Yearly</h5>
-          <h3 class="card-subtitle text-info text-center">$30 USD/year </h3>
-          <span class="text-muted"><center><small>per employee billed yearly</small></center></span>
-          <center><span class="badge badge-success">30 days free trial!</span></center>
-            <p class="card-text">A standard subscription to Motpanel.</p>
+          <h5 class="card-title text-center text-body"> {% trans "Standard Yearly" %}</h5>
+          <h3 class="card-subtitle text-info text-center">{% trans "$30 USD/year" %} </h3>
+          <span class="text-muted"><center><small>{% trans "per employee billed yearly" %}</small></center></span>
+          <center><span class="badge badge-success">{% trans "30 days free trial!" %}</span></center>
+            <p class="card-text">{% trans "A standard subscription to Motpanel" %}.</p>
         </div> <!-- card-body -->
         <div class="text-center card-footer">
-          <a href="{% url 'sign-up' %}" class="btn btn-info text-center my-2"> Try for free </a>
+          <a href="{% url 'sign-up' %}" class="btn btn-info text-center my-2"> {% trans "Try for free" %} </a>
         </div> <!-- card-footer -->
       </div><!-- card -->
 

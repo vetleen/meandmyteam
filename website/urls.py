@@ -6,6 +6,7 @@ from django.conf import settings
 
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView
+from django.conf.urls.i18n import i18n_patterns
 
 urlpatterns = [
 
@@ -33,6 +34,7 @@ urlpatterns = [
 
 
     #Temporary
+
     
 
 ]
