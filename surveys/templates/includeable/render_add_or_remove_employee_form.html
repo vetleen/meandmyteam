@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load widget_tweaks %}
 <form method="post">
   {% csrf_token %}
@@ -71,6 +72,6 @@
     {% endif %}
   </div>
 
-  <button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button>
-  {% if show_back_button %}<a href="javascript:history.back()" class="btn btn-warning" role="button">{% if back_button_text %} {{ back_button_text }} {% else %} Back {% endif %}</a>{% endif %}
+  <button type="submit" class="btn btn-info">{% if submit_button_text %} {{ submit_button_text }} {% else %} {% trans "Submit" %} {% endif %} </button>
+  {% if show_back_button %}<a href="javascript:history.back()" class="btn btn-warning" role="button">{% if back_button_text %} {{ back_button_text }} {% else %} {% trans "Back" %} {% endif %}</a>{% endif %}
 </form>

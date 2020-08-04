@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-03 15:14+0200\n"
+"POT-Creation-Date: 2020-08-04 13:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,22 +23,13 @@ msgid "Employee Engagement Tracking | Motpanel"
 msgstr "Ansatteengasjement - Sporing | Motpanel "
 
 #: payments/templates/current_plan.html:26
-#, fuzzy
-#| msgid "Plans and pricing"
-msgid "Plans and payment"
-msgstr "Planer og prising"
-
 #: payments/templates/current_plan.html:31
-#, fuzzy
-#| msgid "Plans and pricing"
-msgid "Plans and payments"
-msgstr "Planer og prising"
+msgid "Plans and payment"
+msgstr "Planer og betaling"
 
 #: payments/templates/current_plan.html:41
-#, fuzzy
-#| msgid "Your subscription was started!"
 msgid "Your Subscription"
-msgstr "Abonnementet ble igangsatt!"
+msgstr "Ditt abonnement"
 
 #: payments/templates/current_plan.html:48
 msgid "CANCELLED"
@@ -71,7 +62,7 @@ msgstr ""
 "%(stripe_quantity)s ansatte fakturert %(plan_name)s</small></center></span>\n"
 "                  <p class=\"text-center\">\n"
 "                    \n"
-"                    <span class=\"text-muted lead\">Abbonnementet er <span "
+"                    <span class=\"text-muted lead\">Abonnementet er <span "
 "class=\"text-success font-weight-bold\">%(stripe_status)s</span>\n"
 "                  "
 
@@ -99,6 +90,148 @@ msgstr ""
 "                <p class=\"card-text\">* Planen skalerer automatisk til "
 "antall ansatte, og faktureres %(plan_name)s. </p>\n"
 "                "
+
+#: payments/templates/current_plan.html:90
+msgid "Restart subscription"
+msgstr "Gjenoppta abonnement"
+
+#: payments/templates/current_plan.html:95
+#, python-format
+msgid " Switch to %(plan_name)s billing"
+msgstr " Bytt til %(plan_name)s fakturering"
+
+#: payments/templates/current_plan.html:100
+msgid "Cancel subscription"
+msgstr "Stopp abonnement"
+
+#: payments/templates/current_plan.html:112
+msgid "Plans"
+msgstr "Våre planer"
+
+#: payments/templates/current_plan.html:125
+#, python-format
+msgid ""
+"\n"
+"                    <h3 class=\"card-subtitle text-info text-center\">$"
+"%(interval_amount)s %(currency)s/%(interval)s </h3>\n"
+"                    <span class=\"text-muted\"><center><small>per employee "
+"billed %(plane_name)s</small></center></span>\n"
+"                    <center><span class=\"badge badge-success\">"
+"%(trial_period_days)s days free trial!</span></center>\n"
+"                    <p class=\"card-text\">%(product_description)s.</p>\n"
+"                    "
+msgstr ""
+"\n"
+"                    <h3 class=\"card-subtitle text-info text-center\">$"
+"%(interval_amount)s %(currency)s/%(interval)s </h3>\n"
+"                    <span class=\"text-muted\"><center><small>per ansatt "
+"fakturert %(plane_name)s</small></center></span>\n"
+"                    <center><span class=\"badge badge-success\">"
+"%(trial_period_days)s dager gratis prøveperiode!</span></center>\n"
+"                    <p class=\"card-text\">%(product_description)s.</p>\n"
+"                    "
+
+#: payments/templates/current_plan.html:133 website/templates/index.html:16
+#: website/templates/index.html:101 website/templates/index.html:117
+#: website/templates/index.html:132 website/templates/index.html:158
+#: website/templates/index.html:172
+msgid "Try for free"
+msgstr "Prøv gratis"
+
+#: payments/templates/current_plan.html:133
+msgid "Pick plan"
+msgstr "Velg plan"
+
+#: payments/templates/current_plan.html:145
+msgid "Active payment method"
+msgstr "Aktiv betalingsmåte"
+
+#: payments/templates/current_plan.html:147
+#: payments/templates/current_plan.html:164
+msgid "ending in:"
+msgstr "slutter på:"
+
+#: payments/templates/current_plan.html:148
+#: payments/templates/current_plan.html:165
+msgid "Cardholder name:"
+msgstr "Kortholders navn:"
+
+#: payments/templates/current_plan.html:149
+#: payments/templates/current_plan.html:166
+msgid "Expires:"
+msgstr "Utgår:"
+
+#: payments/templates/current_plan.html:150
+#: payments/templates/current_plan.html:171
+msgid "Actions:"
+msgstr "Handlinger"
+
+#: payments/templates/current_plan.html:150
+#: payments/templates/current_plan.html:171
+#: surveys/templates/includeable/employee_list_displayer.html:8
+msgid "Delete"
+msgstr "Slett"
+
+#: payments/templates/current_plan.html:154
+msgid "Change payment method"
+msgstr "Endre betalingsmåte"
+
+#: payments/templates/current_plan.html:160
+msgid "All payment methods"
+msgstr "Alle betalingsmetoder"
+
+#: payments/templates/current_plan.html:169
+msgid "(active<br>card)"
+msgstr "(aktivt<br>kort)"
+
+#: payments/templates/current_plan.html:171
+msgid "Use"
+msgstr "Bruk"
+
+#: payments/templates/current_plan.html:178
+msgid "New payment method"
+msgstr "Ny betalingsmåte"
+
+#: payments/templates/current_plan.html:183
+#: payments/templates/current_plan.html:184
+msgid "Add payment method"
+msgstr "Legg til betalingsmåte"
+
+#: payments/templates/current_plan.html:189
+msgid "Invoices"
+msgstr "Fakturaer"
+
+#: payments/templates/current_plan.html:193
+msgid "Invoice number/date:"
+msgstr "Fakturanummer/dato:"
+
+#: payments/templates/current_plan.html:197
+msgid "Plan:"
+msgstr "Plan"
+
+#: payments/templates/current_plan.html:203
+msgid "Billing Period:"
+msgstr "Fakturaperiode:"
+
+#: payments/templates/current_plan.html:205
+msgid "to"
+msgstr "til"
+
+#: payments/templates/current_plan.html:209
+msgid "Amount:"
+msgstr "Sum"
+
+#: payments/templates/current_plan.html:215
+msgid "Status:"
+msgstr "Status"
+
+#: payments/templates/current_plan.html:217
+msgid "Paid"
+msgstr "Betalt"
+
+#: payments/templates/current_plan.html:219
+msgid "Not paid"
+msgstr "Ikke betalt"
 
 #: payments/templates/set_up_payment_method.html:27
 msgid "Add a card"
@@ -132,29 +265,55 @@ msgstr ""
 msgid "We currently only support payments with credit cards."
 msgstr "Vi støtter for tiden kun betaling med kredittkort."
 
-#: payments/views.py:68
+#: payments/views.py:70 payments/views.py:140
 msgid "month"
 msgstr "måned"
 
-#: payments/views.py:70
+#: payments/views.py:72 payments/views.py:142
 msgid "year"
 msgstr "år"
 
-#: payments/views.py:75
-#, fuzzy
-#| msgid "Standard Quarterly"
+#: payments/views.py:77 payments/views.py:147
 msgid "Quarterly"
 msgstr "Kvartalsvis"
 
-#: payments/views.py:77
+#: payments/views.py:79 payments/views.py:149
 msgid "Yearly"
 msgstr "Årlig"
 
-#: payments/views.py:260
+#: payments/views.py:84
+msgid "active"
+msgstr "aktivt"
+
+#: payments/views.py:86
+msgid "trialing"
+msgstr "i prøveperiode"
+
+#: payments/views.py:88
+msgid "canceled"
+msgstr "Avbrutt"
+
+#: payments/views.py:90
+msgid "unpaid"
+msgstr "ubetalt"
+
+#: payments/views.py:92
+msgid "past_due"
+msgstr "over forfall"
+
+#: payments/views.py:94
+msgid "incomplete"
+msgstr "ukomplett"
+
+#: payments/views.py:96
+msgid "incomplete_expired"
+msgstr "ukomplett/utgått"
+
+#: payments/views.py:291
 msgid "The subscription setup process was cancelled. Try again?"
 msgstr "Prosessen med å sette opp et abonnement ble avbrytt. Prøv på nytt?"
 
-#: payments/views.py:282
+#: payments/views.py:313
 msgid ""
 "Looks like you were able to set up a payment method, but we were unable to "
 "get data from our payment provider just now. Don't worry though, our support "
@@ -164,17 +323,15 @@ msgstr ""
 "klarte ikke å få dataene ut i fra betalingsløsningen vår akkurat nå. Men "
 "frykt ikke, supportavdelingen vår har fått beskjed, og fikser saken!"
 
-#: payments/views.py:291
+#: payments/views.py:322
 msgid "Payment method set up successfully!"
 msgstr "Oppsett av betalingsmåte var vellykket!"
 
-#: payments/views.py:305
-#, fuzzy
-#| msgid "Your profile details was updated."
+#: payments/views.py:336
 msgid "Your preferred payment method was updated!"
 msgstr "Den foretrukne betalingmåten din ble oppdatert!"
 
-#: payments/views.py:307
+#: payments/views.py:338
 msgid ""
 "We tried to change your payment method, but it may not have work. Feel free "
 "to try again!"
@@ -182,11 +339,11 @@ msgstr ""
 "Vi forsøkte å endre betalingsmetoden din, men det kan hende det ikke "
 "fungerte. Prøv gjerne igjen!"
 
-#: payments/views.py:326
+#: payments/views.py:357
 msgid "The selected card was deleted!"
 msgstr "Det valgte kortet ble slettet!"
 
-#: payments/views.py:329
+#: payments/views.py:360
 msgid ""
 "We tried to delete your card, but it may not have work. Feel free to try "
 "again!"
@@ -194,11 +351,11 @@ msgstr ""
 "Vi forsøkte å slette kortet ditt, men det kan hende at det ikke fungerte. "
 "Prøv gjerne igjen!"
 
-#: payments/views.py:372
+#: payments/views.py:403
 msgid "Your subscription was started!"
 msgstr "Abonnementet ble igangsatt!"
 
-#: payments/views.py:381
+#: payments/views.py:412
 msgid ""
 "We tried to start your subscription, but something went wrong. You can try "
 "again, and we'll make sure you don't get charged twice!"
@@ -206,13 +363,13 @@ msgstr ""
 "Vi forsøkte å starte et abonnement, men noe gikk galt. Du kan prøve på nytt, "
 "og så skal vi sjekke manuelt at du ikke blir belastet dobbelt!"
 
-#: payments/views.py:400
+#: payments/views.py:431
 msgid "Your subscription was cancelled, it will not renew next billing cycle."
 msgstr ""
 "Abonnementet ditt ble kansellert, og vil dermed ikke fornyes ved neste "
 "fakturadato."
 
-#: payments/views.py:408
+#: payments/views.py:439
 msgid ""
 "We tried to cancel your subscription, but it may not have work. Try again "
 "later, or contact support."
@@ -220,11 +377,11 @@ msgstr ""
 "Vi forsøkte å kansellere abonnementet ditt, men det kan hende det ikke "
 "fungerte. Prøv igjen senere, eller kontakt brukerstøtten vår."
 
-#: payments/views.py:427
+#: payments/views.py:458
 msgid "Your subscription was restarted!"
 msgstr "Abonnementet ditt ble gjenopptatt!"
 
-#: payments/views.py:435
+#: payments/views.py:466
 msgid ""
 "We tried to restart your subscription, but it may not have worked. Try again "
 "later, or contact support."
@@ -232,17 +389,621 @@ msgstr ""
 "Vi forsøkte å gjennoppta abonnementet ditt, men det kan hende det ikke "
 "funket. Prøv igjen senere, eller kontakt brukerstøtten vår"
 
-#: payments/views.py:453
+#: payments/views.py:484
 msgid "Your subscription was updated with the chosen plan!"
 msgstr "Abonnementet ditt ble oppdatert med den valgte planen!"
 
-#: payments/views.py:458
+#: payments/views.py:489
 msgid ""
 "We tried to update your subscription, but it may not have worked. Try again "
 "later, or contact support."
 msgstr ""
 "Vi forsøkte å oppdatere abonnementet ditt, men det kan være at det ikke "
 "gikk. Prøv igjen senere, eller kontakt brukerstøtten vår"
+
+#: surveys/templates/add_or_remove_employees.html:3
+msgid "Add or remove employees"
+msgstr "Legg til eller fjern ansatte"
+
+#: surveys/templates/add_or_remove_employees.html:20
+#: surveys/templates/dashboard.html:245
+msgid "Add employees"
+msgstr "Legg til ansatte"
+
+#: surveys/templates/add_or_remove_employees.html:23
+msgid "I'm done adding employees"
+msgstr "Jeg er ferdig med å legge til ansatte"
+
+#: surveys/templates/add_or_remove_employees.html:28
+#, python-format
+msgid " Employees at %(organization_name)s"
+msgstr " Ansatte i %(organization_name)s"
+
+#: surveys/templates/answer_survey.html:8
+msgid "Answer survey"
+msgstr "Svare på undersøkelse"
+
+#: surveys/templates/answer_survey.html:29
+#: surveys/templates/answer_survey.html:52
+#, python-format
+msgid "%(organization)s employee survey"
+msgstr "%(organization)s's ansatteundersøkelse"
+
+#: surveys/templates/answer_survey.html:33
+#: surveys/templates/answer_survey.html:55
+msgid "Thank you for taking the time to answer this survey"
+msgstr "Takk for at du tar deg tid til å svare på undersøkelsen"
+
+#: surveys/templates/answer_survey.html:35
+#, python-format
+msgid ""
+"\n"
+"            The survey has been successfully completed, and your answers "
+"saved. You can update your answers until %(date_close)s by using the button "
+"below, and the link we emailed you before will get you back here if you need "
+"it.\n"
+"            "
+msgstr ""
+"\n"
+"Undersøkelsen er ferdig besvart, og svarene dine lagret. Du kan "
+"oppdateresvarene dine frem til %(date_close)s ved å bruke knappen under. "
+"Linken fra epostinvitasjonen får deg tilbake hit.\n"
+"            "
+
+#: surveys/templates/answer_survey.html:40
+msgid "You may close this window now."
+msgstr "Du kan lukke dette vinduet nå."
+
+#: surveys/templates/answer_survey.html:42
+msgid "Review answers"
+msgstr "Gå igjennom svarene dine"
+
+#: surveys/templates/answer_survey.html:57
+msgid ""
+"\n"
+"            The data we collect in this survey will be used to provide your\n"
+"            organization with a picture of its strong and weak points "
+"regarding your\n"
+"            well-being and motivation. We maintain your anonymity in the "
+"following manner:\n"
+"            "
+msgstr ""
+"\n"
+"Dataene vi samler inn i denne undersøkelsen vil bli brukt til å gi "
+"organisasjonen du jobber i er bilde av sine styrker og svakheter angående "
+"ditt velvære og din motivasjon. We opprettholder anonymiteten din på "
+"følgende måte:\n"
+"            "
+
+#: surveys/templates/answer_survey.html:65
+msgid ""
+"\n"
+"            We do not directly tell your organization (or anyone else) WHO "
+"has answered WHAT\n"
+"            to these questions. Yet, in some case, it may be possible to to "
+"guess. For\n"
+"            example if everyone in your organization gives the same answer "
+"to a particular question.\n"
+"            "
+msgstr ""
+"\n"
+"Vi forteller ikke organisasjonen din (eller noen andre) direkte HVEM som har "
+"svart HVA på disse spørsmålene. Men, i noen tilfeller kan det være mulig å "
+"gjette. For eksempel, dersom alle i organisasjonen din gir samme svar til et "
+"spesifikt spørsmål.\n"
+"            "
+
+#: surveys/templates/answer_survey.html:73
+#, python-format
+msgid ""
+"Read our full <a href=\"%(url)s\" target=\"_blank\">privacy policy&#11016;</"
+"a>."
+msgstr ""
+"Les hele vår <a href=\"%(url)s\" target=\"_blank"
+"\">personvernerklæring&#11016;</a>."
+
+#: surveys/templates/answer_survey.html:103
+msgid "Start survey"
+msgstr "Start undersøkelse"
+
+#: surveys/templates/answer_survey.html:115
+msgid "Progress:"
+msgstr "Fremdrift"
+
+#: surveys/templates/answer_survey.html:168
+#: surveys/templates/includeable/render_add_or_remove_employee_form.html:75
+#: surveys/templates/setup_instrument.html:113
+#: website/templates/edit_account_form.html:212
+#: website/templates/includeable/form_renderer.html:32
+#: website/templates/sign_up_form.html:280
+msgid "Submit"
+msgstr "Send"
+
+#: surveys/templates/dashboard.html:3 surveys/templates/dashboard.html:8
+msgid "Dashboard"
+msgstr "Dashbord"
+
+#: surveys/templates/dashboard.html:21 surveys/templates/dashboard.html:33
+msgid "Your next step to get started"
+msgstr "Neste skritt for å komme igang"
+
+#: surveys/templates/dashboard.html:24
+msgid "Add some coworkers to track"
+msgstr "Legg til noen ansatte"
+
+#: surveys/templates/dashboard.html:25
+msgid ""
+"Where are we going to send surveys? You can add coworkers manually, or email "
+"us a list (e.g. an excel sheet), and we'll add them for you!"
+msgstr ""
+"Hvor skal vi sende spørreundersøkelsene? Du kan legge til medarbeidere "
+"manuelt, eller send oss en liste per epost (f.eks. et excel-ark), og så "
+"legger vi de inn for deg! "
+
+#: surveys/templates/dashboard.html:26
+msgid "Add coworkers"
+msgstr "Legg til medarbeidere"
+
+#: surveys/templates/dashboard.html:36 surveys/templates/dashboard.html:38
+msgid "Set up a plan"
+msgstr "Sett opp en plan"
+
+#: surveys/templates/dashboard.html:37
+msgid ""
+"To get started with our employee engagement software, you first need to pick "
+"a plan. Don't worry though, the first month is free for all plans!"
+msgstr ""
+"For å komme igang med vår software for sporing av ansattengasjement, må du "
+"først velge en plan. Den første måneden er gratis for alle planer!"
+
+#: surveys/templates/dashboard.html:53
+msgid "Latest measurements"
+msgstr "Siste målinger"
+
+#: surveys/templates/dashboard.html:56
+#, python-format
+msgid "Latest data was collected %(date_close)s."
+msgstr "De siste dataene ble samlet %(date_close)s."
+
+#: surveys/templates/dashboard.html:62
+#, python-format
+msgid "<b>%(n_completed)s</b> responded out of <b>%(n_invited)s</b> invited"
+msgstr "<b>%(n_completed)s</b> svarte ut av <b>%(n_invited)s</b> inviterte"
+
+#: surveys/templates/dashboard.html:63
+#: surveys/templates/instrument_report.html:38
+#: surveys/templates/instrument_report.html:113
+msgid "(some information will be hidden for privacy reasons)"
+msgstr "(noe informasjon holdes skjult pga. personvern)"
+
+#: surveys/templates/dashboard.html:76
+#: surveys/templates/includeable/display_single_dimension_result.html:14
+msgid "Weakn."
+msgstr "Svakh."
+
+#: surveys/templates/dashboard.html:87
+#: surveys/templates/instrument_report.html:194
+msgid "Average hidden"
+msgstr "Snitt skjult"
+
+#: surveys/templates/dashboard.html:92
+#: surveys/templates/includeable/display_single_dimension_result.html:45
+msgid "Strength"
+msgstr "Styrke"
+
+#: surveys/templates/dashboard.html:103
+#, python-format
+msgid ""
+"\n"
+"                        The %(instrument_name)s Tracking tool has not yet "
+"finished collecting your first set of data.\n"
+"                      "
+msgstr ""
+"\n"
+"%(instrument_name)s-verktøyet har ikke enda fullført innsamlingen av første "
+"gangs data.\n"
+"                      "
+
+#: surveys/templates/dashboard.html:108
+#, python-format
+msgid ""
+"\n"
+"                          But fear not, we are currently collecting data, "
+"and it will be available for review %(date_close)s.\n"
+"                        "
+msgstr ""
+"\n"
+"Men frykt ikke, vi samler nå inn data, og den vil være tilgjengelig for "
+"gjennomgang %(date_close)s.\n"
+"                        "
+
+#: surveys/templates/dashboard.html:113
+msgid ""
+"\n"
+"                        We have not yet begun collecting data either, but "
+"will usually do that within a few hours of you activating the product. So "
+"make sure you have added all the employees you want to track, sit back and "
+"relax while we do all the hard work!\n"
+"                      "
+msgstr ""
+"\n"
+"Vi har heller ikke begynt å samle data, men begynner vanligvis innen noen "
+"timer fra du aktiverer produktet. Så sikre at alle ansatte er lagt til, og "
+"sett deg tilbake slapp av mens vi gjør jobben!\n"
+"                      "
+
+#: surveys/templates/dashboard.html:124
+msgid "View details"
+msgstr "Se detaljer"
+
+#: surveys/templates/dashboard.html:126
+msgid "Review settings"
+msgstr "Gjennomgå instillinger"
+
+#: surveys/templates/dashboard.html:131
+#, python-format
+msgid "%(instrument_name)s measurements"
+msgstr "Målinger av %(instrument_name)s"
+
+#: surveys/templates/dashboard.html:135
+msgid "(latest)"
+msgstr "(siste)"
+
+#: surveys/templates/dashboard.html:145
+#, python-format
+msgid "%(instrument_name)s Tracking is currently <b>active</b>"
+msgstr "Overvåkning av %(instrument_name)s er <b>aktivert</b>"
+
+#: surveys/templates/dashboard.html:162
+msgid "You are ready!"
+msgstr "Du er klar!"
+
+#: surveys/templates/dashboard.html:163
+msgid "Don't worry, you can always add more coworkers to track later."
+msgstr "Du kan alltids legge til flere medarbeidere senere."
+
+#: surveys/templates/dashboard.html:164
+msgid "Start tracking!"
+msgstr "Begynn sporing!"
+
+#: surveys/templates/dashboard.html:170
+#, python-format
+msgid "%(instrument_name)s Tracking is currently <b>inactive</b>"
+msgstr "Overvåkning av %(instrument_name)s er <b>deaktivert</b>"
+
+#: surveys/templates/dashboard.html:190
+msgid "Organization"
+msgstr "Organisasjon"
+
+#: surveys/templates/dashboard.html:195
+msgid "Number of co-workers:"
+msgstr "Antall medarbeidere"
+
+#: surveys/templates/dashboard.html:200 surveys/templates/dashboard.html:212
+#, python-format
+msgid "%(instrument_name)s tracking:"
+msgstr "%(instrument_name)s-sporing:"
+
+#: surveys/templates/dashboard.html:203
+msgid "ON"
+msgstr "PÅ"
+
+#: surveys/templates/dashboard.html:215
+msgid "OFF"
+msgstr "AV"
+
+#: surveys/templates/dashboard.html:224
+msgid "Edit organization details"
+msgstr "Endre info om organisasjonen"
+
+#: surveys/templates/dashboard.html:234
+msgid "Employees"
+msgstr "Ansatte"
+
+#: surveys/templates/dashboard.html:238
+#, python-format
+msgid "Co-workers at %(organization_name)s"
+msgstr "Ansatte i %(organization_name)s"
+
+#: surveys/templates/edit_employee.html:3
+#: surveys/templates/edit_employee.html:8
+msgid "Edit employee"
+msgstr "Rediger ansatt"
+
+#: surveys/templates/includeable/display_single_dimension_result.html:40
+msgid "Score hidden"
+msgstr "Score skjult"
+
+#: surveys/templates/includeable/display_single_dr_change.html:10
+msgid "Down"
+msgstr "Ned"
+
+#: surveys/templates/includeable/display_single_dr_change.html:16
+msgid "No change"
+msgstr "Ingen endring"
+
+#: surveys/templates/includeable/display_single_dr_change.html:30
+msgid "Change hidden"
+msgstr "Endring skjult"
+
+#: surveys/templates/includeable/display_single_dr_change.html:36
+msgid "&nbsp;&uarr; Up&nbsp;"
+msgstr "&nbsp;&uarr; Opp&nbsp;"
+
+#: surveys/templates/includeable/employee_list_displayer.html:9
+msgid "Edit"
+msgstr "Endre"
+
+#: surveys/templates/includeable/render_add_or_remove_employee_form.html:76
+#: website/templates/edit_account_form.html:214
+#: website/templates/includeable/form_renderer.html:33
+msgid "Back"
+msgstr "Tilbake"
+
+#: surveys/templates/instrument_report.html:5
+#: surveys/templates/instrument_report.html:13
+#, python-format
+msgid "%(instrument_name)s tracking report"
+msgstr "%(instrument_name)s sporingsrapport"
+
+#: surveys/templates/instrument_report.html:22
+msgid "1. Summary"
+msgstr "1. Oppsummering"
+
+#: surveys/templates/instrument_report.html:23
+msgid "1.1 Summary of scores"
+msgstr "1.1 Oppsummering av scorer"
+
+#: surveys/templates/instrument_report.html:26
+#, python-format
+msgid ""
+"\n"
+"        Latest data was collected %(date_close)s.<br />\n"
+"        "
+msgstr ""
+"\n"
+"Siste datainnsamling var %(date_close)s.<br />\n"
+"        "
+
+#: surveys/templates/instrument_report.html:33
+#, python-format
+msgid ""
+"\n"
+"        <b>%(n_completed)s</b> responded out of <b>%(n_invited)s</b> "
+"invited\n"
+"        "
+msgstr ""
+"\n"
+"<b>%(n_completed)s</b> svarte av <b>%(n_invited)s</b> inviterte\n"
+"        "
+
+#: surveys/templates/instrument_report.html:44
+#, python-format
+msgid ""
+"\n"
+"          We score your organization on %(n_dimensions)s dimensions. Your "
+"organization's scores are\n"
+"          summarized below.\n"
+"        "
+msgstr ""
+"\n"
+"Vi scorer organisasjonen din på %(n_dimensions)s dimensjoner. Scorene er "
+"oppsummert nedenfor.\n"
+"        "
+
+#: surveys/templates/instrument_report.html:54
+#, python-format
+msgid ""
+"\n"
+"        %(instrument_name)s is scored on %(n_dimensions)s dimensions. Your "
+"organization's scores are\n"
+"        summarized below.\n"
+"      "
+msgstr ""
+"\n"
+"%(instrument_name)s scores på %(n_dimensions)s dimensjoner. Din "
+"organisasjons scorer er oppsummert nedenfor.\n"
+"      "
+
+#: surveys/templates/instrument_report.html:62
+msgid ""
+"\n"
+"        <span class=\"font-weight-bold\">Since this survey had three or "
+"fewer respondents,\n"
+"        we can only show you what your organizations highest and lowest "
+"scores\n"
+"        are</span>. This is because we promised your co-workers that we "
+"would anonymize\n"
+"        their data, and with this few responents it starts to become "
+"possible to guess\n"
+"        individual answers based on the processed scores.<br />\n"
+"      "
+msgstr ""
+"\n"
+"<span class=\"font-weight-bold\">Siden denne organisasjonen hadde tre eller "
+"færre respondenter, kan vi bare vise organisasjonens høyeste og laveste "
+"scorer</span>. Dette er fordi vi lovt medarbeiderne dine å ananymisere "
+"dataene deres, og med så få respondenter begynner det å bli mulig å gjette "
+"individuelle svar, basert på de prosesserte tallene.<br />\n"
+"      "
+
+#: surveys/templates/instrument_report.html:82
+msgid "Highest score!"
+msgstr "Høyeste score!"
+
+#: surveys/templates/instrument_report.html:88
+msgid "Lowest score"
+msgstr "Laveste score"
+
+#: surveys/templates/instrument_report.html:101
+msgid "1.2 Change from previous survey"
+msgstr "1.2 Endring fra forrige undersøkelse"
+
+#: surveys/templates/instrument_report.html:108
+#, python-format
+msgid ""
+"\n"
+"            <b>%(n_completed)s</b> responded out of <b>%(n_invited)s</b> "
+"invited\n"
+"          "
+msgstr ""
+"\n"
+"<b>%(n_completed)s</b> svarte av <b>%(n_invited)s</b> inviterte\n"
+"          "
+
+#: surveys/templates/instrument_report.html:120
+msgid "View previous survey"
+msgstr "Se forrige undersøkelse"
+
+#: surveys/templates/instrument_report.html:131
+msgid "2. Results"
+msgstr "2. Resultater"
+
+#: surveys/templates/instrument_report.html:139
+msgid "Your organization's strongest point!"
+msgstr "Din organisasjonens sterkes punkt!"
+
+#: surveys/templates/instrument_report.html:142
+msgid "Your organization's weakest point"
+msgstr "Din organisasjonens svakeste punkt!"
+
+#: surveys/templates/instrument_report.html:158
+#, python-format
+msgid "1 What does \"%(dimension_name)s\" mean?"
+msgstr "1 Hva betyr \"%(dimension_name)s\""
+
+#: surveys/templates/instrument_report.html:161
+msgid "How did we arrive at this score?"
+msgstr "Hvordan har vi kommet frem til denne scoren?"
+
+#: surveys/templates/instrument_report.html:163
+msgid "The average answers were:"
+msgstr "Gjennomsnittlig svar var:"
+
+#: surveys/templates/instrument_report.html:163
+msgid ""
+"We have hidden results for statements with fewer than 4 respondents. This is "
+"because of our privacy policy."
+msgstr ""
+"Vi har gjemt svarene for utsagn med færre enn 4 respondenter. Dette er pga "
+"personvernerklæringen vår."
+
+#: surveys/templates/instrument_report.html:209
+msgid ""
+"\n"
+"The numbers represent the average rating for your organization. A \"full bar"
+"\"\n"
+"means your co-workers agreed with the statement, regardless of it being "
+"positive\n"
+"or negative.\n"
+"      "
+msgstr ""
+"\n"
+"Tallene representerer gjennomsnittet for organisasjonen din. En \"full bar\" "
+"betyr at medarbeiderne dine var enige i utsagnet, uavhengig om det var "
+"positivt eller negativt.\n"
+"      "
+
+#: surveys/templates/setup_instrument.html:5
+#: surveys/templates/setup_instrument.html:14
+#, python-format
+msgid "Set up %(instrument_name)s tracking"
+msgstr "Konfigurer %(instrument_name)s tracking"
+
+#: surveys/templates/setup_instrument.html:54
+#, python-format
+msgid "Track %(instrument_name)s? "
+msgstr "Spor %(instrument_name)s? "
+
+#: surveys/templates/setup_instrument.html:114 surveys/views.py:117
+#: website/views.py:76 website/views.py:215 website/views.py:239
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: surveys/views.py:45
+msgid "Add employee"
+msgstr "Legg til ansatt"
+
+#: surveys/views.py:70
+#, python-format
+msgid ""
+"You have added a coworker (%(email)s)! You can continue to add more below."
+msgstr ""
+"Du har lagt til en ansatt (%(email)s)! Du kan fortsette å legge til fler."
+
+#: surveys/views.py:100 surveys/views.py:146
+msgid "We couldn't find the employee you were looking for."
+msgstr "Vi fant den ansatte du ba om."
+
+#: surveys/views.py:115
+msgid "Update"
+msgstr "Oppdater"
+
+#: surveys/views.py:131
+msgid "Employee was updated."
+msgstr "Den ansatte ble oppdatert."
+
+#: surveys/views.py:154
+#, python-format
+msgid "%(email)s was permanently deleted, and will not receive future surveys."
+msgstr ""
+"%(email)s ble slettet permanent og vil ikke motta fremtidige undersøkelser."
+
+#: surveys/views.py:275
+#, python-format
+msgid ""
+"Your settings were updated successfully, %(instrument_name)s tracking is "
+"ACTIVE!"
+msgstr ""
+"Instillingene dine ble oppdatert, sporing av %(instrument_name)s er AKTIVERT!"
+
+#: surveys/views.py:282
+#, python-format
+msgid ""
+"Your settings were updated successfully, %(instrument_name)s tracking is "
+"INACTIVE!"
+msgstr ""
+"Instillingene dine ble oppdatert, sporing av %(instrument_name)s er "
+"DEAKTIVERT!"
+
+#: surveys/views.py:297
+msgid "Update settings"
+msgstr "Oppdater innstillinger"
+
+#: surveys/views.py:312
+msgid "We couldn't find the survey you were looking for."
+msgstr "Vi fant ikke undersøkelsen du ser etter."
+
+#: surveys/views.py:330
+msgid "We couldn't find the instrument you were looking for."
+msgstr "Vi fant ikke verktøyet du ba om."
+
+#: surveys/views.py:367
+msgid ""
+"The survey you asked for does not exist. If you pasted a link, make sure you "
+"got the entire link."
+msgstr ""
+"Undersøkelsen du ba om eksisterer ikke. Hvis du limte inn en lenke, "
+"dobbeltsjekk at du fikk med hele lenken."
+
+#: surveys/views.py:378
+msgid "Continue"
+msgstr "Fortsett"
+
+#: surveys/views.py:414
+msgid ""
+"Welcome back! We saved your place, so you can continue where you left off."
+msgstr ""
+"Velkommen tilbake! Vi merket av hvor du var, så du kan fortsette der du "
+"slapp!"
+
+#: surveys/views.py:425
+msgid ""
+"Thank you for taking the time to answer this survey! Please indicate that "
+"you consent to answer the survey to continue."
+msgstr ""
+"Takk for at du tar deg tid til å svare på denne undersøkelsen! Vennligst "
+"kryss av for at du godtar å svare på undersøkelsen for å fortsette."
 
 #: templates/400.html:6
 msgid "400 bad request"
@@ -299,8 +1060,6 @@ msgid "There was an error with the form you submitted."
 msgstr "Det var en feil med skjemaet du sendte inn."
 
 #: templates/403_csrf.html:22
-#, fuzzy
-#| msgid "400: Form error."
 msgid "403: Form error."
 msgstr "403: Skjemafeil"
 
@@ -343,10 +1102,8 @@ msgid "Change password"
 msgstr "Endre passord"
 
 #: website/templates/change_password_form.html:8
-#, fuzzy
-#| msgid "Change password"
 msgid "Change your password"
-msgstr "Endre passord"
+msgstr "Endre passordet ditt"
 
 #: website/templates/edit_account_form.html:4
 #: website/templates/edit_account_form.html:9
@@ -358,20 +1115,9 @@ msgstr "Kontodetaljer"
 msgid "Organization information:"
 msgstr "Info om organisasjonen"
 
-#: website/templates/edit_account_form.html:212
-#: website/templates/includeable/form_renderer.html:32
-#: website/templates/sign_up_form.html:280
-msgid "Submit"
-msgstr "Send"
-
 #: website/templates/edit_account_form.html:213
 msgid "Reset"
 msgstr "Nullstill"
-
-#: website/templates/edit_account_form.html:214
-#: website/templates/includeable/form_renderer.html:33
-msgid "Back"
-msgstr "Tilbake"
 
 #: website/templates/includeable/footer.html:6
 msgid ""
@@ -418,10 +1164,8 @@ msgstr "Bli med"
 
 #: website/templates/includeable/full_footer.html:18
 #: website/templates/login_form.html:3 website/templates/login_form.html:8
-#, fuzzy
-#| msgid "Log out"
 msgid "Log in"
-msgstr "Logg ut"
+msgstr "Logg inn"
 
 #: website/templates/includeable/full_footer.html:23
 msgid "Legal"
@@ -523,12 +1267,6 @@ msgstr "Gode ledere leder høyt motiverte ansatte"
 #: website/templates/index.html:14
 msgid "Automatic employee engagement tracking, and more."
 msgstr "Autmatisk sporing av ansattes engasjement - og mer."
-
-#: website/templates/index.html:16 website/templates/index.html:101
-#: website/templates/index.html:117 website/templates/index.html:132
-#: website/templates/index.html:158 website/templates/index.html:172
-msgid "Try for free"
-msgstr "Prøv gratis"
 
 #: website/templates/index.html:17 website/templates/index.html:102
 #: website/templates/index.html:118 website/templates/index.html:133
@@ -663,15 +1401,11 @@ msgid "A standard subscription to Motpanel"
 msgstr "Et standard abonnement på Motpanel"
 
 #: website/templates/login_form.html:20
-#, fuzzy
-#| msgid "Change password"
 msgid "Forgot password"
-msgstr "Endre passord"
+msgstr "Glemt passord"
 
 #: website/templates/logout_complete.html:3
 #: website/templates/logout_complete.html:8
-#, fuzzy
-#| msgid "Log out"
 msgid "Logged out"
 msgstr "Logget ut"
 
@@ -703,14 +1437,8 @@ msgid "Terms and conditions"
 msgstr "Vilkår og betingelser"
 
 #: website/views.py:75
-#, fuzzy
-#| msgid "Change password"
 msgid "Update password"
-msgstr "Endre passord"
-
-#: website/views.py:76 website/views.py:215 website/views.py:239
-msgid "Cancel"
-msgstr "Avbryt"
+msgstr "Oppdater passord"
 
 #: website/views.py:88
 msgid ""
@@ -740,14 +1468,10 @@ msgstr ""
 "spørreskjema til!"
 
 #: website/views.py:195
-#, fuzzy
-#| msgid "Change password"
 msgid "Choose a password"
 msgstr "Velg passord"
 
 #: website/views.py:195
-#, fuzzy
-#| msgid "Change password"
 msgid "Confirm password"
 msgstr "Bekreft passord"
 
@@ -764,10 +1488,8 @@ msgid "You have logged out successfully."
 msgstr "Du har logget deg ut."
 
 #: website/views.py:274
-#, fuzzy
-#| msgid "Account details"
 msgid "Update account details"
-msgstr "Kontodetaljer"
+msgstr "Oppdatert kontodetaljer"
 
 #: website/views.py:294
 msgid "Your profile details was updated."
@@ -776,19 +1498,3 @@ msgstr "Profilen din ble oppdatert."
 #: website/views.py:301
 msgid "Can't edit profile when you are not logged in."
 msgstr "Du kan ikke endre profilen din når du ikke er logget inn."
-
-#~ msgid ""
-#~ "\n"
-#~ "                  <span class=\"text-muted lead\">Subscription is <span "
-#~ "class=\"text-success font-weight-bold\">%(stripe_subscription.status)s</"
-#~ "span>\n"
-#~ "                  "
-#~ msgstr ""
-#~ "\n"
-#~ "                  <span class=\"text-muted lead\">Abonnementet er <span "
-#~ "class=\"text-success font-weight-bold\">%(stripe_subscription.status)s</"
-#~ "span>\n"
-#~ "                  "
-
-#~ msgid ", an Engesbak Promotions brand. All rights reserved."
-#~ msgstr ", et Engesbak Promotions merkenavn. Alle rettigheter er reservert."

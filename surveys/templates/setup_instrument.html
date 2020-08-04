@@ -1,11 +1,18 @@
 {% extends "base_generic.html" %}
-{% block title %}<title>Set up {{ instrument.name|lower }} tracking | {{ PAGE_TITLE }} </title>{% endblock %}
+{% load i18n %}
+{% block title %}
+{% with instrument.name|lower as instrument_name %}
+<title>{% blocktrans %}Set up {{ instrument_name }} tracking{% endblocktrans %} | {{ PAGE_TITLE }} </title>
+{% endwith %}
+{% endblock %}
 {% load widget_tweaks %}
 {% block content %}
 <div class="container">
   <div class="row pt-4">
     <div class="col-lg-8 offset-lg-2">
-      <h3> Set up {{ instrument.name|lower }} tracking </h3>
+      {% with instrument.name|lower as instrument_name %}
+      <h3>{% blocktrans %}Set up {{ instrument_name }} tracking{% endblocktrans %}</h3>
+      {% endwith %}
     </div>
   </div> <!-- row -->
   <div class="row justify-content-center pt-2">
@@ -43,7 +50,9 @@
         {% endif %}
         </div> <!-- col -->
         <div class="col-8 col-md-7">
-          Track {{ instrument.name|lower }}?
+          {% with instrument.name|lower as instrument_name %}
+          {% blocktrans %}Track {{ instrument_name }}? {% endblocktrans %}
+          {% endwith %}
         </div>
       </div><!-- form group row -->
 
@@ -101,8 +110,8 @@
       </div><!-- col -->
     </div><!-- form group row -->
 
-        <center><button type="submit" class="btn btn-info ">{% if submit_button_text %} {{ submit_button_text }} {% else %} Submit {% endif %} </button>
-        <a href="javascript:history.back()" class="btn btn-warning" role="button">Cancel</a></center>
+        <center><button type="submit" class="btn btn-info ">{% if submit_button_text %} {{ submit_button_text }} {% else %} {% trans "Submit" %} {% endif %} </button>
+        <a href="javascript:history.back()" class="btn btn-warning" role="button">{% trans "Cancel" %}</a></center>
       </form>
 
 

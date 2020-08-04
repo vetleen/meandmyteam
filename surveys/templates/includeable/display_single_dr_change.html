@@ -1,3 +1,4 @@
+{% load i18n %}
 {# this templates takes a dimension_result argument and displays the change since last #}
 
 <div class="row">
@@ -6,13 +7,13 @@
   </div><!-- col -->
   <div class="col-1 text-right px-0">
     {% if dimension_result.change_average is not None and dimension_result.change_average < 0 %}
-      <span class="badge badge-pill badge-danger">Down &darr;</span>
+      <span class="badge badge-pill badge-danger">{% trans "Down" %} &darr;</span>
     {% endif %}
   </div><!-- col -->
   <div class="col">
     <div class="progress"  style="height: 20px;">
       {% if dimension_result.change_average is not None %}
-        <div class="progress-bar bg-transparent" role="progressbar" style="width: {% if dimension_result.change_average == 0 %}100{% else %}{{ dimension_result.blue_bar }}{% endif %}%" aria-valuenow="{{ dimension_result.blue_bar }}" aria-valuemin="0" aria-valuemax="100">{% if dimension_result.change_average == 0 %}<span class="text-dark">No change</span>{% endif %}</div>
+        <div class="progress-bar bg-transparent" role="progressbar" style="width: {% if dimension_result.change_average == 0 %}100{% else %}{{ dimension_result.blue_bar }}{% endif %}%" aria-valuenow="{{ dimension_result.blue_bar }}" aria-valuemin="0" aria-valuemax="100">{% if dimension_result.change_average == 0 %}<span class="text-dark">{% trans "No change" %}</span>{% endif %}</div>
         <div class="progress-bar
         {% if colored == True %}
           bg-danger
@@ -26,13 +27,13 @@
           bg-secondary
         {% endif %}" role="progressbar" style="width: {{ dimension_result.green_bar }}%" aria-valuenow="{{ dimension_result.green_bar }}" aria-valuemin="0" aria-valuemax="100"> +{{dimension_result.change_average|floatformat}} </div>
       {% else %}
-        <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">Change hidden</span></div>
+        <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">{% trans "Change hidden" %}</span></div>
       {% endif %}
     </div>
   </div><!-- col -->
   <div class="col-1 text-left px-0">
     {% if dimension_result.change_average is not None and dimension_result.change_average > 0 %}
-      <span class="badge badge-pill badge-success">&nbsp;&uarr; Up&nbsp;</span>
+      <span class="badge badge-pill badge-success">{% trans "&nbsp;&uarr; Up&nbsp;" %}</span>
     {% endif %}
   </div><!-- col -->
 </div><!-- row -->

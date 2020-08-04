@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseForbidden, Http404, HttpResponseRedirect
 from django.utils.encoding import DjangoUnicodeDecodeError
+from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -41,7 +42,7 @@ def add_or_remove_employee_view(request):
     form = AddRespondentForm()
     context = {
         'form': form,
-        'submit_button_text': 'Add employee',
+        'submit_button_text': _('Add employee'),
         'show_back_button': True,
         'employee_list': employee_list,
     }
@@ -66,7 +67,7 @@ def add_or_remove_employee_view(request):
                 stripe_logic.modify_stripe_subscription(request.user.organization.stripe_subscription_id, quantity=q)
 
             #declare success and make a new form for the next employee
-            messages.success(request, 'You have added a coworker (%s)! You can continue to add more below.'%(form.cleaned_data['email']), extra_tags='alert alert-success')
+            messages.success(request, _('You have added a coworker (%(email)s)! You can continue to add more below.'%{'email': form.cleaned_data['email']}), extra_tags='alert alert-success')
             form = AddRespondentForm()
             context.update({
                     'form': form, 
@@ -96,7 +97,7 @@ def edit_employee_view(request, **kwargs):
         respondent = Respondent.objects.get(pk=uid)
     except Exception as err:
         logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
-        raise Http404("We couldn't find the employee you were looking for.")
+        raise Http404(_("We couldn't find the employee you were looking for."))
 
     #check that User is allowed to change this Respondent
     if not request.user == respondent.organization.owner:
@@ -111,9 +112,9 @@ def edit_employee_view(request, **kwargs):
     form = EditRespondentForm(initial=data)
     context = {
         'form': form,
-        'submit_button_text': 'Update',
+        'submit_button_text': _('Update'),
         'show_back_button': True,
-        'back_button_text': 'Cancel',
+        'back_button_text': _('Cancel'),
         }
 
     #Check if POST, and deal with it:
@@ -127,7 +128,7 @@ def edit_employee_view(request, **kwargs):
             respondent.first_name = form.cleaned_data['first_name']
             respondent.last_name = form.cleaned_data['last_name']
             respondent.save()
-            messages.success(request, 'Employee was updated.', extra_tags='alert alert-success')
+            messages.success(request, _('Employee was updated.'), extra_tags='alert alert-success')
             #no point hanging arouhnd here if it worked
             return HttpResponseRedirect(request.GET.get('next', reverse('surveys-add-or-remove-employees')))
 
@@ -142,7 +143,7 @@ def delete_employee_view(request, **kwargs):
         respondent = Respondent.objects.get(pk=uid)
     except (Respondent.DoesNotExist, DjangoUnicodeDecodeError) as err:
         logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
-        raise Http404("We couldn't find the employee you were looking for.")
+        raise Http404(_("We couldn't find the employee you were looking for."))
 
 
     #check that User is allowed to change this Respondent
@@ -150,7 +151,7 @@ def delete_employee_view(request, **kwargs):
         return HttpResponseForbidden()
 
     else:
-        messages.info(request, '%s was permanently deleted, and will not receive future surveys.'%(respondent.email), extra_tags='alert alert-warning')
+        messages.info(request, _('%(email)s was permanently deleted, and will not receive future surveys.'%{'email': respondent.email}), extra_tags='alert alert-warning')
         respondent.delete()
         #also update stripe subscription quantity
         q = request.user.organization.update_stripe_subscription_quantity()
@@ -271,13 +272,15 @@ def setup_instrument_view(request, **kwargs):
             survey_setting.save()
             #report back
             if survey_setting.is_active == True:
-                success_string = "Your settings were updated successfully, %s tracking is ACTIVE!"%(survey_setting.instrument.name)
+                success_string = _("Your settings were updated successfully, %(instrument_name)s tracking is ACTIVE!"\
+                    %{'instrument_name': survey_setting.instrument.name})
                 messages.success(request, success_string, extra_tags='alert alert-success')
                 #mark an event 
                 event = Event(category='started_tracking_with_an_instrument', user=request.user, comment=None)
                 event.save()
             else:
-                success_string = "Your settings were updated successfully, %s tracking is INACTIVE!"%(survey_setting.instrument.name)
+                success_string = _("Your settings were updated successfully, %(instrument_name)s tracking is INACTIVE!"\
+                    %{'instrument_name': survey_setting.instrument.name})
                 messages.success(request, success_string, extra_tags='alert alert-warning')
                 #mark an event 
                 event = Event(category='stopped_tracking_with_an_instrument', user=request.user, comment=None)
@@ -291,7 +294,7 @@ def setup_instrument_view(request, **kwargs):
     context={
         'form': form,
         'instrument': instrument,
-        'submit_button_text': "Update settings"
+        'submit_button_text': _("Update settings")
     }
     return render(request, 'setup_instrument.html', context)
 
@@ -306,7 +309,7 @@ def survey_details_view(request, **kwargs):
     except (Survey.DoesNotExist, DjangoUnicodeDecodeError, AssertionError) as err:
         logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."\
             %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
-        raise Http404("We couldn't find the survey you were looking for.")
+        raise Http404(_("We couldn't find the survey you were looking for."))
 
     #check that User is allowed to view this survey
     try:
@@ -324,7 +327,7 @@ def survey_details_view(request, **kwargs):
     except Instrument.DoesNotExist as err:
         logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."\
             %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
-        raise Http404("We couldn't find that instrument you were looking for.")
+        raise Http404(_("We couldn't find the instrument you were looking for."))
 
     #get the survey_data
     survey_data = survey_logic.get_results_from_survey(survey=survey, instrument=instrument)
@@ -361,7 +364,7 @@ def answer_survey_view(request, **kwargs):
         event.save()
         #log and redirect
         logger.exception("%s %s: answer_survey_view: (user: %s) %s: %s."%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
-        raise Http404("The survey you asked for does not exist. If you pasted a link, make sure you got the entire link.")
+        raise Http404(_("The survey you asked for does not exist. If you pasted a link, make sure you got the entire link."))
 
     #get the page argument, to see if we should be inn the paginated pages, and if so, which one
     page=kwargs.get('page', None)
@@ -372,7 +375,7 @@ def answer_survey_view(request, **kwargs):
     context = {
         'survey_instance': survey_instance,
         'page': page,
-        'submit_button_text': 'Continue',
+        'submit_button_text': _('Continue'),
 
     }
 
@@ -408,7 +411,7 @@ def answer_survey_view(request, **kwargs):
                 answered_item_counter+=1
                 if item.answered == False:
                     current_page = math.ceil((answered_item_counter/page_size))
-                    messages.info(request, "Welcome back! We saved your place, so you can continue where you left off.", extra_tags='alert alert-info')
+                    messages.info(request, _("Welcome back! We saved your place, so you can continue where you left off."), extra_tags='alert alert-info')
                     return HttpResponseRedirect(reverse('surveys-answer-survey-pages', args=(url_token, current_page)))
         #finally, R has given consent, but not started or completed the survey, send him to first page
         elif request.method == 'POST' and survey_instance.consent_was_given == True and survey_instance.check_completed() == False:
@@ -419,7 +422,7 @@ def answer_survey_view(request, **kwargs):
     #if page is not none, make sure consent was given
     else:
         if survey_instance.consent_was_given != True:
-            messages.info(request, "Thank you for taking the time to answer this survey! Please indicate that you consent to answer the survey to continue.", extra_tags='alert alert-info')
+            messages.info(request, _("Thank you for taking the time to answer this survey! Please indicate that you consent to answer the survey to continue."), extra_tags='alert alert-info')
             return HttpResponseRedirect(reverse('surveys-answer-survey', args=[url_token]))
     #Show questions now that we know we are in the paginated part
     #make a list 'item_list' containing exactly the items the user should be asked

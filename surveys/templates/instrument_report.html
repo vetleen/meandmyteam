@@ -1,10 +1,17 @@
 {% extends "base_generic.html" %}
-{% block title %}<title>{{ instrument.name }} tracking report | {{ PAGE_TITLE }} </title>{% endblock %}
+{% load i18n %}
+{% block title %}
+  {% with instrument.name as instrument_name %}
+  <title>{% blocktrans %}{{ instrument_name }} tracking report{% endblocktrans %} | {{ PAGE_TITLE }} </title>
+  {% endwith %}
+  {% endblock %}
 {% block content %}
 <div class="container">
   <div class="row pt-4">
     <div class="col-sm-12 text-center">
-      <h4>{{ instrument.name }} tracking report</h4>
+      {% with instrument.name as instrument_name%}
+      <h4>{% blocktrans %}{{ instrument_name }} tracking report{% endblocktrans %}</h4>
+      {% endwith %}
     </div>
   </div> <!-- row -->
   <div class="row justify-content-center pt-2">
@@ -12,37 +19,53 @@
   </div><!-- row -->
   <div class="row justify-content-center">
     <div class="col-md-8 mt-4">
-      <h3>1. Summary</h3>
-      <h5>1.1 Summary of scores </h5>
+      <h3>{% trans "1. Summary" %}</h3>
+      <h5>{% trans "1.1 Summary of scores" %} </h5>
       <p class="text-muted">
-        Latest data was collected {{ survey_data.survey.date_close }}.<br />
+        {% with survey_data.survey.date_close as date_close%}
+        {% blocktrans %}
+        Latest data was collected {{ date_close }}.<br />
+        {% endblocktrans %}
+        {% endwith %}
         {% if survey_data.survey.n_completed < 4 %}<span class="text-danger">{% endif %}
-        <b>{{ survey_data.survey.n_completed }}</b> responded out of <b>{{ survey_data.survey.n_completed }}</b> invited
-        {% if survey_data.survey.n_completed < 4 %}</span>{% if survey_data.survey.n_completed > 0 %}<small><span class="text-muted">(some information will be hidden for privacy reasons)</span></small>{% endif %}{% endif %}
+        {% with survey_data.survey.n_completed as n_completed %}
+        {% with survey_data.survey.n_invited as n_invited %}
+        {% blocktrans %}
+        <b>{{ n_completed }}</b> responded out of <b>{{ n_invited }}</b> invited
+        {% endblocktrans %}
+        {% endwith %}
+        {% endwith %}
+        {% if survey_data.survey.n_completed < 4 %}</span>{% if survey_data.survey.n_completed > 0 %}<small><span class="text-muted">{% trans "(some information will be hidden for privacy reasons)" %}</span></small>{% endif %}{% endif %}
       </p>
 
       <p class="text-body">
       {% if survey_data.survey.n_completed > 3 %}
-        We score your organization on {{ survey_data.dimension_results|length }} dimensions. Your organization's scores are
-        summarized below.
+      {% with survey_data.dimension_results|length as n_dimensions %}
+        {% blocktrans %}
+          We score your organization on {{ n_dimensions }} dimensions. Your organization's scores are
+          summarized below.
+        {% endblocktrans %}
+      {% endwith %}
         </p>
         <p class="text-body">
-        <!-- <span class="text-body">Note that we have processed the data in such a way so
-        that <span class="font-weight-bold">a higher score (the colored bar reaches all
-        the way to the right) is always better</span>. This means it's a strength for
-        your organziation, while low scores represent weak points that you could
-        improve.
-        </span> -->
       {% else %}
-        {{ instrument.name }} is scored on {{ survey_data.dimension_results|length }} dimensions. Your organization's scores are
+      {% with instrument.name as instrument_name %}
+      {% with survey_data.dimension_results|length as n_dimensions %}
+      {% blocktrans %}
+        {{ instrument_name }} is scored on {{ n_dimensions }} dimensions. Your organization's scores are
         summarized below.
+      {% endblocktrans %}
+      {% endwith %}
+      {% endwith %}
         </p>
         <p class="text-body">
+      {% blocktrans %}
         <span class="font-weight-bold">Since this survey had three or fewer respondents,
         we can only show you what your organizations highest and lowest scores
         are</span>. This is because we promised your co-workers that we would anonymize
         their data, and with this few responents it starts to become possible to guess
         individual answers based on the processed scores.<br />
+      {% endblocktrans %}
       {% endif %}
       </p>
 
@@ -56,13 +79,13 @@
           {% if dimension.highest_average == True %}
           <li class="list-group-item d-flex justify-content-between align-items-center">
             {{dimension.dimension.name}}
-            <span class="badge badge-success">Highest score!</span>
+            <span class="badge badge-success">{% trans "Highest score!" %}</span>
           </li>
           {% endif %}
           {% if dimension.lowest_average == True %}
           <li class="list-group-item d-flex justify-content-between align-items-center">
               {{dimension.dimension.name}}
-            <span class="badge badge-warning">Lowest score</span>
+            <span class="badge badge-warning">{% trans "Lowest score" %}</span>
           </li>
           {% endif %}
         {% endfor %}
@@ -75,20 +98,26 @@
 
     {% if survey_data.previous_data.dimension_results %}
     <div class="col-md-8 mt-4">
-      <h5>1.2 Change from previous survey</h5>
+      <h5>{% trans "1.2 Change from previous survey" %}</h5>
       <p class="text-muted">
         The previous survey was closed {{ survey_data.previous_data.survey.date_close }}.<br />
 
         {% if survey_data.previous_data.survey.n_completed < 4 %}<span class="text-danger">{% endif %}
-        <b>{{ survey_data.previous_data.survey.n_completed }}</b> responded out of <b>{{ survey_data.previous_data.survey.n_completed }}</b> invited
-        {% if survey_data.previous_data.survey.n_completed < 4 %}</span>{% if survey_data.previous_data.survey.n_completed > 0 %}<small><span class="text-muted">(some information will be hidden for privacy reasons)</span></small>{% endif %}{% endif %}
+        {% with survey_data.previous_data.survey.n_completed as n_completed %}
+        {% with survey_data.previous_data.survey.n_invited as n_invited %}
+          {% blocktrans %}
+            <b>{{ n_completed }}</b> responded out of <b>{{ n_invited }}</b> invited
+          {% endblocktrans %}
+        {% endwith %}
+        {% endwith %}
+        {% if survey_data.previous_data.survey.n_completed < 4 %}</span>{% if survey_data.previous_data.survey.n_completed > 0 %}<small><span class="text-muted">{% trans "(some information will be hidden for privacy reasons)" %}</span></small>{% endif %}{% endif %}
       </p>
 
       {% for dimension_result in survey_data.dimension_results %}
         {% include "includeable/display_single_dr_change.html" with label=dimension_result.dimension.name colored=True %} {# displays the dr change sincel last bar #}
       {% endfor %}
       <p class="mt-2 text-center">
-        <a href="{% url 'surveys-survey-details' survey_data.previous_data.survey.uidb64 instrument.slug_name %}">View previous survey</a>
+        <a href="{% url 'surveys-survey-details' survey_data.previous_data.survey.uidb64 instrument.slug_name %}">{% trans "View previous survey" %}</a>
       </p>
     </div> <!-- col -->
     {% endif %} {# done showing data/change from previous (1.2) #}
@@ -99,7 +128,7 @@
 
 
     <div class="col-md-8 mt-2">
-      <h3>2. Results</h3>
+      <h3>{% trans "2. Results" %}</h3>
     </div>
     {% for dimension_result in survey_data.dimension_results %}
 
@@ -107,10 +136,10 @@
       <h5><a id="{{ dimension_result.dimension.name|slugify }}">2.{{ forloop.counter }} {{ dimension_result.dimension.name }}</a></h5>
       {% if dimension_result.n_completed < 4 %}
         {% if dimension_result.highest_average == True %}
-          <h5><center><span class="badge badge-success">Your organization's strongest point!</span></center></h5>
+          <h5><center><span class="badge badge-success">{% trans "Your organization's strongest point!" %}</span></center></h5>
         {% endif %}
         {% if dimension_result.lowest_average == True %}
-          <h5><center><span class="badge badge-warning">Your organization's weakest point</span></center></h5>
+          <h5><center><span class="badge badge-warning">{% trans "Your organization's weakest point" %}</span></center></h5>
         {% endif %}
       {% endif %}
 
@@ -126,12 +155,12 @@
       {% include "includeable/display_single_dimension_result.html" with dimension_result=dimension_result label="Current score:" colored=True %} {# displays the plain dimension_result bar #}
       {# end of display the three bars in 2.x #}
       <p>
-        <h6 class="mt-2">2.{{ forloop.counter }}.1 What does "{{ dimension_result.dimension.name|lower }}" mean?</h6>
+        <h6 class="mt-2">2.{{ forloop.counter }}.{% with dimension_result.dimension.name|lower as dimension_name %}{% blocktrans %}1 What does "{{ dimension_name }}" mean?{% endblocktrans %}{% endwith %}</h6>
         {{ dimension_result.dimension.description }}
       </p>
-      <h6 class="mt-2">2.{{ forloop.counter }}.2 How did we arrive at this score:</h6>
+      <h6 class="mt-2">2.{{ forloop.counter }}.2 {% trans "How did we arrive at this score?" %}</h6>
       To arrive at this score, we asked your employees to review a set of statements with the following instruction: <b>"{{ dimension_result.scale.instruction }}"</b>.
-      {% if dimension_result.n_completed > 3 %} The average answers were: {% else %} We have hidden results for statements with fewer than 4 respondents. This is because of our privacy policy. {% endif %}
+      {% if dimension_result.n_completed > 3 %} {% trans "The average answers were:" %} {% else %} {% trans "We have hidden results for statements with fewer than 4 respondents. This is because of our privacy policy." %} {% endif %}
       <ul class="list-group mt-4">
 
       {% for item_result in survey_data.item_results %}
@@ -162,7 +191,7 @@
                 </div><!-- col -->
                 <div class="col-9">
                   <div class="progress"  style="height: 20px;">
-                    <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">Average hidden</span></div>
+                    <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">{% trans "Average hidden" %}</span></div>
                   </div>
                 </div><!-- col -->
                 <div class="col text-left px-0">
@@ -177,9 +206,11 @@
       </ul>
       {% if number_of_respondents > 3 %}
       <p class="text-muted"><small>
+      {% blocktrans %}
 The numbers represent the average rating for your organization. A "full bar"
 means your co-workers agreed with the statement, regardless of it being positive
 or negative.
+      {% endblocktrans %}
       </small></p>
       {% endif %}
 

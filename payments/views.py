@@ -63,24 +63,40 @@ def current_plan_view(request):
         return HttpResponseServerError()
 
     #clean it up for the template:
-    #clean plan_interval
-    if stripe_subscription.plan.interval == "month":
-        plan_interval = _("month")
-    elif stripe_subscription.plan.interval == "year":
-        plan_interval = _("year")
-    else:
-        plan_interval = stripe_subscription.plan.interval
-    #clean plan_name
-    if stripe_subscription.plan.nickname == "Quarterly":
-        plan_name = _("Quarterly")
-    elif stripe_subscription.plan.nickname == "Yearly":
-        plan_name = _("Yearly")
-    else:
-         plan_name = stripe_subscription.plan.nickname
-
     clean_stripe_subscription = None
     if stripe_subscription is not None:
-        clean_stripe_subscription = {}
+        #clean plan_interval
+        if stripe_subscription.plan.interval == "month":
+            plan_interval = _("month")
+        elif stripe_subscription.plan.interval == "year":
+            plan_interval = _("year")
+        else:
+            plan_interval = stripe_subscription.plan.interval
+        #clean plan_name
+        if stripe_subscription.plan.nickname == "Quarterly":
+            plan_name = _("Quarterly")
+        elif stripe_subscription.plan.nickname == "Yearly":
+            plan_name = _("Yearly")
+        else:
+            plan_name = stripe_subscription.plan.nickname
+        #clean status
+        if stripe_subscription.status == "active":
+            stripe_subscription_status = _("active")
+        elif stripe_subscription.status == "trialing":
+            stripe_subscription_status = _("trialing")
+        elif stripe_subscription.status == "canceled":
+            stripe_subscription_status = _("canceled")
+        elif stripe_subscription.status == "unpaid":
+            stripe_subscription_status = _("unpaid") 
+        elif stripe_subscription.status == "past_due":
+            stripe_subscription_status = _("past_due") 
+        elif stripe_subscription.status == "incomplete":
+            stripe_subscription_status = _("incomplete")    
+        elif stripe_subscription.status == "incomplete_expired":
+            stripe_subscription_status = _("incomplete_expired")              
+        else:
+            stripe_subscription_status = stripe_subscription.status
+        #make cleaned dict
         clean_stripe_subscription = {
             'id': stripe_subscription.id,
             'cancel_at_period_end': stripe_subscription.cancel_at_period_end,
@@ -93,7 +109,8 @@ def current_plan_view(request):
             'plan_interval': plan_interval,
             'plan_name': plan_name,
             'quantity': stripe_subscription.quantity,
-            'status': stripe_subscription.status,
+            'status': stripe_subscription_status,
+            'english_status': stripe_subscription.status,
             'current_period_start': datetime.datetime.fromtimestamp(stripe_subscription.current_period_start).date(),
             'current_period_end': datetime.datetime.fromtimestamp(stripe_subscription.current_period_end).date(),
             'billing_cycle_anchor': datetime.datetime.fromtimestamp(stripe_subscription.billing_cycle_anchor).date(),
@@ -118,13 +135,27 @@ def current_plan_view(request):
     clean_plan_list = []
     for plan in plan_list:
         if plan.product == product.id and plan.active == True:
+            #clean plan_interval
+            if plan.interval == "month":
+                plan_interval = _("month")
+            elif plan.interval == "year":
+                plan_interval = _("year")
+            else:
+                plan_interval = plan.interval
+            #clean plan_name
+            if plan.nickname == "Quarterly":
+                plan_name = _("Quarterly")
+            elif plan.nickname == "Yearly":
+                plan_name = _("Yearly")
+            else:
+                plan_name = stripe_subscription.plan.nickname
 
             #clean data and dict for each plan
             cleaned_plan = {
-                'name': plan.nickname,
+                'name': plan_name,
                 'currency': plan.currency,
                 'id': plan.id,
-                'interval': plan.interval,
+                'interval': plan_interval,
                 'interval_count': plan.interval_count,
                 'trial_period_days': plan.trial_period_days,
                 'amount': "%.0f" % int(plan.amount/100),

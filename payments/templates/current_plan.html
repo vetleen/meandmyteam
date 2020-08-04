@@ -28,7 +28,7 @@ function stripeRedirect(){
 <div class="container">
   <div class="row pt-4">
     <div class="col">
-      <h3> {% trans "Plans and payments" %}</h3>
+      <h3> {% trans "Plans and payment" %}</h3>
     </div>
   </div> <!-- row -->
   <div class="row justify-content-center pt-2">
@@ -36,7 +36,7 @@ function stripeRedirect(){
   </div><!-- row -->
   <div class="row">
 
-            {% if stripe_subscription is not None and stripe_subscription.status != 'canceled' %}
+            {% if stripe_subscription is not None and stripe_subscription.english_status != 'canceled' %}
         <div class="col-lg-6"><!-- Your subsciption -->
             <h5>{% trans "Your Subscription" %}</h5>
             <div class="card-group">
@@ -67,7 +67,7 @@ function stripeRedirect(){
                     <span class="text-muted lead">Subscription is <span class="text-success font-weight-bold">{{ stripe_status }}</span>
                   {% endblocktrans %}
                 {% endwith %}
-                  {% if stripe_subscription.status == 'active' or stripe_subscription.status == 'trialing' %}
+                  {% if stripe_subscription.english_status == 'active' or stripe_subscription.english_status == 'trialing' %}
                   {% trans "until" %} {{ stripe_subscription.current_period_end }}.</span><br />
                   {% else %}
                     .<br />
@@ -87,15 +87,17 @@ function stripeRedirect(){
               <div class="text-center card-footer">
                 <center>
                   {% if stripe_subscription.cancel_at_period_end == True %}
-                    <a href="{% url 'payments-restart_cancelled-subscription' stripe_subscription.id %}" class="btn btn-success btn-sm">Restart subscription</a>
+                    <a href="{% url 'payments-restart_cancelled-subscription' stripe_subscription.id %}" class="btn btn-success btn-sm">{% trans "Restart subscription" %}</a>
                   {% endif %}
                   {% for plan in plan_list %}
                     {% if plan.id != stripe_subscription.plan_id %}
-                      <a href="{% url 'payments-change-subscription-price' plan.id %}" class="btn btn-info btn-sm">Switch to {{ plan.name|lower }} billing </a>
+                      {% with plan.name|lower as plan_name %}
+                      <a href="{% url 'payments-change-subscription-price' plan.id %}" class="btn btn-info btn-sm">{% blocktrans %} Switch to {{ plan_name }} billing{% endblocktrans %} </a>
+                      {% endwith %}
                     {% endif %}
                   {% endfor %}
                   {% if stripe_subscription.cancel_at_period_end != True %}
-                    <a href="{% url 'payments-cancel-subscription' stripe_subscription.id %}" class="btn btn-danger btn-sm">Cancel subscription</a>
+                    <a href="{% url 'payments-cancel-subscription' stripe_subscription.id %}" class="btn btn-danger btn-sm">{% trans "Cancel subscription" %}</a>
                   {% endif %}
                 </center>
               </div> <!-- card-footer -->
@@ -107,21 +109,28 @@ function stripeRedirect(){
         </div><!-- col -->
             {% else %}
         <div class="col-lg-6 {% if default_payment_method is None %}offset-lg-3{% endif %} justify-content-center"><!-- Plans -->
-            <h5>Plans</h5>
+            <h5>{% trans "Plans" %}</h5>
                 <div class="card-group">
                 {% for plan in plan_list %}
                 <div class="card col-md-6 px-0">
                   <img src="{% static 'images/basic-plan-1.svg' %}" class="card-img-top mt-2" style="height: 10rem;" alt="{{ plan.name }} plan">
                   <div class="card-body">
                     <h5 class="card-title text-center text-body"> Standard {{ plan.name }}</h5>
-                    <!--<span class="text-muted"><span class="lead">$3 <small>USD</small> / month </span> per {{ product.unit_label }}</span><br />-->
-                    <h3 class="card-subtitle text-info text-center">${{ plan.interval_amount }} {{ plan.currency|upper }}/{{ plan.interval }} </h3>
-                    <span class="text-muted"><center><small>per {{ product.unit_label }} billed {{ plan.name|lower }}</small></center></span>
-                    <center><span class="badge badge-success">{{ plan.trial_period_days }} days free trial!</span></center>
-                    <p class="card-text">{{ product.description }}.</p>
+                    {% trans plan.interval_amount as interval_amount %}
+                    {% trans plan.currency|upper as currency %}
+                    {% trans plan.interval as interval %}
+                    {% trans plan.name|lower as plane_name %}
+                    {% trans plan.trial_period_days as trial_period_days %}
+                    {% trans product.description as product_description %}
+                    {% blocktrans %}
+                    <h3 class="card-subtitle text-info text-center">${{ interval_amount }} {{ currency }}/{{ interval }} </h3>
+                    <span class="text-muted"><center><small>per employee billed {{ plane_name }}</small></center></span>
+                    <center><span class="badge badge-success">{{ trial_period_days }} days free trial!</span></center>
+                    <p class="card-text">{{ product_description }}.</p>
+                    {% endblocktrans %}
                   </div> <!-- card-body -->
                   <div class="text-center card-footer">
-                    <a href="{% url 'payments-create-subscription' plan.id %}" class="btn btn-success text-center my-2">{% if request.user.organization.stripe_subscription_id == "" or  request.user.organization.stripe_subscription_id is None %}Try for free{% else %}Pick plan{% endif %}</a>
+                    <a href="{% url 'payments-create-subscription' plan.id %}" class="btn btn-success text-center my-2">{% if request.user.organization.stripe_subscription_id == "" or  request.user.organization.stripe_subscription_id is None %}{% trans "Try for free" %}{% else %}{% trans "Pick plan" %}{% endif %}</a>
                   </div> <!-- card-footer -->
                 </div><!-- card -->
                 {% endfor %}
@@ -133,88 +142,87 @@ function stripeRedirect(){
         <div class="col-lg-6"><!-- Payment methods -->
           {% if default_payment_method is not None %}
 
-            <h5>Active payment method</h5>
+            <h5>{% trans "Active payment method" %}</h5>
             <ul class="list-group list-group-horizontal-sm mb-2 ">
-              <li class="list-group-item col-sm-3 list-group-item-info"><span class="text-muted"><small>{{ default_payment_method.card.brand|capfirst }} ending in:</small></span><br /> {{ default_payment_method.card.last4 }}</li>
-              <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>Cardholder name:</small></span><br />  {{ default_payment_method.billing_details.name }}</li>
-              <li class="list-group-item col-sm-2 list-group-item-info"><span class="text-muted"><small>Expires:</small></span><br />  {{ default_payment_method.card.exp_month }}/{{ default_payment_method.card.exp_year }}</li>
-              <li class="list-group-item col-sm-3 list-group-item-info"><span class="text-muted"><small>Actions:</small></span><br /><center> <a class="badge badge-danger" href="{% url 'payments-delete-payment-method' default_payment_method.id %}">Delete</a></center></li>
+              <li class="list-group-item col-sm-3 list-group-item-info"><span class="text-muted"><small>{{ default_payment_method.card.brand|capfirst }}{% trans "ending in:" %}</small></span><br /> {{ default_payment_method.card.last4 }}</li>
+              <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>{% trans "Cardholder name:" %}</small></span><br />  {{ default_payment_method.billing_details.name }}</li>
+              <li class="list-group-item col-sm-2 list-group-item-info"><span class="text-muted"><small>{% trans "Expires:" %}</small></span><br />  {{ default_payment_method.card.exp_month }}/{{ default_payment_method.card.exp_year }}</li>
+              <li class="list-group-item col-sm-3 list-group-item-info"><span class="text-muted"><small>{% trans "Actions:" %}</small></span><br /><center> <a class="badge badge-danger" href="{% url 'payments-delete-payment-method' default_payment_method.id %}">{% trans "Delete" %}</a></center></li>
             </ul>
 
           <p class="text-center">
-            <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">Change payment method</a>
+            <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">{% trans "Change payment method" %}</a>
           </p>
           {% endif %}
           {% if pm_list is not None and pm_list.data|length > 1 %}
 
 
-          <h5>All payment methods</h5>
+          <h5>{% trans "All payment methods" %}</h5>
             {% for pm in pm_list %}
             {% if pm.id %}
             <ul class="list-group list-group-horizontal-sm mb-2 ">
-              <li class="list-group-item col-sm-3{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>{{ pm.card.brand|capfirst }} ending in:</small></span><br /> {{ pm.card.last4 }}</li>
-              <li class="list-group-item flex-fill{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>Cardholder name:</small></span><br />  {{ pm.billing_details.name }}</li>
-              <li class="list-group-item col-sm-2{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>Expires:</small></span><br />  {{ pm.card.exp_month }}/{{ pm.card.exp_year }}</li>
+              <li class="list-group-item col-sm-3{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>{{ pm.card.brand|capfirst }} {% trans "ending in:" %}</small></span><br /> {{ pm.card.last4 }}</li>
+              <li class="list-group-item flex-fill{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>{% trans "Cardholder name:" %}</small></span><br />  {{ pm.billing_details.name }}</li>
+              <li class="list-group-item col-sm-2{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}"><span class="text-muted"><small>{% trans "Expires:" %}</small></span><br />  {{ pm.card.exp_month }}/{{ pm.card.exp_year }}</li>
               <li class="list-group-item col-sm-3{% if pm.id == default_payment_method.id %} list-group-item-info{% endif %}">
                 {% if pm.id == default_payment_method.id %}
-                  <small><center>(active<br>card)</center></small>
+                  <small><center>{% blocktrans %}(active<br>card){% endblocktrans %}</center></small>
                 {% else %}
-                  <span class="text-muted"><small>Actions:</small></span><br /><a class="badge badge-success" href="{% url 'payments-use-payment-method' pm.id %}">Use</a> <a class="badge badge-danger" href="{% url 'payments-delete-payment-method' pm.id %}">Delete</a>
+                  <span class="text-muted"><small>{% trans "Actions:" %}</small></span><br /><a class="badge badge-success" href="{% url 'payments-use-payment-method' pm.id %}">{% trans "Use" %}</a> <a class="badge badge-danger" href="{% url 'payments-delete-payment-method' pm.id %}">{% trans "Delete" %}</a>
                 {% endif %}
               </li>
             </ul>
             {% endif %}
             {% endfor %}
             <p class="text-center">
-              <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">New payment method</a>
+              <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">{% trans "New payment method" %}</a>
             </p>
           {% endif %}
           {% if default_payment_method is None and stripe_subscription is not None and stripe_subscription.status != 'canceled' %}
 
-          <h5>Add payment method</h5>
-            <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">Add payment method</a>
+          <h5>{% trans "Add payment method" %}</h5>
+            <a href="{% url 'payments-set-up-payment-method' %}" class="btn btn-info btn-sm">{% trans "Add payment method" %}</a>
           {% endif %}<!-- Plans -->
         </div><!-- col -->
         {% if invoice_list is not None %}
         <div class="col-12"><!-- Invoices -->
-          <h5 class="mt-3">Invoices</h5>
+          <h5 class="mt-3">{% trans "Invoices" %}</h5>
           {% for invoice in invoice_list %}
           <ul class="list-group list-group-horizontal-sm mb-2 ">
             <li class="list-group-item flex-fill{% if invoice.paid == True %} list-group-item-success{% else %}ist-group-item-warning{% endif %}">
-              <span class="text-muted"><small>Invoice number/date:</small></span><br />
-              <a href="{{ invoice.invoice_pdf }}" targte="_blank">{{ invoice.number }} &#11016;</a><br /> {{ invoice.created }}
+              <span class="text-muted"><small>{% trans "Invoice number/date:" %}</small></span><br />
+              <a href="{{ invoice.invoice_pdf }}" target="_blank">{{ invoice.number }} &#11016;</a><br /> {{ invoice.created }}
             </li>
             <li class="list-group-item flex-fill{% if invoice.paid == True %} list-group-item-success{% else %}ist-group-item-warning{% endif %}">
-              <span class="text-muted"><small>Plan:</small></span><br />
+              <span class="text-muted"><small>{% trans "Plan:" %}</small></span><br />
               {% for item in invoice.line_items %}
                 {{ item.plan_name }}
               {% endfor %}
             </li>
             <li class="list-group-item flex-fill{% if invoice.paid == True %} list-group-item-success{% else %}ist-group-item-warning{% endif %}">
-              <span class="text-muted"><small>Billing Period:</small></span><br />
+              <span class="text-muted"><small>{% trans "Billing Period:" %}</small></span><br />
               {% for item in invoice.line_items %}
-                {{ item.period_start }} to<br />  {{ item.period_end }}
+                {{ item.period_start }} {% trans "to" %}<br />  {{ item.period_end }}
               {% endfor %}
             </li>
             <li class="list-group-item flex-fill{% if invoice.paid == True %} list-group-item-success{% else %}ist-group-item-warning{% endif %}">
-              <span class="text-muted"><small>Amount:</small></span><br />
+              <span class="text-muted"><small>{% trans "Amount:" %}</small></span><br />
               {% for item in invoice.line_items %}
                 $ {{ item.amount }} {{ item.currency|upper }}
               {% endfor %}
             </li>
             <li class="list-group-item flex-fill{% if invoice.paid == True %} list-group-item-success{% else %}ist-group-item-warning{% endif %}">
-              <span class="text-muted"><small>Status:</small></span><br />
+              <span class="text-muted"><small>{% trans "Status:" %}</small></span><br />
               {% if invoice.paid == True %}
-                Paid
+                {% trans "Paid" %}
               {% else %}
-                Not paid
+                {% trans "Not paid" %}
               {% endif %}
             </li>
           </ul>
           {% endfor %}
         </div><!-- col -->
       {% endif %}
-
   </div> <!-- row -->
 </div><!-- container -->
 
