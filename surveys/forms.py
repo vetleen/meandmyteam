@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
 from surveys.models import Respondent
 from django_countries.widgets import CountrySelectWidget
 from django_countries.fields import CountryField
@@ -7,15 +8,15 @@ from surveys.models import SurveyInstanceItem, RatioSurveyInstanceItem
 
 
 class AddRespondentForm(forms.Form):
-    email = forms.EmailField(max_length = 150, label="Email address", widget=forms.TextInput(attrs={'placeholder': 'Required'}))
-    first_name = forms.CharField(max_length = 255, label="First name", required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
-    last_name = forms.CharField(max_length = 255, label="Last name", required=False, widget=forms.TextInput(attrs={'placeholder': 'Optional'}))
+    email = forms.EmailField(max_length = 150, label=_("Email address"), widget=forms.TextInput(attrs={'placeholder': _('Required')}))
+    first_name = forms.CharField(max_length = 255, label=_("First name"), required=False, widget=forms.TextInput(attrs={'placeholder': _('Optional')}))
+    last_name = forms.CharField(max_length = 255, label=_("Last name"), required=False, widget=forms.TextInput(attrs={'placeholder': _('Optional')}))
     #receives_surveys = forms.BooleanField(label="Send surveys to this employee", required=False, widget=forms.CheckboxInput(attrs={'default': 'true'}))
 
     def clean_email(self):
         if Respondent.objects.filter(email=self.cleaned_data['email']).exists():
             raise forms.ValidationError(
-                "An employee with that email already exists (%(taken_email)s).",
+                _("An employee with that email already exists in our database (%(taken_email)s)."),
                 code='invalid',
                 params={'taken_email': self.cleaned_data['email']}
             )
@@ -32,7 +33,7 @@ class EditRespondentForm(AddRespondentForm):
             existing_respondent = Respondent.objects.get(email=self.cleaned_data['email'])
             if  existing_respondent.id != self.respondent_id:
                 raise forms.ValidationError(
-                    "An employee with that email already exists (%(taken_email)s).",
+                    _("An employee with that email already exists in our database (%(taken_email)s)."),
                     code='invalid',
                     params={'taken_email': self.cleaned_data['email']}
                 )
@@ -41,40 +42,40 @@ class EditRespondentForm(AddRespondentForm):
 class EditSurveySettingsForm(forms.Form):
 
     is_active = forms.BooleanField(
-        label="Activate tracking?",
+        label=_("Activate tracking?"),
         required=False,
         widget=forms.CheckboxInput(attrs={'default': 'true'})
     )
     survey_interval = forms.ChoiceField(
-        label="How often should employees in your organization be surveyed?",
+        label=_("How often should employees in your organization be surveyed?"),
         required=True,
         choices=(
-            (90, 'Every 3 months (reccomended)'),
-            (180, 'Every 6 months'),
-            (365, 'Every year'),
+            (90, _('Every 3 months (reccomended)')),
+            (180, _('Every 6 months')),
+            (365, _('Every year')),
             )
     )
     surveys_remain_open_days = forms.ChoiceField(
-        label="How much time should employees be given to answer a survey?",
+        label=_("How much time should employees be given to answer a survey?"),
         required=True,
         choices=(
-            (7, 'One week (recommended)'),
-            (14, 'Two weeks'),
-            (21, 'Three weeks'),
-            (30, 'One month'),
+            (7, _('One week (recommended)')),
+            (14, _('Two weeks')),
+            (21, _('Three weeks')),
+            (30, _('One month')),
             )
     )
 
 class ConsentToAnswerForm(forms.Form):
     consent_to_answer = forms.BooleanField(
-        label="I consent to the collection of information in this survey",
+        label=_("I consent to the collection of information in this survey"),
         required=True,
         widget=forms.CheckboxInput(attrs={'default': 'false'})
     )
     def clean_consent_to_answer(self):
         if self.cleaned_data['consent_to_answer'] != True:
             raise forms.ValidationError(
-                "Please indicate that you consent to answer this survey to continue.",
+                _("Please indicate that you consent to answer this survey to continue."),
                 code='invalid',
                 params={'consent_to_answer': self.cleaned_data['consent_to_answer']}
             )
@@ -82,8 +83,8 @@ class ConsentToAnswerForm(forms.Form):
 
 class CustomChoiceField(forms.ChoiceField):
     def __init__(self, *args, **kwargs):
-        self.min_value_description = kwargs.pop('min_value_description', 'Disagree')
-        self.max_value_description = kwargs.pop('max_value_description', 'Agree')
+        self.min_value_description = kwargs.pop('min_value_description', _('Disagree'))
+        self.max_value_description = kwargs.pop('max_value_description', _('Agree'))
         self.opt_out = kwargs.pop('opt_out', False)
         super(CustomChoiceField, self).__init__(*args, **kwargs)
 
@@ -110,7 +111,7 @@ class AnswerSurveyForm(forms.Form):
             if isinstance(item, RatioSurveyInstanceItem):
                 CHOICES = [(number, str(number)) for number in range (item.survey_item.item_dimension.scale.min_value, item.survey_item.item_dimension.scale.max_value)]
                 if item.survey_item.item_dimension.scale.opt_out == True:
-                    CHOICES.append(("chose_to_not_answer", "I don't know, or I don't want to answer"))                
+                    CHOICES.append(("chose_to_not_answer", _("I don't know, or I don't want to answer")))                
                 self.fields[field_name] = CustomChoiceField(
                     min_value_description = item.survey_item.item_dimension.scale.min_value_description,
                     max_value_description = item.survey_item.item_dimension.scale.max_value_description,

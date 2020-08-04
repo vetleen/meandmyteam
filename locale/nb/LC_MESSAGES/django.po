@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-04 16:10+0200\n"
+"POT-Creation-Date: 2020-08-04 16:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -468,6 +468,105 @@ msgstr "rediger-ansatt/<uidb64>/"
 #: surveys/dashboard_urls.py:14
 msgid "delete-employee/<uidb64>/"
 msgstr "slett-ansatt/<uidb64>/"
+
+#: surveys/forms.py:11 website/forms.py:18 website/forms.py:121
+#: website/forms.py:172
+#, fuzzy
+#| msgid "Easily add employees"
+msgid "Email address"
+msgstr "Legg til ansatte enkelt"
+
+#: surveys/forms.py:11
+msgid "Required"
+msgstr ""
+
+#: surveys/forms.py:12
+msgid "First name"
+msgstr ""
+
+#: surveys/forms.py:12 surveys/forms.py:13
+msgid "Optional"
+msgstr ""
+
+#: surveys/forms.py:13
+msgid "Last name"
+msgstr ""
+
+#: surveys/forms.py:19 surveys/forms.py:36
+#, python-format
+msgid ""
+"An employee with that email already exists in our database (%(taken_email)s)."
+msgstr ""
+
+#: surveys/forms.py:45
+#, fuzzy
+#| msgid "Start tracking!"
+msgid "Activate tracking?"
+msgstr "Begynn sporing!"
+
+#: surveys/forms.py:50
+msgid "How often should employees in your organization be surveyed?"
+msgstr ""
+
+#: surveys/forms.py:53
+msgid "Every 3 months (reccomended)"
+msgstr ""
+
+#: surveys/forms.py:54
+msgid "Every 6 months"
+msgstr ""
+
+#: surveys/forms.py:55
+msgid "Every year"
+msgstr ""
+
+#: surveys/forms.py:59
+msgid "How much time should employees be given to answer a survey?"
+msgstr ""
+
+#: surveys/forms.py:62
+msgid "One week (recommended)"
+msgstr ""
+
+#: surveys/forms.py:63
+msgid "Two weeks"
+msgstr ""
+
+#: surveys/forms.py:64
+msgid "Three weeks"
+msgstr ""
+
+#: surveys/forms.py:65
+#, fuzzy
+#| msgid "month"
+msgid "One month"
+msgstr "måned"
+
+#: surveys/forms.py:71
+msgid "I consent to the collection of information in this survey"
+msgstr ""
+
+#: surveys/forms.py:78
+#, fuzzy
+#| msgid ""
+#| "Thank you for taking the time to answer this survey! Please indicate that "
+#| "you consent to answer the survey to continue."
+msgid "Please indicate that you consent to answer this survey to continue."
+msgstr ""
+"Takk for at du tar deg tid til å svare på denne undersøkelsen! Vennligst "
+"kryss av for at du godtar å svare på undersøkelsen for å fortsette."
+
+#: surveys/forms.py:86
+msgid "Disagree"
+msgstr ""
+
+#: surveys/forms.py:87
+msgid "Agree"
+msgstr ""
+
+#: surveys/forms.py:114
+msgid "I don't know, or I don't want to answer"
+msgstr ""
 
 #: surveys/surveys_urls.py:10
 msgid "setup-tracking/<instrument>/"
@@ -1205,6 +1304,178 @@ msgstr "Å nei! Serveren vår gjorde en feil."
 #: templates/500.html:21
 msgid "500: Server error."
 msgstr "500: Server feil."
+
+#: website/forms.py:19 website/views.py:195
+msgid "Choose a password"
+msgstr "Velg passord"
+
+#: website/forms.py:20 website/views.py:195
+msgid "Confirm password"
+msgstr "Bekreft passord"
+
+#: website/forms.py:23
+#, fuzzy
+#| msgid "Organization"
+msgid "Organization name*"
+msgstr "Organisasjon"
+
+#: website/forms.py:24
+msgid "Phone number"
+msgstr ""
+
+#: website/forms.py:25
+msgid "Street address*"
+msgstr ""
+
+#: website/forms.py:27
+msgid "Zip*"
+msgstr ""
+
+#: website/forms.py:28 website/forms.py:181
+msgid "City"
+msgstr ""
+
+#: website/forms.py:29 website/forms.py:182
+msgid "(Select country)"
+msgstr ""
+
+#: website/forms.py:29
+msgid "Country*"
+msgstr ""
+
+#: website/forms.py:31
+msgid "I accept the terms and conditions and the privacy policy."
+msgstr ""
+
+#: website/forms.py:39
+#, python-format
+msgid "A user with the email already exist (%(taken_email)s)."
+msgstr ""
+
+#: website/forms.py:56
+msgid ""
+"The second password you entered did not match the first. Please try again."
+msgstr ""
+
+#: website/forms.py:64
+#, python-format
+msgid "An organization with that name already exists (%(taken_name)s)."
+msgstr ""
+
+#: website/forms.py:80
+#, fuzzy
+#| msgid ""
+#| "Thank you for taking the time to answer this survey! Please indicate that "
+#| "you consent to answer the survey to continue."
+msgid "Please indicate that you accept the terms and conditions."
+msgstr ""
+"Takk for at du tar deg tid til å svare på denne undersøkelsen! Vennligst "
+"kryss av for at du godtar å svare på undersøkelsen for å fortsette."
+
+#: website/forms.py:94
+#, fuzzy
+#| msgid "Current score:"
+msgid "Current password"
+msgstr "Siste score:"
+
+#: website/forms.py:94
+#, fuzzy
+#| msgid "Update password"
+msgid "Old Password"
+msgstr "Oppdater passord"
+
+#: website/forms.py:95
+#, fuzzy
+#| msgid "Change password"
+msgid "Enter a new password"
+msgstr "Endre passord"
+
+#: website/forms.py:95
+#, fuzzy
+#| msgid "Change password"
+msgid "New Password"
+msgstr "Endre passord"
+
+#: website/forms.py:96
+#, fuzzy
+#| msgid "Confirm password"
+msgid "Confirm new password"
+msgstr "Bekreft passord"
+
+#: website/forms.py:96
+#, fuzzy
+#| msgid "Confirm password"
+msgid "Confirm New Password"
+msgstr "Bekreft passord"
+
+#: website/forms.py:101 website/forms.py:152
+#, fuzzy
+#| msgid "Change password"
+msgid "Wrong password."
+msgstr "Endre passord"
+
+#: website/forms.py:115
+msgid ""
+"The second new password you entered did not match the first. Please try "
+"again."
+msgstr ""
+
+#: website/forms.py:126 website/forms.py:142
+#, python-format
+msgid "There is no user with that email (%(attempted)s)."
+msgstr ""
+
+#: website/forms.py:158
+msgid "Please enter the password again."
+msgstr ""
+
+#: website/forms.py:172
+msgid "Your email is also your username."
+msgstr ""
+
+#: website/forms.py:175
+#, fuzzy
+#| msgid "Organization"
+msgid "Organization name"
+msgstr "Organisasjon"
+
+#: website/forms.py:176
+msgid "Phone incl.country code (e.g. +01)"
+msgstr ""
+
+#: website/forms.py:176
+msgid "Example: +12125552368"
+msgstr ""
+
+#: website/forms.py:178
+msgid "Street address"
+msgstr ""
+
+#: website/forms.py:180
+msgid "Zip"
+msgstr ""
+
+#: website/forms.py:182
+msgid "Country"
+msgstr ""
+
+#: website/forms.py:194
+#, python-format
+msgid ""
+"An organization with that name already exists in our system (%(taken_name)s)."
+msgstr ""
+
+#: website/forms.py:203
+#, python-format
+msgid "A user with the email already exists in our system (%(taken_email)s)."
+msgstr ""
+
+#: website/models.py:49
+#, python-format
+msgid ""
+"Tried to create an organization with an invalid phone number "
+"(%(phone_number)s). Error message: %(error_message)s"
+msgstr ""
 
 #: website/templates/change_password_form.html:3
 #: website/templates/edit_account_form.html:67
@@ -2131,14 +2402,6 @@ msgid "Welcome aboard. Let's start by adding some employees to survey!"
 msgstr ""
 "Velkommen ombord. La oss begynne med å legge til noen ansatte å sende "
 "spørreskjema til!"
-
-#: website/views.py:195
-msgid "Choose a password"
-msgstr "Velg passord"
-
-#: website/views.py:195
-msgid "Confirm password"
-msgstr "Bekreft passord"
 
 #: website/views.py:206
 msgid "You are already logged in."

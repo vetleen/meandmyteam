@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils import timezone
-
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
 #my stuff
@@ -46,7 +46,7 @@ class Organization(models.Model):
                 validate_international_phonenumber(self.phone)
             except ValidationError as err:
                 raise ValidationError(
-                    "Tried to create an organization with an invalid phone number (%(phone_number)s). Error message: %(error_message)s",
+                    _("Tried to create an organization with an invalid phone number (%(phone_number)s). Error message: %(error_message)s"),
                     code='invalid',
                     params={'phone_number': self.phone, 'error_message': err.message}
                 )
