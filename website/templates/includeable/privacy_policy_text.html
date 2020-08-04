@@ -1,6 +1,7 @@
-
-<h2 class="text-body"> Privacy Policy</h2>
-<h4 class="text-body">Our contact details</h4>
+{% load i18n %}
+<h2 class="text-body"> {% trans "Privacy Policy</h2>
+<h4 class="text-body">{% trans "Our contact details</h4>
+{% blocktrans %}
 <p>
 Company Name: Engesbak Promotions<br />
 Address: Elgesetergate 58B, 7030 Trondheim, Norway<br />
@@ -10,8 +11,9 @@ Email: privacy@motpanel.com<br />
 <p>
 If you have any questions about privacy, please do not hesitate to contact us.
 </p>
-
-<h4 class="text-body">Purpose and legal basis for processing personal information</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Purpose and legal basis for processing personal information" %}</h4>
+{% blocktrans %}
 <p>
 We collect and process data about individuals solely on a consentual basis.
 </p>
@@ -28,8 +30,9 @@ for example in AI-models. This data may be shared with others through scientific
 publishing, blogging, or otherwise, but is always anonymized and to the best of
 our knowledge and ability, made completely untraceable.
 </p>
-
-<h4 class="text-body">Sharing of personal data</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Sharing of personal data" %}</h4>
+{% blocktrans %}
 <p>
 We may share ANOYMOUS data with third parties, never NON-ANONYMIZED data*. We do
 sometimes share NON-ANONYMIZED data between employer (customer) and employee
@@ -70,7 +73,9 @@ long as the proper login credentials are provided.
   EU to ensure these services are governed by the same strict privacy
   regulations that we are.
 </p>
-<h4 class="text-body">How long do we store data?</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "How long do we store data?" %}</h4>
+{% blocktrans %}
 <p>
 NON-ANONYMIZED personal data is generally stored for as long a company remains a
 customer,
@@ -79,7 +84,9 @@ employee from our system, if for example, that employee quits. In such a case
 the data is
 immediatly anonymized. Individuals may also request their data be anonymized.
 </p>
-<h4 class="text-body">Users rights</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Users rights" %}</h4>
+{% blocktrans %}
 <p>
 Anyone whose data we store have the following rights:
 <ul>
@@ -125,3 +132,4 @@ You have a right to raise any complaint about your rights to the data protection
 agency in your country.
 
 </p>
+{% endblocktrans %}

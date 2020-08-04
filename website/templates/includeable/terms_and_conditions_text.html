@@ -1,14 +1,16 @@
-
-<h2 class="text-body"> Terms and Conditions </h2>
-<h4 class="text-body">Website owner, the offering, and binding of Terms</h4>
+{% load i18n %}
+<h2 class="text-body">{% trans "Terms and Conditions" %}</h2>
+<h4 class="text-body">{% trans "Website owner, the offering, and binding of Terms" %}</h4>
+{% blocktrans %}
 <p>
 This website is owned and operated by Engesbak Promotions.
 These Terms set forth the terms and conditions under which you may use our
 website and services as offered by us. This website offers employee surveying
 tools. By signing up to, accessing or using the website of our service, you
 approve that you have read, understood, and agree to be bound by these Terms.</p>
-
-<h4 class="text-body">Who can the website, and the requirements to create an account</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Who can the website, and the requirements to create an account" %}</h4>
+{% blocktrans %}
 <p>
 In order to use our website and/or receive our services, you must be at least 18
 years of age, or of the legal age of majority in your jurisdiction, and possess
@@ -17,8 +19,9 @@ agreement. You are not allowed to use this website and/or receive services if
 doing so is prohibited in your country or under any law or regulation applicable
 to you.
 </p>
-
-<h4 class="text-body">Key commercial Terms</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Key commercial Terms" %}</h4>
+{% blocktrans %}
 <p>
 When subscribing, you agree that: (i) you are aware that the subscription
 quantity scales dynamically to match the maximum number of co-workers you add in
@@ -39,28 +42,32 @@ your use of the service, such as taxes and possible transaction fees, will be
 charged to your payment method at the interval you have chosen. Prorates may be
 added when subscription quantity or price changes.
 </p>
-
-<h4 class="text-body">Refund and cancellation policy</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Refund and cancellation policy" %}</h4>
+{% blocktrans %}
 <p>
   You may cancel your subscription at any time. Cancelled subscriptions remain
   active until the paid-for time period reaches an end. We do as a general rule
   not offer refunds.
 </p>
-
-<h4 class="text-body">Right to change offering</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Right to change offering" %}</h4>
+{% blocktrans %}
 <p>
 We may, without prior notice, change the services; stop providing the services
 or any features of the services we offer; or create limits for the services. We
 may permanently or temporarily terminate or suspend access to the services
 without notice and liability for any reason, or for no reason.
 </p>
-
-<h4 class="text-body">Warranties & responsibility for services</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Warranties & responsibility for services" %}</h4>
+{% blocktrans %}
 <p>
 No warranties are given for any of our products or services.
 </p>
-
-<h4 class="text-body">Ownership of intellectual property, copyrights and logos</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Ownership of intellectual property, copyrights and logos" %}</h4>
+{% blocktrans %}
 <p>
 The Service and all materials therein or transferred thereby, including, without
 limitation, software, images, text, graphics, logos, patents, trademarks,
@@ -72,8 +79,9 @@ Intellectual Property Rights, and you agree not to sell, license, rent, modify,
 distribute, copy, reproduce, transmit, publicly display, publicly perform,
 publish, adapt, edit or create derivative works thereof.
 </p>
-
-<h4 class="text-body">Right to suspend or cancel user account</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Right to suspend or cancel user account" %}</h4>
+{% blocktrans %}
 <p>
 We may permanently or temporarily terminate or suspend your access to the
 service without notice and liability for any reason, including if in our sole
@@ -84,8 +92,9 @@ foregoing, with respect to automatically-renewed subscriptions to paid services,
 such subscriptions will be discontinued only upon the expiration of the
 respective period for which you have already made payment.
 </p>
-
-<h4 class="text-body">Indemnification</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Indemnification" %}</h4>
+{% blocktrans %}
 <p>
 You agree to indemnify and hold www.motpaneol.com and its affiliates harmless
 from any demands, loss, liability, claims or expenses (including attorneys’
@@ -93,8 +102,9 @@ fees), made against them by any third party due to, or arising out of, or in
 connection with your use of the website or any of the services offered on the
 website.
 </p>
-
-<h4 class="text-body">Limitation of liability</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Limitation of liability" %}</h4>
+{% blocktrans %}
 <p>
 To the maximum extent permitted by applicable law, in no event shall
 www.motpanel.com or its affiliates, be liable for any indirect, punitive,
@@ -111,8 +121,9 @@ nature whatsoever, resulting from your access to or use of our service; and
 (iii) any unauthorized access to or use of our secure servers and/or any and
 all personal information stored therein.
 </p>
-
-<h4 class="text-body">Right to change and modify Terms</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Right to change and modify Terms" %}</h4>
+{% blocktrans %}
 <p>
 We reserve the right to modify these terms from time to time at our sole
 discretion. Therefore, you should review these page periodically. When we change
@@ -122,16 +133,18 @@ any such change constitutes your acceptance of the new Terms. If you do not
 agree to any of these terms or any future version of the Terms, do not use or
 access (or continue to access) the website or the service.
 </p>
-
-<h4 class="text-body">Promotional emails and content</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Promotional emails and content" %}</h4>
+{% blocktrans %}
 <p>
 You agree to receive from time to time promotional messages and materials from
 us, by mail, email or any other contact form you may provide us with (including
 your phone number for calls or text messages). If you don't want to receive such
 promotional materials or notices – please just notify us at any time.
 </p>
-
-<h4 class="text-body">Preference of law and dispute resolution</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Preference of law and dispute resolution" %}</h4>
+{% blocktrans %}
 <p>
 These Terms, the rights and remedies provided hereunder, and any and all claims
 and disputes related hereto and/or to the services, shall be governed by,
@@ -142,8 +155,10 @@ brought in, and you hereby consent to them being decided exclusively by a court
 of Sør-Trøndelag Tingrett. The application of the United Nations Convention of
 Contracts for the International Sale of Goods is hereby expressly excluded.
 </p>
-
-<h4 class="text-body">Customer support details & contact info</h4>
+{% endblocktrans %}
+<h4 class="text-body">{% trans "Customer support details & contact info" %}</h4>
+{% blocktrans %}
 <p>
 Support requests may be sent to support@motpanel.com.
 </p>
+{% endblocktrans %}
