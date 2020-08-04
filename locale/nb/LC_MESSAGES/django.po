@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-04 13:06+0200\n"
+"POT-Creation-Date: 2020-08-04 15:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,6 +21,26 @@ msgstr ""
 #: meandmyteam/settings.py:204
 msgid "Employee Engagement Tracking | Motpanel"
 msgstr "Ansatteengasjement - Sporing | Motpanel "
+
+#: meandmyteam/urls.py:25
+msgid "admin/"
+msgstr "admin/"
+
+#: meandmyteam/urls.py:26
+msgid "accounts/"
+msgstr "konto/"
+
+#: meandmyteam/urls.py:28
+msgid "dashboard/"
+msgstr "dashbord/"
+
+#: meandmyteam/urls.py:29
+msgid "surveys/"
+msgstr "undersøkelser/"
+
+#: meandmyteam/urls.py:31
+msgid "payments/"
+msgstr "betaling/"
 
 #: payments/templates/current_plan.html:26
 #: payments/templates/current_plan.html:31
@@ -265,6 +285,42 @@ msgstr ""
 msgid "We currently only support payments with credit cards."
 msgstr "Vi støtter for tiden kun betaling med kredittkort."
 
+#: payments/urls.py:9
+msgid "set-up-payment-method/"
+msgstr "sett-opp-betalingsmåte/"
+
+#: payments/urls.py:10
+msgid "set-up-payment-method-success/"
+msgstr "oppsett-av-betalingsmåte-vellykket/"
+
+#: payments/urls.py:11
+msgid "set-up-payment-method-cancel/"
+msgstr "oppsett-av-betalingsmåte-avbrutt/"
+
+#: payments/urls.py:12
+msgid "use-payment-method/<payment_method_id>/"
+msgstr "bruk-betalingsmåte/<payment_method_id>/"
+
+#: payments/urls.py:13
+msgid "delete-payment-method/<payment_method_id>/"
+msgstr "slett-betalingsmåte/<payment_method_id>/"
+
+#: payments/urls.py:14
+msgid "create-subscription/<subscription_id>/"
+msgstr "lag-abonnement/<subscription_id>/"
+
+#: payments/urls.py:15
+msgid "cancel-subscription/<subscription_id>/"
+msgstr "stopp-abonnement/<subscription_id>/"
+
+#: payments/urls.py:16
+msgid "restart-cancelled-subscription/<subscription_id>/"
+msgstr "gjenoppta-abonnement/<subscription_id>/"
+
+#: payments/urls.py:17
+msgid "change-plan/<price_id>/"
+msgstr "endre-plan/<price_id>/"
+
 #: payments/views.py:70 payments/views.py:140
 msgid "month"
 msgstr "måned"
@@ -400,6 +456,34 @@ msgid ""
 msgstr ""
 "Vi forsøkte å oppdatere abonnementet ditt, men det kan være at det ikke "
 "gikk. Prøv igjen senere, eller kontakt brukerstøtten vår"
+
+#: surveys/dashboard_urls.py:12
+msgid "add-or-remove-employees/"
+msgstr "legg-til-eller-fjern-ansatte/"
+
+#: surveys/dashboard_urls.py:13
+msgid "edit-employee/<uidb64>/"
+msgstr "rediger-ansatt/<uidb64>/"
+
+#: surveys/dashboard_urls.py:14
+msgid "delete-employee/<uidb64>/"
+msgstr "slett-ansatt/<uidb64>/"
+
+#: surveys/surveys_urls.py:10
+msgid "setup-tracking/<instrument>/"
+msgstr "konfigurer-sporing/<instrument>/"
+
+#: surveys/surveys_urls.py:11
+msgid "survey-details/<uidb64>/<instrument>/"
+msgstr "undersøkelsesdetaljer/<uidb64>/<instrument>/"
+
+#: surveys/surveys_urls.py:12
+msgid "answer/<token>/"
+msgstr "svar/<token>/"
+
+#: surveys/surveys_urls.py:13
+msgid "answer/<token>/<page>/"
+msgstr "svar/<token>/<page>/"
 
 #: surveys/templates/add_or_remove_employees.html:3
 msgid "Add or remove employees"
@@ -572,24 +656,28 @@ msgstr "<b>%(n_completed)s</b> svarte ut av <b>%(n_invited)s</b> inviterte"
 
 #: surveys/templates/dashboard.html:63
 #: surveys/templates/instrument_report.html:38
-#: surveys/templates/instrument_report.html:113
+#: surveys/templates/instrument_report.html:116
 msgid "(some information will be hidden for privacy reasons)"
 msgstr "(noe informasjon holdes skjult pga. personvern)"
 
 #: surveys/templates/dashboard.html:76
-#: surveys/templates/includeable/display_single_dimension_result.html:14
+#: surveys/templates/includeable/display_single_dimension_result.html:15
 msgid "Weakn."
 msgstr "Svakh."
 
 #: surveys/templates/dashboard.html:87
-#: surveys/templates/instrument_report.html:194
+#: surveys/templates/instrument_report.html:201
 msgid "Average hidden"
 msgstr "Snitt skjult"
 
 #: surveys/templates/dashboard.html:92
-#: surveys/templates/includeable/display_single_dimension_result.html:45
+#: surveys/templates/includeable/display_single_dimension_result.html:46
 msgid "Strength"
 msgstr "Styrke"
+
+#: surveys/templates/dashboard.html:100
+msgid "No measurements yet!"
+msgstr "Ingen målepunkter enda!"
 
 #: surveys/templates/dashboard.html:103
 #, python-format
@@ -652,7 +740,7 @@ msgstr "(siste)"
 #: surveys/templates/dashboard.html:145
 #, python-format
 msgid "%(instrument_name)s Tracking is currently <b>active</b>"
-msgstr "Overvåkning av %(instrument_name)s er <b>aktivert</b>"
+msgstr "%(instrument_name)s-sporing er <b>aktivert</b>"
 
 #: surveys/templates/dashboard.html:162
 msgid "You are ready!"
@@ -669,7 +757,7 @@ msgstr "Begynn sporing!"
 #: surveys/templates/dashboard.html:170
 #, python-format
 msgid "%(instrument_name)s Tracking is currently <b>inactive</b>"
-msgstr "Overvåkning av %(instrument_name)s er <b>deaktivert</b>"
+msgstr "%(instrument_name)s-sporing er <b>deaktivert</b>"
 
 #: surveys/templates/dashboard.html:190
 msgid "Organization"
@@ -710,23 +798,23 @@ msgstr "Ansatte i %(organization_name)s"
 msgid "Edit employee"
 msgstr "Rediger ansatt"
 
-#: surveys/templates/includeable/display_single_dimension_result.html:40
+#: surveys/templates/includeable/display_single_dimension_result.html:41
 msgid "Score hidden"
 msgstr "Score skjult"
 
-#: surveys/templates/includeable/display_single_dr_change.html:10
+#: surveys/templates/includeable/display_single_dr_change.html:11
 msgid "Down"
 msgstr "Ned"
 
-#: surveys/templates/includeable/display_single_dr_change.html:16
+#: surveys/templates/includeable/display_single_dr_change.html:17
 msgid "No change"
 msgstr "Ingen endring"
 
-#: surveys/templates/includeable/display_single_dr_change.html:30
+#: surveys/templates/includeable/display_single_dr_change.html:31
 msgid "Change hidden"
 msgstr "Endring skjult"
 
-#: surveys/templates/includeable/display_single_dr_change.html:36
+#: surveys/templates/includeable/display_single_dr_change.html:37
 msgid "&nbsp;&uarr; Up&nbsp;"
 msgstr "&nbsp;&uarr; Opp&nbsp;"
 
@@ -839,7 +927,18 @@ msgstr "Laveste score"
 msgid "1.2 Change from previous survey"
 msgstr "1.2 Endring fra forrige undersøkelse"
 
-#: surveys/templates/instrument_report.html:108
+#: surveys/templates/instrument_report.html:104
+#, python-format
+msgid ""
+"\n"
+"        The previous survey was closed %(date_close)s.<br />\n"
+"        "
+msgstr ""
+"\n"
+"Forrige undersøkelse ble lukket %(date_close)s.<br />\n"
+"        "
+
+#: surveys/templates/instrument_report.html:111
 #, python-format
 msgid ""
 "\n"
@@ -851,36 +950,48 @@ msgstr ""
 "<b>%(n_completed)s</b> svarte av <b>%(n_invited)s</b> inviterte\n"
 "          "
 
-#: surveys/templates/instrument_report.html:120
+#: surveys/templates/instrument_report.html:123
 msgid "View previous survey"
 msgstr "Se forrige undersøkelse"
 
-#: surveys/templates/instrument_report.html:131
+#: surveys/templates/instrument_report.html:134
 msgid "2. Results"
 msgstr "2. Resultater"
 
-#: surveys/templates/instrument_report.html:139
+#: surveys/templates/instrument_report.html:142
 msgid "Your organization's strongest point!"
 msgstr "Din organisasjonens sterkes punkt!"
 
-#: surveys/templates/instrument_report.html:142
+#: surveys/templates/instrument_report.html:145
 msgid "Your organization's weakest point"
 msgstr "Din organisasjonens svakeste punkt!"
 
-#: surveys/templates/instrument_report.html:158
+#: surveys/templates/instrument_report.html:153
+msgid "Previous score:"
+msgstr "Forrige score:"
+
+#: surveys/templates/instrument_report.html:154
+msgid "Change:"
+msgstr "Endring:"
+
+#: surveys/templates/instrument_report.html:161
+msgid "Current score:"
+msgstr "Siste score:"
+
+#: surveys/templates/instrument_report.html:165
 #, python-format
 msgid "1 What does \"%(dimension_name)s\" mean?"
 msgstr "1 Hva betyr \"%(dimension_name)s\""
 
-#: surveys/templates/instrument_report.html:161
+#: surveys/templates/instrument_report.html:168
 msgid "How did we arrive at this score?"
 msgstr "Hvordan har vi kommet frem til denne scoren?"
 
-#: surveys/templates/instrument_report.html:163
+#: surveys/templates/instrument_report.html:170
 msgid "The average answers were:"
 msgstr "Gjennomsnittlig svar var:"
 
-#: surveys/templates/instrument_report.html:163
+#: surveys/templates/instrument_report.html:170
 msgid ""
 "We have hidden results for statements with fewer than 4 respondents. This is "
 "because of our privacy policy."
@@ -888,7 +999,7 @@ msgstr ""
 "Vi har gjemt svarene for utsagn med færre enn 4 respondenter. Dette er pga "
 "personvernerklæringen vår."
 
-#: surveys/templates/instrument_report.html:209
+#: surveys/templates/instrument_report.html:216
 msgid ""
 "\n"
 "The numbers represent the average rating for your organization. A \"full bar"
@@ -1130,8 +1241,7 @@ msgstr ""
 "\n"
 "        <span class=\"text-muted\"><small>© 2020 <span class=\"text-info "
 "font-weight-bold\" style=\"font-family: serif;\">motpanel</span>, en "
-"Engesbak Promotions merkevare. Alle rettigheter er reservert.\" <br /><br /"
-">\n"
+"Engesbak Promotions merkevare. Alle rettigheter er reservert.<br /><br />\n"
 "        "
 
 #: website/templates/includeable/full_footer.html:6
@@ -1435,6 +1545,70 @@ msgstr ""
 #: website/templates/terms_template.html:6
 msgid "Terms and conditions"
 msgstr "Vilkår og betingelser"
+
+#: website/urls.py:15
+msgid "change-password/"
+msgstr "endre-passord/"
+
+#: website/urls.py:16
+msgid "sign-up/"
+msgstr "opprett-bruker/"
+
+#: website/urls.py:17
+msgid "login/"
+msgstr "logg-inn/"
+
+#: website/urls.py:18
+msgid "logout/"
+msgstr "logg-ut/"
+
+#: website/urls.py:19
+msgid "edit-account/"
+msgstr "rediger-konto/"
+
+#: website/urls.py:20
+msgid "password-reset-request/"
+msgstr "passord-gjenoppretning-forespørsel/"
+
+#: website/urls.py:21
+msgid "password-reset-request-received/"
+msgstr "passord-gjenoppretning-forespørsel-mottatt/"
+
+#: website/urls.py:22
+msgid "password-reset/<uidb64>/<token>/"
+msgstr "passord-gjenoppretning/<uidb64>/<instrument>/"
+
+#: website/urls.py:23
+msgid "password-reset-complete/"
+msgstr "passord-gjenoppretning-fullført"
+
+#: website/urls.py:25
+msgid "privacy-policy/"
+msgstr "personvernerklæring/"
+
+#: website/urls.py:26
+msgid "terms-and-conditions/"
+msgstr "vilkår-og-betingelser"
+
+#: website/urls.py:29
+msgid "your-plan/"
+msgstr "din-plan/"
+
+#: website/urls.py:30
+msgid "choose-plan/"
+msgstr "velg-plan/"
+
+#: website/urls.py:31
+msgid "change-plan/"
+msgstr "endre-plan/"
+
+#: website/urls.py:32
+msgid "cancel-plan/"
+msgstr "avbryt-plan/"
+
+#: website/urls.py:33
+msgid "show-interest-in-unavailable-plan/"
+msgstr "vis-interesse-i-utilgjengelig-plan/"
 
 #: website/views.py:75
 msgid "Update password"

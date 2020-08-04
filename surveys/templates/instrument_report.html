@@ -1,5 +1,5 @@
 {% extends "base_generic.html" %}
-{% load i18n %}
+{% load i18n %}{% load l10n %}
 {% block title %}
   {% with instrument.name as instrument_name %}
   <title>{% blocktrans %}{{ instrument_name }} tracking report{% endblocktrans %} | {{ PAGE_TITLE }} </title>
@@ -100,8 +100,11 @@
     <div class="col-md-8 mt-4">
       <h5>{% trans "1.2 Change from previous survey" %}</h5>
       <p class="text-muted">
-        The previous survey was closed {{ survey_data.previous_data.survey.date_close }}.<br />
-
+        {% with survey_data.previous_data.survey.date_close as date_close%}
+        {% blocktrans %}
+        The previous survey was closed {{ date_close }}.<br />
+        {% endblocktrans %}
+        {% endwith %}
         {% if survey_data.previous_data.survey.n_completed < 4 %}<span class="text-danger">{% endif %}
         {% with survey_data.previous_data.survey.n_completed as n_completed %}
         {% with survey_data.previous_data.survey.n_invited as n_invited %}
@@ -147,12 +150,16 @@
       {% if survey_data.previous_data is not None %}{# if there was a previous survey, show the results from that and the change #}
         {% for previous_dimension_result in survey_data.previous_data.dimension_results  %}
           {% if previous_dimension_result.dimension == dimension_result.dimension %}
-            {% include "includeable/display_single_dimension_result.html" with dimension_result=previous_dimension_result label="Previous score:" colored=False %} {# displays the plain dimension_result bar #}
-            {% include "includeable/display_single_dr_change.html" with label="Change:" colored=False %} {# displays the dr change sincel last bar #}
+            {% trans "Previous score:" as previous_score_label %}
+            {% trans "Change:" as change_label %}
+              {% include "includeable/display_single_dimension_result.html" with dimension_result=previous_dimension_result label=previous_score_label colored=False %} {# displays the plain dimension_result bar #}
+              {% include "includeable/display_single_dr_change.html" with label=change_label colored=False %} {# displays the dr change sincel last bar #}
+            
           {% endif %}
         {% endfor %}
       {% endif %}{# end of "if there was a previous survey, show the results from that and the change" #}
-      {% include "includeable/display_single_dimension_result.html" with dimension_result=dimension_result label="Current score:" colored=True %} {# displays the plain dimension_result bar #}
+      {% trans "Current score:" as current_score_label %}
+      {% include "includeable/display_single_dimension_result.html" with dimension_result=dimension_result label=current_score_label colored=True %} {# displays the plain dimension_result bar #}
       {# end of display the three bars in 2.x #}
       <p>
         <h6 class="mt-2">2.{{ forloop.counter }}.{% with dimension_result.dimension.name|lower as dimension_name %}{% blocktrans %}1 What does "{{ dimension_name }}" mean?{% endblocktrans %}{% endwith %}</h6>
@@ -179,7 +186,7 @@
                     <div class="progress-bar
                       {% if item_result.percent_of_max < 20 %} bg-primary
                       {% elif item_result.percent_of_max >= 80 %} bg-primary
-                      {% else %} bg-primary{% endif %}" role="progressbar" style="width: {{ item_result.percent_of_max }}%" aria-valuenow="{{ item_result.percent_of_max }}" aria-valuemin="0" aria-valuemax="100">{{ item_result.average|floatformat }}</div>
+                      {% else %} bg-primary{% endif %}" role="progressbar" style="width: {{ item_result.percent_of_max|unlocalize }}%" aria-valuenow="{{ item_result.percent_of_max|unlocalize }}" aria-valuemin="0" aria-valuemax="100">{{ item_result.average|floatformat }}</div>
                   </div>
                 </div><!-- col -->
                 <div class="col text-left px-0">

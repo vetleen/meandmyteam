@@ -26,6 +26,7 @@
       {% if employee_list %}
         {% with request.user.organization.name as organization_name %}
         <h4>{% blocktrans %} Employees at {{ organization_name }}{% endblocktrans %}</h4>
+        {% endwith %}
         {% include "includeable/employee_list_displayer.html" %}
       {% else %}
 

@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load l10n %}
 {# this templates takes a dimension_result argument and displays the change since last #}
 
 <div class="row">
@@ -13,19 +14,19 @@
   <div class="col">
     <div class="progress"  style="height: 20px;">
       {% if dimension_result.change_average is not None %}
-        <div class="progress-bar bg-transparent" role="progressbar" style="width: {% if dimension_result.change_average == 0 %}100{% else %}{{ dimension_result.blue_bar }}{% endif %}%" aria-valuenow="{{ dimension_result.blue_bar }}" aria-valuemin="0" aria-valuemax="100">{% if dimension_result.change_average == 0 %}<span class="text-dark">{% trans "No change" %}</span>{% endif %}</div>
+        <div class="progress-bar bg-transparent" role="progressbar" style="width: {% if dimension_result.change_average == 0 %}100{% else %}{{ dimension_result.blue_bar|unlocalize }}{% endif %}%" aria-valuenow="{{ dimension_result.blue_bar|unlocalize }}" aria-valuemin="0" aria-valuemax="100">{% if dimension_result.change_average == 0 %}<span class="text-dark">{% trans "No change" %}</span>{% endif %}</div>
         <div class="progress-bar
         {% if colored == True %}
           bg-danger
         {% else %}
           bg-secondary
-        {% endif %}" role="progressbar" style="width: {{ dimension_result.red_bar }}%" aria-valuenow="{{ dimension_result.red_bar }}" aria-valuemin="0" aria-valuemax="100"> {{dimension_result.change_average|floatformat}} </div>
+        {% endif %}" role="progressbar" style="width: {{ dimension_result.red_bar|unlocalize }}%" aria-valuenow="{{ dimension_result.red_bar|unlocalize }}" aria-valuemin="0" aria-valuemax="100"> {{dimension_result.change_average|floatformat}} </div>
         <div class="progress-bar
         {% if colored == True %}
           bg-success
         {% else %}
           bg-secondary
-        {% endif %}" role="progressbar" style="width: {{ dimension_result.green_bar }}%" aria-valuenow="{{ dimension_result.green_bar }}" aria-valuemin="0" aria-valuemax="100"> +{{dimension_result.change_average|floatformat}} </div>
+        {% endif %}" role="progressbar" style="width: {{ dimension_result.green_bar|unlocalize }}%" aria-valuenow="{{ dimension_result.green_bar|unlocalize }}" aria-valuemin="0" aria-valuemax="100"> +{{dimension_result.change_average|floatformat}} </div>
       {% else %}
         <div class="progress-bar bg-transparent" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><span class="text-dark">{% trans "Change hidden" %}</span></div>
       {% endif %}
