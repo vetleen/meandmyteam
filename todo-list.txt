@@ -4,7 +4,7 @@
 
 
 #AFTER LAUNCH
-
+translate instruments: (https://django-modeltranslation.readthedocs.io/en/latest/)
 search engine optimization
 
 translation

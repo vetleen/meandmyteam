@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-04 16:34+0200\n"
+"POT-Creation-Date: 2020-08-04 16:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: meandmyteam/settings.py:204
 msgid "Employee Engagement Tracking | Motpanel"
-msgstr "Ansatteengasjement - Sporing | Motpanel "
+msgstr "Ansattengasjement - Sporing | Motpanel "
 
 #: meandmyteam/urls.py:25
 msgid "admin/"
@@ -471,102 +471,92 @@ msgstr "slett-ansatt/<uidb64>/"
 
 #: surveys/forms.py:11 website/forms.py:18 website/forms.py:121
 #: website/forms.py:172
-#, fuzzy
-#| msgid "Easily add employees"
 msgid "Email address"
-msgstr "Legg til ansatte enkelt"
+msgstr "Epost-adresse"
 
 #: surveys/forms.py:11
 msgid "Required"
-msgstr ""
+msgstr "Påkrevd"
 
 #: surveys/forms.py:12
 msgid "First name"
-msgstr ""
+msgstr "Fornavn"
 
 #: surveys/forms.py:12 surveys/forms.py:13
 msgid "Optional"
-msgstr ""
+msgstr "Ikke påkrevd"
 
 #: surveys/forms.py:13
 msgid "Last name"
-msgstr ""
+msgstr "Etternavn"
 
 #: surveys/forms.py:19 surveys/forms.py:36
 #, python-format
 msgid ""
 "An employee with that email already exists in our database (%(taken_email)s)."
 msgstr ""
+"Vi har allerede en ansatt med den epostadressen i databasen vår (%(taken_email)s)."
 
 #: surveys/forms.py:45
-#, fuzzy
-#| msgid "Start tracking!"
 msgid "Activate tracking?"
-msgstr "Begynn sporing!"
+msgstr "Aktiver sporing?"
 
 #: surveys/forms.py:50
 msgid "How often should employees in your organization be surveyed?"
-msgstr ""
+msgstr "Hvor skal ansatte i din organisasjon motta spørreundersøkelser?"
 
 #: surveys/forms.py:53
 msgid "Every 3 months (reccomended)"
-msgstr ""
+msgstr "Hver tredje måned (anbefalt)"
 
 #: surveys/forms.py:54
 msgid "Every 6 months"
-msgstr ""
+msgstr "Hver sjette måned"
 
 #: surveys/forms.py:55
 msgid "Every year"
-msgstr ""
+msgstr "Hvert år"
 
 #: surveys/forms.py:59
 msgid "How much time should employees be given to answer a survey?"
-msgstr ""
+msgstr "Hvor mye tid skal de ansatte få til å svare på undersøkelsen"
 
 #: surveys/forms.py:62
 msgid "One week (recommended)"
-msgstr ""
+msgstr "En uke (anbefalt)"
 
 #: surveys/forms.py:63
 msgid "Two weeks"
-msgstr ""
+msgstr "To uker"
 
 #: surveys/forms.py:64
 msgid "Three weeks"
-msgstr ""
+msgstr "Tre uker"
 
 #: surveys/forms.py:65
-#, fuzzy
-#| msgid "month"
 msgid "One month"
-msgstr "måned"
+msgstr "En måned"
 
 #: surveys/forms.py:71
 msgid "I consent to the collection of information in this survey"
-msgstr ""
+msgstr "Jeg samtykker til innsamling av informasjon i denne spørreundersøkelsen"
 
 #: surveys/forms.py:78
-#, fuzzy
-#| msgid ""
-#| "Thank you for taking the time to answer this survey! Please indicate that "
-#| "you consent to answer the survey to continue."
 msgid "Please indicate that you consent to answer this survey to continue."
-msgstr ""
-"Takk for at du tar deg tid til å svare på denne undersøkelsen! Vennligst "
-"kryss av for at du godtar å svare på undersøkelsen for å fortsette."
+msgstr "Vennligst kryss av for at du samtykker til å svare på undersøkelsen for å fortsette."
 
 #: surveys/forms.py:86
 msgid "Disagree"
-msgstr ""
+msgstr "Uenig"
+
 
 #: surveys/forms.py:87
 msgid "Agree"
-msgstr ""
+msgstr "Enig"
 
 #: surveys/forms.py:114
 msgid "I don't know, or I don't want to answer"
-msgstr ""
+msgstr "Jeg vet ikke, eller jeg vil ikke svare"
 
 #: surveys/surveys_urls.py:10
 msgid "setup-tracking/<instrument>/"
@@ -1314,161 +1304,138 @@ msgid "Confirm password"
 msgstr "Bekreft passord"
 
 #: website/forms.py:23
-#, fuzzy
-#| msgid "Organization"
 msgid "Organization name*"
-msgstr "Organisasjon"
+msgstr "Organisasjonnavn*"
 
 #: website/forms.py:24
 msgid "Phone number"
-msgstr ""
+msgstr "Telefonnummer"
 
 #: website/forms.py:25
 msgid "Street address*"
-msgstr ""
+msgstr "Gateaddresse"
 
 #: website/forms.py:27
 msgid "Zip*"
-msgstr ""
+msgstr "Postnummer*"
 
 #: website/forms.py:28 website/forms.py:181
 msgid "City"
-msgstr ""
+msgstr "By/sted"
 
 #: website/forms.py:29 website/forms.py:182
 msgid "(Select country)"
-msgstr ""
+msgstr "(Velg land)"
 
 #: website/forms.py:29
 msgid "Country*"
-msgstr ""
+msgstr "Land*"
 
 #: website/forms.py:31
 msgid "I accept the terms and conditions and the privacy policy."
-msgstr ""
+msgstr "Jeg aksepterer vilkårene for bruk, og personvernerklæringen."
 
 #: website/forms.py:39
 #, python-format
 msgid "A user with the email already exist (%(taken_email)s)."
-msgstr ""
+msgstr "En bruker med den eposten finnes allerede (%(taken_email)s)."
 
 #: website/forms.py:56
 msgid ""
 "The second password you entered did not match the first. Please try again."
-msgstr ""
+msgstr "Det andre passordet du skrev inn matchet ikke med det første. Prøv igjen."
 
 #: website/forms.py:64
 #, python-format
 msgid "An organization with that name already exists (%(taken_name)s)."
-msgstr ""
+msgstr "En organisasjon med det navnet finnes allerede (%(taken_name)s)."
 
 #: website/forms.py:80
-#, fuzzy
-#| msgid ""
-#| "Thank you for taking the time to answer this survey! Please indicate that "
-#| "you consent to answer the survey to continue."
 msgid "Please indicate that you accept the terms and conditions."
 msgstr ""
-"Takk for at du tar deg tid til å svare på denne undersøkelsen! Vennligst "
-"kryss av for at du godtar å svare på undersøkelsen for å fortsette."
+"Vennligst kryss av for at du samtykker til å svare på undersøkelsen for å fortsette."
 
 #: website/forms.py:94
-#, fuzzy
-#| msgid "Current score:"
 msgid "Current password"
-msgstr "Siste score:"
+msgstr "Nåværende passord:"
 
 #: website/forms.py:94
-#, fuzzy
-#| msgid "Update password"
 msgid "Old Password"
-msgstr "Oppdater passord"
+msgstr "Gammelt Passord"
 
 #: website/forms.py:95
-#, fuzzy
-#| msgid "Change password"
 msgid "Enter a new password"
-msgstr "Endre passord"
+msgstr "Skriv inn nytt passord"
 
 #: website/forms.py:95
-#, fuzzy
-#| msgid "Change password"
 msgid "New Password"
-msgstr "Endre passord"
+msgstr "Nytt Passord"
 
 #: website/forms.py:96
-#, fuzzy
-#| msgid "Confirm password"
 msgid "Confirm new password"
-msgstr "Bekreft passord"
+msgstr "Bekreft nytt passord"
 
 #: website/forms.py:96
-#, fuzzy
-#| msgid "Confirm password"
 msgid "Confirm New Password"
-msgstr "Bekreft passord"
+msgstr "Bekreft Nytt Passord"
 
 #: website/forms.py:101 website/forms.py:152
-#, fuzzy
-#| msgid "Change password"
 msgid "Wrong password."
-msgstr "Endre passord"
+msgstr "Feil passord"
 
 #: website/forms.py:115
 msgid ""
 "The second new password you entered did not match the first. Please try "
 "again."
-msgstr ""
+msgstr "Det andre passordet du skrev inn matchet ikke med det første. Prøv igjen."
 
 #: website/forms.py:126 website/forms.py:142
 #, python-format
 msgid "There is no user with that email (%(attempted)s)."
-msgstr ""
+msgstr "Vi har ikke en bruker med den epostaddressen (%(attempted)s)."
 
 #: website/forms.py:158
 msgid "Please enter the password again."
-msgstr ""
+msgstr "Please enter the password again."
 
 #: website/forms.py:172
 msgid "Your email is also your username."
-msgstr ""
+msgstr "Eposten din er også brukernavnet ditt."
 
 #: website/forms.py:175
-#, fuzzy
-#| msgid "Organization"
 msgid "Organization name"
-msgstr "Organisasjon"
+msgstr "Organisasjonsnavn"
 
 #: website/forms.py:176
 msgid "Phone incl.country code (e.g. +01)"
-msgstr ""
+msgstr "Telefon inkl. landskode (f.eks. (+47)"
 
 #: website/forms.py:176
 msgid "Example: +12125552368"
-msgstr ""
+msgstr "Eksempel: +4797969594"
 
 #: website/forms.py:178
 msgid "Street address"
-msgstr ""
+msgstr "Gateadresse"
 
 #: website/forms.py:180
 msgid "Zip"
-msgstr ""
+msgstr "Postnummer"
 
 #: website/forms.py:182
 msgid "Country"
-msgstr ""
+msgstr "Land"
 
 #: website/forms.py:194
 #, python-format
 msgid ""
 "An organization with that name already exists in our system (%(taken_name)s)."
-msgstr ""
+msgstr "Vi har allerede en organisasjon med det navnet i systemet vårt (%(taken_name)s)."
 
 #: website/forms.py:203
 #, python-format
 msgid "A user with the email already exists in our system (%(taken_email)s)."
-msgstr ""
+msgstr "En bruker med den epostadressen fins allerede i systemet vårt (%(taken_email)s)."
 
 #: website/models.py:49
 #, python-format
@@ -1476,6 +1443,8 @@ msgid ""
 "Tried to create an organization with an invalid phone number "
 "(%(phone_number)s). Error message: %(error_message)s"
 msgstr ""
+"Prøvde å lage en organisasjon med et ugyldig telefonnummer "
+"(%(phone_number)s). Feilmelding: %(error_message)s"
 
 #: website/templates/change_password_form.html:3
 #: website/templates/edit_account_form.html:67
@@ -2186,7 +2155,7 @@ msgid ""
 "Receive comprehensive reports showing employee engagement snap-shots and "
 "trends, learn what is working to improve engagement. </p>"
 msgstr ""
-"Motta utfyllende rapporter som viser ansatteengasjement og trender, lær hva "
+"Motta utfyllende rapporter som viser ansattengasjement og trender, lær hva "
 "som virker for å øke engasjementet. </p>"
 
 #: website/templates/index.html:97
@@ -2212,7 +2181,7 @@ msgid ""
 "you to the dashboard, where you can access all settings and data."
 msgstr ""
 "Hvis du klikker \"Start her\" i menyen vil du alltid bli sendt til neste "
-"steg i prosessen med å komme i gang med sporing av ansatteengasjement. Når "
+"steg i prosessen med å komme i gang med sporing av ansattengasjement. Når "
 "alt er satt opp og klart, blir du sendt til dashbordet, hvorfra du kan endre "
 "instillinger og de dataene dine."
 
@@ -2426,3 +2395,12 @@ msgstr "Profilen din ble oppdatert."
 #: website/views.py:301
 msgid "Can't edit profile when you are not logged in."
 msgstr "Du kan ikke endre profilen din når du ikke er logget inn."
+
+#~ msgid "Employee Engagement"
+#~ msgstr "Ansattengasjement"
+
+#~ msgid "employee-engagement"
+#~ msgstr "ansattengasjement"
+
+#~ msgid "An instrument that measures employee engagement"
+#~ msgstr "Et instrument som måler de ansattes engasjement"
