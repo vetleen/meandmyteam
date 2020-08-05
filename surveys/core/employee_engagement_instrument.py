@@ -229,7 +229,7 @@ i015 = {
 
     #TRANSLATION
     #NB
-    'formulation_nb': "Det er vanskelig å frakoble meg fra jobben.",
+    'formulation_nb': "Det er vanskelig å koble meg av jobben.",
 }
 
 i016 = {

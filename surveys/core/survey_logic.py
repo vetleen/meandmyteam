@@ -1,6 +1,7 @@
 from surveys.models import *
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.utils.translation import gettext as _
 
 import datetime
 import os
@@ -743,11 +744,17 @@ def send_email_for_survey_instance(survey_instance):
         url_token = survey_instance.get_url_token()
 
         #Get a string representation fon the owner of the Survey
-        contact_person = survey_instance.survey.owner.owner
-        contact_person_str = contact_person.email
-        if contact_person.first_name !='' and contact_person.last_name !='':
-            contact_person_str = '%s %s'%(survey_instance.survey.owner.owner.first_name, survey_instance.survey.owner.owner.last_name)
-
+        try:
+            contact_person = survey_instance.survey.owner.owner
+            contact_person_str = contact_person.email
+            if contact_person.first_name !='' and contact_person.last_name !='':
+                contact_person_str = '%s %s'%(survey_instance.survey.owner.owner.first_name, survey_instance.survey.owner.owner.last_name)
+        except AttributeError as err:
+            contact_person_str = _("*Unable to retrieve user*")
+            logger.warning(
+                "%s %s: %s: unable to find contact person for survey instance sent to %s, for survey is: %s."\
+                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', __name__, survey_instance.respondent.email, survey_instance.survey.id)
+            )
         #find out the topics covered
         instrument_list = []
         dimension_result_list = survey_instance.survey.dimensionresult_set.all()
