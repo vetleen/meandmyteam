@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-05 10:39+0200\n"
+"POT-Creation-Date: 2020-08-05 11:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -603,7 +603,7 @@ msgstr "Svare på undersøkelse"
 #: surveys/templates/answer_survey.html:52
 #, python-format
 msgid "%(organization)s employee survey"
-msgstr "%(organization)s's ansatteundersøkelse"
+msgstr "%(organization)s's ansattundersøkelse"
 
 #: surveys/templates/answer_survey.html:33
 #: surveys/templates/answer_survey.html:55
@@ -622,7 +622,7 @@ msgid ""
 msgstr ""
 "\n"
 "Undersøkelsen er ferdig besvart, og svarene dine lagret. Du kan "
-"oppdateresvarene dine frem til %(date_close)s ved å bruke knappen under. "
+"oppdatere svarene dine frem til %(date_close)s ved å bruke knappen under. "
 "Linken fra epostinvitasjonen får deg tilbake hit.\n"
 "            "
 
@@ -646,7 +646,7 @@ msgid ""
 msgstr ""
 "\n"
 "Dataene vi samler inn i denne undersøkelsen vil bli brukt til å gi "
-"organisasjonen du jobber i er bilde av sine styrker og svakheter angående "
+"organisasjonen du jobber i et bilde av sine styrker og svakheter angående "
 "ditt velvære og din motivasjon. We opprettholder anonymiteten din på "
 "følgende måte:\n"
 "            "
@@ -672,11 +672,11 @@ msgstr ""
 #: surveys/templates/answer_survey.html:73
 #, python-format
 msgid ""
-"Read our full <a href=\"%(url)s\" target=\"_blank\">privacy policy&#11016;</"
-"a>."
+"Read our full <a href=\"%(pp_url)s\" target=\"_blank\">privacy policy&#11016;"
+"</a>."
 msgstr ""
-"Les hele vår <a href=\"%(url)s\" target=\"_blank"
-"\">personvernerklæring&#11016;</a>."
+"Les hele <a href=\"%(pp_url)s\" target=\"_blank\">personvernerklæringen&#11016;"
+"</a> vår."
 
 #: surveys/templates/answer_survey.html:103
 msgid "Start survey"

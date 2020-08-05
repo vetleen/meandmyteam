@@ -69,9 +69,9 @@
             {% endblocktrans %}
           </p>
           <p class="card-text">
-            {% with url 'privacy-policy' as url %}
-            {% blocktrans %}Read our full <a href="{{ url }}" target="_blank">privacy policy&#11016;</a>.{% endblocktrans %}
-            {% endwith %}
+            {% url 'privacy-policy' as pp_url %}
+            {% blocktrans %}Read our full <a href="{{ pp_url }}" target="_blank">privacy policy&#11016;</a>.{% endblocktrans %}
+          
             <form method="post">
               {% csrf_token %}
               {% for hidden_field in form.hidden_fields %}
