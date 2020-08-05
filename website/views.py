@@ -145,7 +145,7 @@ def sign_up(request):
     form = SignUpForm
     context = {
         'form': form,
-        'submit_button_text': 'Sign up',
+        'submit_button_text': _('Sign up',)
     }
     # If this is a POST request then process the Form data
     if request.method == 'POST':

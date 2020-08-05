@@ -51,11 +51,12 @@ function stripeRedirect(){
                   {% else %}
                   {% endif %}
                 </h5>
-                {% trans stripe_subscription.plan_total as plan_total %}
+                
                 {% trans stripe_subscription.plan_currency|upper as plan_currency %}
                 {% trans stripe_subscription.plan_interval as plan_interval %}
                 {% trans stripe_subscription.plan_name|lower as plan_name %}
                 {% trans stripe_subscription.status as stripe_status %}
+                {% with stripe_subscription.plan_total as plan_total %}
                 {% with stripe_subscription.quantity as stripe_quantity %}
                 
                   {% blocktrans %}
@@ -66,6 +67,7 @@ function stripeRedirect(){
                     
                     <span class="text-muted lead">Subscription is <span class="text-success font-weight-bold">{{ stripe_status }}</span>
                   {% endblocktrans %}
+                {% endwith %}
                 {% endwith %}
                   {% if stripe_subscription.english_status == 'active' or stripe_subscription.english_status == 'trialing' %}
                   {% trans "until" %} {{ stripe_subscription.current_period_end }}.</span><br />
@@ -116,18 +118,24 @@ function stripeRedirect(){
                   <img src="{% static 'images/basic-plan-1.svg' %}" class="card-img-top mt-2" style="height: 10rem;" alt="{{ plan.name }} plan">
                   <div class="card-body">
                     <h5 class="card-title text-center text-body"> Standard {{ plan.name }}</h5>
-                    {% trans plan.interval_amount as interval_amount %}
-                    {% trans plan.currency|upper as currency %}
-                    {% trans plan.interval as interval %}
-                    {% trans plan.name|lower as plane_name %}
-                    {% trans plan.trial_period_days as trial_period_days %}
-                    {% trans product.description as product_description %}
+                    {% with plan.interval_amount as interval_amount %}
+                    {% with plan.currency|upper as currency %}
+                    {% with plan.interval as interval %}
+                    {% with plan.name|lower as plane_name %}
+                    {% with plan.trial_period_days as trial_period_days %}
+                    {% with product.description as product_description %}
                     {% blocktrans %}
                     <h3 class="card-subtitle text-info text-center">${{ interval_amount }} {{ currency }}/{{ interval }} </h3>
                     <span class="text-muted"><center><small>per employee billed {{ plane_name }}</small></center></span>
                     <center><span class="badge badge-success">{{ trial_period_days }} days free trial!</span></center>
                     <p class="card-text">{{ product_description }}.</p>
                     {% endblocktrans %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
                   </div> <!-- card-body -->
                   <div class="text-center card-footer">
                     <a href="{% url 'payments-create-subscription' plan.id %}" class="btn btn-success text-center my-2">{% if request.user.organization.stripe_subscription_id == "" or  request.user.organization.stripe_subscription_id is None %}{% trans "Try for free" %}{% else %}{% trans "Pick plan" %}{% endif %}</a>
@@ -144,7 +152,7 @@ function stripeRedirect(){
 
             <h5>{% trans "Active payment method" %}</h5>
             <ul class="list-group list-group-horizontal-sm mb-2 ">
-              <li class="list-group-item col-sm-3 list-group-item-info"><span class="text-muted"><small>{{ default_payment_method.card.brand|capfirst }}{% trans "ending in:" %}</small></span><br /> {{ default_payment_method.card.last4 }}</li>
+              <li class="list-group-item col-sm-3 list-group-item-info"><span class="text-muted"><small>{{ default_payment_method.card.brand|capfirst }} {% trans "ending in:" %}</small></span><br /> {{ default_payment_method.card.last4 }}</li>
               <li class="list-group-item flex-fill list-group-item-info"><span class="text-muted"><small>{% trans "Cardholder name:" %}</small></span><br />  {{ default_payment_method.billing_details.name }}</li>
               <li class="list-group-item col-sm-2 list-group-item-info"><span class="text-muted"><small>{% trans "Expires:" %}</small></span><br />  {{ default_payment_method.card.exp_month }}/{{ default_payment_method.card.exp_year }}</li>
               <li class="list-group-item col-sm-3 list-group-item-info"><span class="text-muted"><small>{% trans "Actions:" %}</small></span><br /><center> <a class="badge badge-danger" href="{% url 'payments-delete-payment-method' default_payment_method.id %}">{% trans "Delete" %}</a></center></li>

@@ -21,7 +21,7 @@ class SignUpForm(forms.Form):
 
     #Organization
     name = forms.CharField(max_length = 255, label=_("Organization name*"), widget=forms.TextInput(attrs={}))
-    phone = PhoneNumberField(max_length=30, required=False, label=_("Phone number"), widget=PhoneNumberInternationalFallbackWidget(attrs={'placeholder':'(e.g. +12125552368 or +1 212 555 2368)'})) #widget=forms.TextInput(attrs={'placeholder':'[+][country code][your number]'}) #incl.country code (e.g. +01 for USA)
+    phone = PhoneNumberField(max_length=30, required=False, label=_("Phone number"), widget=PhoneNumberInternationalFallbackWidget(attrs={'placeholder':_('(e.g. +12125552368 or +1 212 555 2368)')})) #widget=forms.TextInput(attrs={'placeholder':'[+][country code][your number]'}) #incl.country code (e.g. +01 for USA)
     address_line_1 = forms.CharField(max_length = 255, label=_("Street address*"), widget=forms.TextInput(attrs={}))
     address_line_2 =forms.CharField(max_length = 255, label="", required=False, widget=forms.TextInput(attrs={}))
     zip_code = forms.CharField(max_length = 20, label=_("Zip*"), widget=forms.TextInput(attrs={}))

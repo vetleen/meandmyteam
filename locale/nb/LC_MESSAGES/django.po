@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-05 10:14+0200\n"
+"POT-Creation-Date: 2020-08-05 10:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,7 +59,7 @@ msgstr "STOPPET"
 msgid "ACTIVE"
 msgstr "AKTIV"
 
-#: payments/templates/current_plan.html:61
+#: payments/templates/current_plan.html:62
 #, python-format
 msgid ""
 "\n"
@@ -86,19 +86,19 @@ msgstr ""
 "class=\"text-success font-weight-bold\">%(stripe_status)s</span>\n"
 "                  "
 
-#: payments/templates/current_plan.html:71
+#: payments/templates/current_plan.html:73
 msgid "until"
 msgstr "frem til"
 
-#: payments/templates/current_plan.html:76
+#: payments/templates/current_plan.html:78
 msgid "(will not renew automatically!)"
 msgstr "(fornyes ikke automatisk!)"
 
-#: payments/templates/current_plan.html:78
+#: payments/templates/current_plan.html:80
 msgid "(renews automatically!)"
 msgstr "(fornyes automatisk!)"
 
-#: payments/templates/current_plan.html:82
+#: payments/templates/current_plan.html:84
 #, python-format
 msgid ""
 "\n"
@@ -111,24 +111,24 @@ msgstr ""
 "antall ansatte, og faktureres %(plan_name)s. </p>\n"
 "                "
 
-#: payments/templates/current_plan.html:90
+#: payments/templates/current_plan.html:92
 msgid "Restart subscription"
 msgstr "Gjenoppta abonnement"
 
-#: payments/templates/current_plan.html:95
+#: payments/templates/current_plan.html:97
 #, python-format
 msgid " Switch to %(plan_name)s billing"
 msgstr " Bytt til %(plan_name)s fakturering"
 
-#: payments/templates/current_plan.html:100
+#: payments/templates/current_plan.html:102
 msgid "Cancel subscription"
 msgstr "Stopp abonnement"
 
-#: payments/templates/current_plan.html:112
+#: payments/templates/current_plan.html:114
 msgid "Plans"
 msgstr "Våre planer"
 
-#: payments/templates/current_plan.html:125
+#: payments/templates/current_plan.html:127
 #, python-format
 msgid ""
 "\n"
@@ -151,105 +151,105 @@ msgstr ""
 "                    <p class=\"card-text\">%(product_description)s.</p>\n"
 "                    "
 
-#: payments/templates/current_plan.html:133 website/templates/index.html:16
+#: payments/templates/current_plan.html:141 website/templates/index.html:16
 #: website/templates/index.html:101 website/templates/index.html:117
 #: website/templates/index.html:132 website/templates/index.html:158
 #: website/templates/index.html:172
 msgid "Try for free"
 msgstr "Prøv gratis"
 
-#: payments/templates/current_plan.html:133
+#: payments/templates/current_plan.html:141
 msgid "Pick plan"
 msgstr "Velg plan"
 
-#: payments/templates/current_plan.html:145
+#: payments/templates/current_plan.html:153
 msgid "Active payment method"
 msgstr "Aktiv betalingsmåte"
 
-#: payments/templates/current_plan.html:147
-#: payments/templates/current_plan.html:164
+#: payments/templates/current_plan.html:155
+#: payments/templates/current_plan.html:172
 msgid "ending in:"
 msgstr "slutter på:"
 
-#: payments/templates/current_plan.html:148
-#: payments/templates/current_plan.html:165
+#: payments/templates/current_plan.html:156
+#: payments/templates/current_plan.html:173
 msgid "Cardholder name:"
 msgstr "Kortholders navn:"
 
-#: payments/templates/current_plan.html:149
-#: payments/templates/current_plan.html:166
+#: payments/templates/current_plan.html:157
+#: payments/templates/current_plan.html:174
 msgid "Expires:"
 msgstr "Utgår:"
 
-#: payments/templates/current_plan.html:150
-#: payments/templates/current_plan.html:171
+#: payments/templates/current_plan.html:158
+#: payments/templates/current_plan.html:179
 msgid "Actions:"
 msgstr "Handlinger"
 
-#: payments/templates/current_plan.html:150
-#: payments/templates/current_plan.html:171
+#: payments/templates/current_plan.html:158
+#: payments/templates/current_plan.html:179
 #: surveys/templates/includeable/employee_list_displayer.html:8
 msgid "Delete"
 msgstr "Slett"
 
-#: payments/templates/current_plan.html:154
+#: payments/templates/current_plan.html:162
 msgid "Change payment method"
 msgstr "Endre betalingsmåte"
 
-#: payments/templates/current_plan.html:160
+#: payments/templates/current_plan.html:168
 msgid "All payment methods"
 msgstr "Alle betalingsmetoder"
 
-#: payments/templates/current_plan.html:169
+#: payments/templates/current_plan.html:177
 msgid "(active<br>card)"
 msgstr "(aktivt<br>kort)"
 
-#: payments/templates/current_plan.html:171
+#: payments/templates/current_plan.html:179
 msgid "Use"
 msgstr "Bruk"
 
-#: payments/templates/current_plan.html:178
+#: payments/templates/current_plan.html:186
 msgid "New payment method"
 msgstr "Ny betalingsmåte"
 
-#: payments/templates/current_plan.html:183
-#: payments/templates/current_plan.html:184
+#: payments/templates/current_plan.html:191
+#: payments/templates/current_plan.html:192
 msgid "Add payment method"
 msgstr "Legg til betalingsmåte"
 
-#: payments/templates/current_plan.html:189
+#: payments/templates/current_plan.html:197
 msgid "Invoices"
 msgstr "Fakturaer"
 
-#: payments/templates/current_plan.html:193
+#: payments/templates/current_plan.html:201
 msgid "Invoice number/date:"
 msgstr "Fakturanummer/dato:"
 
-#: payments/templates/current_plan.html:197
+#: payments/templates/current_plan.html:205
 msgid "Plan:"
 msgstr "Plan"
 
-#: payments/templates/current_plan.html:203
+#: payments/templates/current_plan.html:211
 msgid "Billing Period:"
 msgstr "Fakturaperiode:"
 
-#: payments/templates/current_plan.html:205
+#: payments/templates/current_plan.html:213
 msgid "to"
 msgstr "til"
 
-#: payments/templates/current_plan.html:209
+#: payments/templates/current_plan.html:217
 msgid "Amount:"
 msgstr "Sum"
 
-#: payments/templates/current_plan.html:215
+#: payments/templates/current_plan.html:223
 msgid "Status:"
 msgstr "Status"
 
-#: payments/templates/current_plan.html:217
+#: payments/templates/current_plan.html:225
 msgid "Paid"
 msgstr "Betalt"
 
-#: payments/templates/current_plan.html:219
+#: payments/templates/current_plan.html:227
 msgid "Not paid"
 msgstr "Ikke betalt"
 
@@ -718,7 +718,7 @@ msgstr ""
 
 #: surveys/templates/dashboard.html:26
 msgid "Add coworkers"
-msgstr "Legg til medarbeidere"
+msgstr "Legg til ansatte"
 
 #: surveys/templates/dashboard.html:36 surveys/templates/dashboard.html:38
 msgid "Set up a plan"
@@ -1314,6 +1314,10 @@ msgstr "Organisasjonnavn*"
 msgid "Phone number"
 msgstr "Telefonnummer"
 
+#: website/forms.py:24
+msgid "(e.g. +12125552368 or +1 212 555 2368)"
+msgstr "(f.eks +99989796 eller +999 89 796)"
+
 #: website/forms.py:25
 msgid "Street address*"
 msgstr "Gateaddresse"
@@ -1519,6 +1523,7 @@ msgstr "Nettsted"
 #: website/templates/includeable/full_footer.html:15
 #: website/templates/includeable/navbar.html:40
 #: website/templates/sign_up_form.html:4 website/templates/sign_up_form.html:9
+#: website/views.py:148
 msgid "Sign up"
 msgstr "Bli med"
 
@@ -1619,6 +1624,14 @@ msgstr "Hjem"
 #: website/views.py:238
 msgid "Login"
 msgstr "Log inn"
+
+#: website/templates/includeable/privacy_policy_text.html:2
+msgid "Privacy Policy"
+msgstr "Personvernerklæring"
+
+#: website/templates/includeable/privacy_policy_text.html:3
+msgid "Our contact details"
+msgstr "Våre kontaktdetaljer"
 
 #: website/templates/includeable/privacy_policy_text.html:4
 msgid ""
