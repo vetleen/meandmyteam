@@ -109,9 +109,10 @@ class AnswerSurveyForm(forms.Form):
         for item in self.items:
             field_name = 'item_%s'%(item.pk)
             if isinstance(item, RatioSurveyInstanceItem):
-                CHOICES = [(number, str(number)) for number in range (item.survey_item.item_dimension.scale.min_value, item.survey_item.item_dimension.scale.max_value)]
+                CHOICES = [(number, str(number)) for number in range (item.survey_item.item_dimension.scale.min_value, item.survey_item.item_dimension.scale.max_value+1)]
                 if item.survey_item.item_dimension.scale.opt_out == True:
-                    CHOICES.append(("chose_to_not_answer", _("I don't know, or I don't want to answer")))                
+                    CHOICES.append(("chose_to_not_answer", _("I don't know, or I don't want to answer")))
+                print(CHOICES)             
                 self.fields[field_name] = CustomChoiceField(
                     min_value_description = item.survey_item.item_dimension.scale.min_value_description,
                     max_value_description = item.survey_item.item_dimension.scale.max_value_description,

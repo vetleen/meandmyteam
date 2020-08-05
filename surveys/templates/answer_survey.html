@@ -135,7 +135,7 @@
 
       {% for radio in field %}
         {% if forloop.counter == 1 %}
-          {{ field.field.min_value_description|capfirst }}
+          {{ field.field.min_value_description|capfirst }}&nbsp;&nbsp;&nbsp;&nbsp;
         {% endif %}
         {% if forloop.revcounter == 1 and field.field.opt_out == True %}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -145,9 +145,9 @@
           <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
         </div>
         {% if forloop.revcounter == 2 and field.field.opt_out == True %}
-          {{ field.field.max_value_description|capfirst }}
+        &nbsp;&nbsp;&nbsp;{{ field.field.max_value_description|capfirst }} 
         {% elif forloop.revcounter == 1 and field.field.opt_out == False %}
-          {{ field.field.max_value_description|capfirst }}
+        &nbsp;&nbsp;&nbsp;{{ field.field.max_value_description|capfirst }}
         {% endif %}
       {% endfor %}
       <br>

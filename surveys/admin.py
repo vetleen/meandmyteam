@@ -21,8 +21,8 @@ class DimensionInline(admin.StackedInline): #for use in UserAdmin
 class InstrumentAdmin(admin.ModelAdmin):
         inlines = (DimensionInline, )
 
-@admin.register(Scale)
-class ScaleAdmin(admin.ModelAdmin):
+@admin.register(RatioScale)
+class RatioScaleAdmin(admin.ModelAdmin):
         pass
 
 @admin.register(Dimension)
