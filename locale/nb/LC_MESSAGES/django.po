@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-04 16:53+0200\n"
+"POT-Creation-Date: 2020-08-05 07:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -495,7 +495,8 @@ msgstr "Etternavn"
 msgid ""
 "An employee with that email already exists in our database (%(taken_email)s)."
 msgstr ""
-"Vi har allerede en ansatt med den epostadressen i databasen vår (%(taken_email)s)."
+"Vi har allerede en ansatt med den epostadressen i databasen vår "
+"(%(taken_email)s)."
 
 #: surveys/forms.py:45
 msgid "Activate tracking?"
@@ -539,16 +540,18 @@ msgstr "En måned"
 
 #: surveys/forms.py:71
 msgid "I consent to the collection of information in this survey"
-msgstr "Jeg samtykker til innsamling av informasjon i denne spørreundersøkelsen"
+msgstr ""
+"Jeg samtykker til innsamling av informasjon i denne spørreundersøkelsen"
 
 #: surveys/forms.py:78
 msgid "Please indicate that you consent to answer this survey to continue."
-msgstr "Vennligst kryss av for at du samtykker til å svare på undersøkelsen for å fortsette."
+msgstr ""
+"Vennligst kryss av for at du samtykker til å svare på undersøkelsen for å "
+"fortsette."
 
 #: surveys/forms.py:86
 msgid "Disagree"
 msgstr "Uenig"
-
 
 #: surveys/forms.py:87
 msgid "Agree"
@@ -1343,7 +1346,8 @@ msgstr "En bruker med den eposten finnes allerede (%(taken_email)s)."
 #: website/forms.py:56
 msgid ""
 "The second password you entered did not match the first. Please try again."
-msgstr "Det andre passordet du skrev inn matchet ikke med det første. Prøv igjen."
+msgstr ""
+"Det andre passordet du skrev inn matchet ikke med det første. Prøv igjen."
 
 #: website/forms.py:64
 #, python-format
@@ -1353,7 +1357,8 @@ msgstr "En organisasjon med det navnet finnes allerede (%(taken_name)s)."
 #: website/forms.py:80
 msgid "Please indicate that you accept the terms and conditions."
 msgstr ""
-"Vennligst kryss av for at du samtykker til å svare på undersøkelsen for å fortsette."
+"Vennligst kryss av for at du samtykker til å svare på undersøkelsen for å "
+"fortsette."
 
 #: website/forms.py:94
 msgid "Current password"
@@ -1387,7 +1392,8 @@ msgstr "Feil passord"
 msgid ""
 "The second new password you entered did not match the first. Please try "
 "again."
-msgstr "Det andre passordet du skrev inn matchet ikke med det første. Prøv igjen."
+msgstr ""
+"Det andre passordet du skrev inn matchet ikke med det første. Prøv igjen."
 
 #: website/forms.py:126 website/forms.py:142
 #, python-format
@@ -1430,12 +1436,16 @@ msgstr "Land"
 #, python-format
 msgid ""
 "An organization with that name already exists in our system (%(taken_name)s)."
-msgstr "Vi har allerede en organisasjon med det navnet i systemet vårt (%(taken_name)s)."
+msgstr ""
+"Vi har allerede en organisasjon med det navnet i systemet vårt "
+"(%(taken_name)s)."
 
 #: website/forms.py:203
 #, python-format
 msgid "A user with the email already exists in our system (%(taken_email)s)."
-msgstr "En bruker med den epostadressen fins allerede i systemet vårt (%(taken_email)s)."
+msgstr ""
+"En bruker med den epostadressen fins allerede i systemet vårt "
+"(%(taken_email)s)."
 
 #: website/models.py:49
 #, python-format
