@@ -331,7 +331,7 @@ class TestViews(TestCase):
         self.assertTemplateUsed(response, 'dashboard.html')
         self.assertNotIn("To get started with our employee engagement software, you first need to pick a plan", response.content.decode())
         self.assertIn("Latest measurements", response.content.decode())
-        self.assertIn("<a href=\"/surveys/survey-details/MQ/employee_engagement/#vigor\">Vigor</a>\n", response.content.decode())
+        self.assertIn("/surveys/survey-details/MQ/employee_engagement/#vigor\">Vigor</a>\n", response.content.decode())
         self.assertIn("<div>Employee Engagement tracking:</div>", response.content.decode())
         self.assertIn("<h3 class=\"card-title\">Co-workers at TestOrg</h3>", response.content.decode())
 
@@ -462,7 +462,7 @@ class TestViews(TestCase):
         #check that a faulty link triggers 404 (non-existant instrument slug_name)
         response = self.client.get(reverse('surveys-survey-details', args=[survey.uidb64(), "non-existant_instrument"]), follow=True, secure=True)
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.context['exception'], "We couldn't find that instrument you were looking for.")
+        self.assertEqual(response.context['exception'], "We couldn't find the instrument you were looking for.")
 
         #test that another user cannot access this survey
         self.client.logout()

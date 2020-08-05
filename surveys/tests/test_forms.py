@@ -84,7 +84,7 @@ class FormsTest(TestCase):
 
         self.assertFalse(test_form4.is_valid())
         self.assertTrue(test_form4.has_error('email'))
-        self.assertIn("An employee with that email already exists (%s)."%(previous_r.email), test_form4.errors['email'])
+        self.assertIn("An employee with that email already exists in our database (%s)."%(previous_r.email), test_form4.errors['email'])
 
         #test a form that should be invalid because email must be an email-address
         data5 = {
@@ -116,7 +116,7 @@ class FormsTest(TestCase):
         }
         test_form2 = EditRespondentForm(data=data2)
         self.assertFalse(test_form2.is_valid())
-        self.assertIn("An employee with that email already exists (%s)."%(previous_r.email), test_form2.errors['email'])
+        self.assertIn("An employee with that email already exists in our database (%s)."%(previous_r.email), test_form2.errors['email'])
 
         #test: should be valid with correct respondent_id
         previous_r = Respondent.objects.get(id=1)

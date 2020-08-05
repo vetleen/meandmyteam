@@ -25,7 +25,9 @@ def setup_instrument(raw_instrument):
     assert type(raw_instrument['instrument']['name']) == str, "raw_instrument['instrument']['name'] was type %s, expected str"%(type(raw_instrument['instrument']['name']))
     assert type(raw_instrument['instrument']['slug_name']) == str, "raw_instrument['instrument']['slug_name'] was type %s, expected str"%(type(raw_instrument['instrument']['slug_name']))
     assert type(raw_instrument['instrument']['description']) == str, "raw_instrument['instrument']['description'] was type %s, expected str"%(type(raw_instrument['instrument']['description']))
-
+    assert type(raw_instrument['instrument']['name_nb']) == str, "raw_instrument['instrument']['name_nb'] was type %s, expected str"%(type(raw_instrument['instrument']['name_nb']))
+    assert type(raw_instrument['instrument']['slug_name_nb']) == str, "raw_instrument['instrument']['slug_name_nb'] was type %s, expected str"%(type(raw_instrument['instrument']['slug_name_nb']))
+    assert type(raw_instrument['instrument']['description_nb']) == str, "raw_instrument['instrument']['description_nb'] was type %s, expected str"%(type(raw_instrument['instrument']['description_nb']))
     ##... inside scales
     for n, s in enumerate(raw_instrument['scales']):
         assert type(s) == dict, "raw_instrument['scales'][%s] was type %s, expected dict"%(n, type(s))
@@ -37,7 +39,9 @@ def setup_instrument(raw_instrument):
         assert type(s['max_value']) == int, "raw_instrument['scales'][%s]['max_value'] was type %s, expected int"%(n, type(s['max_value']))
         assert type(s['min_value_description']) == str, "raw_instrument['scales'][%s]['min_value_description'] was type %s, expected str"%(n, type(s['min_value_description']))
         assert type(s['max_value_description']) == str, "raw_instrument['scales'][%s]['max_value_description'] was type %s, expected str"%(n, type(s['max_value_description']))
-
+        assert type(s['instruction_nb']) == str, "raw_instrument['scales'][%s]['instruction_nb'] was type %s, expected str"%(n, type(s['instruction_nb']))
+        assert type(s['min_value_description_nb']) == str, "raw_instrument['scales'][%s]['min_value_description_nb'] was type %s, expected str"%(n, type(s['min_value_description_nb']))
+        assert type(s['max_value_description_nb']) == str, "raw_instrument['scales'][%s]['max_value_description_nb'] was type %s, expected str"%(n, type(s['max_value_description_nb']))
     ##... inside dimensions
     for n, d in enumerate(raw_instrument['dimensions']):
         assert type(d) == dict, "raw_instrument['dimensions'][%s] was type %s, expected dict"%(n, type(d))
@@ -45,7 +49,8 @@ def setup_instrument(raw_instrument):
         assert type(d['name']) == str, "raw_instrument['dimensions'][%s]['name'] was type %s, expected str"%(n, type(d['name']))
         assert type(d['description']) == str, "raw_instrument['dimensions'][%s]['description'] was type %s, expected str"%(n, type(d['description']))
         assert type(d['scale_location']) == int, "raw_instrument['dimensions'][%s][scale_location'] was type %s, expected int"%(n, type(d['scale_location']))
-
+        assert type(d['name_nb']) == str, "raw_instrument['dimensions'][%s]['name_nb'] was type %s, expected str"%(n, type(d['name_nb']))
+        assert type(d['description_nb']) == str, "raw_instrument['dimensions'][%s]['description_nb'] was type %s, expected str"%(n, type(d['description_nb']))
     ##... inside items
     for n, i in enumerate(raw_instrument['items']):
         assert type(i) == dict, "raw_instrument['items'][%s] was type %s, expected dict"%(n, type(i))
@@ -53,7 +58,7 @@ def setup_instrument(raw_instrument):
         assert type(i['formulation']) == str, "raw_instrument['dimensions'][%s]['formulation'] was type %s, expected str"%(n, type(d['formulation']))
         assert type(i['active']) == bool, "raw_instrument['dimensions'][%s]['active'] was type %s, expected bool"%(n, type(d['active']))
         assert type(i['inverted']) == bool, "raw_instrument['dimensions'][%s]['inverted'] was type %s, expected bool"%(n, type(d['inverted']))
-
+        assert type(i['formulation_nb']) == str, "raw_instrument['dimensions'][%s]['formulation_nb'] was type %s, expected str"%(n, type(d['formulation_nb']))
 
     #assert that the the index for desired Scale to be found in scales-list is valid
     for d in raw_instrument['dimensions']:
@@ -74,6 +79,11 @@ def setup_instrument(raw_instrument):
         instrument.name=raw_instrument['instrument']['name']
         instrument.description=raw_instrument['instrument']['description']
         instrument.slug_name=raw_instrument['instrument']['slug_name']
+        #TRANSLATIONS
+        #NB
+        instrument.name_nb=raw_instrument['instrument']['name_nb']
+        instrument.description_nb=raw_instrument['instrument']['description_nb']
+        instrument.slug_name_nb=raw_instrument['instrument']['slug_name_nb']
         instrument.save()
         logger.warning("... ... ... instrument already exists.")
 
@@ -82,7 +92,9 @@ def setup_instrument(raw_instrument):
                 id=raw_instrument['instrument']['id'],
                 name=raw_instrument['instrument']['name'],
                 description=raw_instrument['instrument']['description'],
-                slug_name=raw_instrument['instrument']['slug_name']
+                slug_name=raw_instrument['instrument']['slug_name'],
+                #NB
+                name_nb=raw_instrument['instrument']['name_nb']
             )
         instrument.save()
         new_instrument = True
@@ -105,7 +117,12 @@ def setup_instrument(raw_instrument):
                     min_value=scale['min_value'],
                     max_value=scale['max_value'],
                     min_value_description=scale['min_value_description'],
-                    max_value_description=scale['max_value_description']
+                    max_value_description=scale['max_value_description'],
+                    #Translations
+                    #NB
+                    instruction_nb=scale['instruction_nb'],
+                    min_value_description_nb=scale['min_value_description_nb'],
+                    max_value_description_nb=scale['max_value_description_nb']
                 )
                 new_scale.save()
                 scales.append(new_scale)
@@ -127,6 +144,12 @@ def setup_instrument(raw_instrument):
                     existing_scale.opt_out=scale['opt_out']
                     existing_scale.min_value_description=scale['min_value_description']
                     existing_scale.max_value_description=scale['max_value_description']
+                    #Translations
+                    #NB
+                    existing_scale.instruction_nb=scale['instruction_nb']
+                    existing_scale.min_value_description_nb=scale['min_value_description_nb']
+                    existing_scale.max_value_description_nb=scale['max_value_description_nb']
+
                     #save changes
                     existing_scale.save()
                     #add to scales for further processing
@@ -141,8 +164,6 @@ def setup_instrument(raw_instrument):
     ################
     #DIMENSIONS
 
-    #Should never mess with dimensions if instrument already existed and had dimensions
-    #
 
     #add actual Instrument and Scale objects to raw_data
     for d in raw_instrument['dimensions']:
@@ -159,7 +180,11 @@ def setup_instrument(raw_instrument):
                 instrument=d['instrument'],
                 name=d['name'],
                 description=d['description'],
-                scale=d['scale']
+                scale=d['scale'],
+                #TRANSLATIONS
+                #NB
+                name_nb=d['name_nb'],
+                description_nb=d['description_nb']
             )
             new_d.save()
         logger.warning("... ... ... done.")
@@ -170,9 +195,12 @@ def setup_instrument(raw_instrument):
         for d in raw_instrument['dimensions']:
             try:
                 existing_d = Dimension.objects.get(instrument=d['instrument'], name=d['name'])
-                if existing_d.description != d['description']:
-                    existing_d.description = d['description']
-                    d.save()
+                #minor changes
+                existing_d.description = d['description']
+                #translations
+                existing_d.name_nb=d['name_nb']
+                existing_d.description_nb=d['description_nb'] 
+                existing_d.save()
             except Dimension.DoesNotExist as err:
                     logger.info(
                     "%s %s %s dashboard_view: Small whoopsie. Couldn't find a dimension for the instrument %s with the name %s. Don't worry though, everything should work, but dimension names cannot be changed, and so long as the raw_data dimension name does not match the name in the database, other changes may not be made during setup of the instrument."\
@@ -203,12 +231,20 @@ def setup_instrument(raw_instrument):
                 inverted=ritem['inverted']
             )
             logger.warning("... ... ... ... found existing item with id %s, no need to make a new item."%(i.id))
+            #TRANSLATIONS
+            #NB
+            i.formulation_nb = ritem['formulation_nb']
+            i.save()
         except Item.DoesNotExist:
             i = Item(
                 dimension=ritem['dimension'],
                 formulation=ritem['formulation'],
                 active=ritem['active'],
-                inverted=ritem['inverted']
+                inverted=ritem['inverted'],
+                #TRANSLATIONS
+                #NB
+                formulation_nb=ritem['formulation_nb']
+
             )
             i.save()
             logger.warning("... ... ... ... made an item with id %s."%(i.id))

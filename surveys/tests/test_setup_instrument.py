@@ -172,7 +172,10 @@ class SetupInstrumentTest(TestCase):
             'id': 1, #THIS IS THE FOREIGN KEY, SO THAT WE HAVE TIGHT CONTROL OVER INSTRUMENTS
             'name': "Employee Engagement 2",
             'slug_name': "employee_engagement_2",
-            'description': "An instrument that measures employee engagement"
+            'description': "An instrument that measures employee engagement",
+            'name_nb': "Employee Engagement 2",
+            'slug_name_nb': "employee_engagement_2",
+            'description_nb': "An instrument that measures employee engagement"
         }
         rti2 =create_test_data(1)
         rti2.update({'instrument': new_instrument})
@@ -195,7 +198,10 @@ class SetupInstrumentTest(TestCase):
             'id': 1, #THIS IS THE FOREIGN KEY, SO THAT WE HAVE TIGHT CONTROL OVER INSTRUMENTS
             'name': "Employee Engagement 2",
             'slug_name': "employee_engagement_2",
-            'description': "An instrument that measures employee engagement 2"
+            'description': "An instrument that measures employee engagement 2",
+            'name_nb': "Employee Engagement 2",
+            'slug_name_nb': "employee_engagement_2",
+            'description_nb': "An instrument that measures employee engagement 2"
         }
         rti2 =create_test_data(1)
         rti2.update({'instrument': new_instrument})
@@ -267,6 +273,9 @@ class SetupInstrumentTest(TestCase):
                 'max_value': 6,
                 'min_value_description':"never",
                 'max_value_description':"always",
+                'instruction_nb':"Please indicate how frequently the following occurs on a scale from one (Never) to six (always) the following:",
+                'min_value_description_nb':"never",
+                'max_value_description_nb':"always",
             }
             self.assertNotEqual(rti2['scales'][0], scale002)
             rti2['scales'][0] = scale002
@@ -314,7 +323,9 @@ class SetupInstrumentTest(TestCase):
             'instrument_id': 1,
             'name': "Vigor 2",
             'description': "Vigor 2 is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
-            'scale_location': 0
+            'scale_location': 0,
+            'name_nb': "Vigor 2",
+            'description_nb': "Vigor 2 is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
         }
 
         self.assertNotEqual(rti2['dimensions'][0], td_vigor)
@@ -329,13 +340,15 @@ class SetupInstrumentTest(TestCase):
         self.assertNotIn(td_vigor['name'], tidimension_names)
 
 
-        #change instrument - should give assertion error, since it will be different form the id supplied in rti['instrument']['id']
+        #change instrument - should give assertion error, since it will be different from the id supplied in rti['instrument']['id']
         rti3 = create_test_data(1)
         td_vigor = {
             'instrument_id': 2,
             'name': "Vigor 2",
             'description': "Vigor 2 is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
-            'scale_location': 0
+            'scale_location': 0,
+            'name_nb': "Vigor 2",
+            'description_nb': "Vigor 2 is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
         }
 
         self.assertNotEqual(rti3['dimensions'][0], td_vigor)
@@ -357,6 +370,9 @@ class SetupInstrumentTest(TestCase):
             'max_value': 5,
             'min_value_description':"never",
             'max_value_description':"always",
+            'instruction_nb':"Please indicate how frequently the following occurs on a scale from one (Never) to five (always) the following:",
+            'min_value_description_nb':"never",
+            'max_value_description_nb':"always",
         }
         td_scale002 = {
             'type': "RatioScale",
@@ -367,6 +383,9 @@ class SetupInstrumentTest(TestCase):
             'max_value': 2,
             'min_value_description':"1 - One",
             'max_value_description':"2 - Two",
+            'instruction_nb':"One or Two??",
+            'min_value_description_nb':"1 - One",
+            'max_value_description_nb':"2 - Two",
         }
         td_scale003 = {
             'type': "RatioScale",
@@ -377,6 +396,9 @@ class SetupInstrumentTest(TestCase):
             'max_value': 5,
             'min_value_description':"never",
             'max_value_description':"always",
+            'instruction_nb':"Please indicate how frequently the following occurs on a scale from one (Never) to five (always) the following:",
+            'min_value_description_nb':"never",
+            'max_value_description_nb':"always",
         }
         td_scales = [td_scale001, td_scale002, td_scale003]
 
@@ -385,20 +407,27 @@ class SetupInstrumentTest(TestCase):
             'instrument_id': 1,
             'name': "Vigor",
             'description': "Vigor is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
-            'scale_location': 0 #index of the scales-variable (list) where the scale is located
+            'scale_location': 0, #index of the scales-variable (list) where the scale is located
+            'name_nb': "Vigor",
+            'description_nb': "Vigor is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
         }
+        
 
         td_dedication = {
             'instrument_id': 1,
             'name': "Dedication",
             'description': "Dedication is characterized by a sense of significance, enthusiasm, inspiration, pride, and challenge, and is sometimes also called \"Involvement\".",
-            'scale_location': 1 #index of the scales-variable (list) where the scale is located
+            'scale_location': 1, #index of the scales-variable (list) where the scale is located
+            'name_nb': "Dedication",
+            'description_nb': "Dedication is characterized by a sense of significance, enthusiasm, inspiration, pride, and challenge, and is sometimes also called \"Involvement\".",
         }
         td_absorption = {
             'instrument_id': 1,
             'name': "Absorption",
             'description': "Absorption, is characterized by being fully concentrated and deeply engrossed in one’s work, whereby time passes quickly and one has difficulties with detaching oneself from work. Being fully absorbed in one’s work comes close to what has been called ‘flow’, a state of optimal experience that is characterized by focused attention, clear mind, mind and body unison, effortless concentration, complete control, loss of self-consciousness, distortion of time, and intrinsic enjoyment.",
-            'scale_location': 2 #index of the scales-variable (list) where the scale is located
+            'scale_location': 2, #index of the scales-variable (list) where the scale is located
+            'name_nb': "Absorption",
+            'description_nb': "Absorption, is characterized by being fully concentrated and deeply engrossed in one’s work, whereby time passes quickly and one has difficulties with detaching oneself from work. Being fully absorbed in one’s work comes close to what has been called ‘flow’, a state of optimal experience that is characterized by focused attention, clear mind, mind and body unison, effortless concentration, complete control, loss of self-consciousness, distortion of time, and intrinsic enjoyment.",
         }
         td_dimensions = [td_vigor, td_dedication, td_absorption]
 
@@ -423,6 +452,8 @@ class SetupInstrumentTest(TestCase):
             'name': "Vigor",
             'description': "Vigor is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
             'scale_location': 5, #index of the scales-variable (list) where the scale is located
+            'name_nb': "Vigor",
+            'description_nb': "Vigor is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
         }
         self.assertNotEqual(rti5['dimensions'][0], td_vigor)
         rti5['dimensions'][0] = td_vigor

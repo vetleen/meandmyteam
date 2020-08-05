@@ -1,7 +1,7 @@
 ##MeAndMyTeam
 
 #dev
-
+BUG: Vi får bare opp fire alternativer, når skalaen er fem!
 
 #AFTER LAUNCH
 translate instruments: (https://django-modeltranslation.readthedocs.io/en/latest/)

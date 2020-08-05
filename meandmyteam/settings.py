@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'meandmyteam.herokuapp.com']
 # Application definition
 
 INSTALLED_APPS = [
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'polymorphic',
@@ -133,8 +134,8 @@ AUTH_PASSWORD_VALIDATORS = [
 #LANGUAGE_CODE = 'en-us'
 LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
-    ('en-us', 'English'), 
-    ('nb', 'Norsk'), 
+    ('en-us', _('English')), 
+    ('nb', _('Norwegian')), 
 ]
 
 TIME_ZONE = 'Europe/Oslo'

@@ -3,7 +3,10 @@ def create_test_data(instrument_id):
         'id': instrument_id, #THIS IS THE FOREIGN KEY, SO THAT WE HAVE TIGHT CONTROL OVER INSTRUMENTS
         'name': "Employee Engagement",
         'slug_name': "employee_engagement",
-        'description': "An instrument that measures employee engagement"
+        'description': "An instrument that measures employee engagement",
+        'name_nb': "Employee Engagement",
+        'slug_name_nb': "employee_engagement",
+        'description_nb': "An instrument that measures employee engagement",
     }
 
     #Scale
@@ -16,6 +19,9 @@ def create_test_data(instrument_id):
         'max_value': 5,
         'min_value_description':"never",
         'max_value_description':"always",
+        'instruction_nb':"Please indicate how frequently the following occurs on a scale from one (Never) to five (always) the following:",
+        'min_value_description_nb':"never",
+        'max_value_description_nb':"always",
     }
     scales = [scale001, ]
 
@@ -24,20 +30,27 @@ def create_test_data(instrument_id):
         'instrument_id': instrument_id,
         'name': "Vigor",
         'description': "Vigor is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
-        'scale_location': 0 #index of the scales-variable (list) where the scale is located
+        'scale_location': 0, #index of the scales-variable (list) where the scale is located
+        'name_nb': "Vigor",
+        'description_nb': "Vigor is characterized by high levels of energy and mental resilience while working, the willingness to invest effort in one’s work, and persistence even in the face of difficulties.",
     }
 
     dedication = {
         'instrument_id': instrument_id,
         'name': "Dedication",
         'description': "Dedication is characterized by a sense of significance, enthusiasm, inspiration, pride, and challenge, and is sometimes also called \"Involvement\".",
-        'scale_location': 0 #index of the scales-variable (list) where the scale is located
+        'scale_location': 0, #index of the scales-variable (list) where the scale is located
+        'name_nb': "Dedication",
+        'description_nb': "Dedication is characterized by a sense of significance, enthusiasm, inspiration, pride, and challenge, and is sometimes also called \"Involvement\".",
     }
+    
     absorption = {
         'instrument_id': instrument_id,
         'name': "Absorption",
         'description': "Absorption, is characterized by being fully concentrated and deeply engrossed in one’s work, whereby time passes quickly and one has difficulties with detaching oneself from work. Being fully absorbed in one’s work comes close to what has been called ‘flow’, a state of optimal experience that is characterized by focused attention, clear mind, mind and body unison, effortless concentration, complete control, loss of self-consciousness, distortion of time, and intrinsic enjoyment.",
-        'scale_location': 0 #index of the scales-variable (list) where the scale is located
+        'scale_location': 0,#index of the scales-variable (list) where the scale is located
+        'name_nb': "Absorption",
+        'description_nb': "Absorption, is characterized by being fully concentrated and deeply engrossed in one’s work, whereby time passes quickly and one has difficulties with detaching oneself from work. Being fully absorbed in one’s work comes close to what has been called ‘flow’, a state of optimal experience that is characterized by focused attention, clear mind, mind and body unison, effortless concentration, complete control, loss of self-consciousness, distortion of time, and intrinsic enjoyment.",
     }
     dimensions = [vigor, dedication, absorption]
 
@@ -47,6 +60,7 @@ def create_test_data(instrument_id):
         'formulation': "When I get up in the morning, I feel like going to work.",
         'active': True,
         'inverted': False,
+        'formulation_nb': "When I get up in the morning, I feel like going to work.",
     }
 
     i002 = {
@@ -54,6 +68,7 @@ def create_test_data(instrument_id):
         'formulation': "At my work, I feel bursting with energy.",
         'active': True,
         'inverted': False,
+        'formulation_nb': "At my work, I feel bursting with energy.",
     }
 
     i007 = {
@@ -61,6 +76,7 @@ def create_test_data(instrument_id):
         'formulation': "To me, my job is challenging.",
         'active': True,
         'inverted': False,
+        'formulation_nb': "To me, my job is challenging.",
     }
 
     i008 = {
@@ -68,6 +84,7 @@ def create_test_data(instrument_id):
         'formulation': "My job inspires me.",
         'active': True,
         'inverted': False,
+        'formulation_nb': "My job inspires me.",
     }
 
     i012 = {
@@ -75,6 +92,7 @@ def create_test_data(instrument_id):
         'formulation': "When I am working, I forget everything else around me.",
         'active': True,
         'inverted': False,
+        'formulation_nb': "When I am working, I forget everything else around me.",
     }
 
     i013 = {
@@ -82,6 +100,7 @@ def create_test_data(instrument_id):
         'formulation': "Time flies when I am working.",
         'active': True,
         'inverted': False,
+        'formulation_nb': "Time flies when I am working.",
     }
 
     items = [i001, i002, i007, i008, i012, i013]

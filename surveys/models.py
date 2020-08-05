@@ -153,7 +153,23 @@ class Item(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk:
-            raise IntegrityError("You may not edit an existing %s object. Instead make a new one and attach that for future use" % self._meta.model_name)
+            original_self=Item.objects.get(id=self.id)
+            if original_self.dimension != self.dimension:
+                raise IntegrityError(
+                   "You may not change the 'dimension' of an existing %s object."%(self._meta.model_name)
+               )
+            if original_self.formulation != self.formulation:
+                raise IntegrityError(
+                   "You may not change the 'formulation' of an existing %s object."%(self._meta.model_name)
+               )
+            if original_self.active != self.active:
+                raise IntegrityError(
+                   "You may not change the 'active' of an existing %s object."%(self._meta.model_name)
+               )
+            if original_self.inverted != self.inverted:
+                raise IntegrityError(
+                   "You may not change the 'inverted' of an existing %s object."%(self._meta.model_name)
+               )
         super(Item, self).save(*args, **kwargs)
 
     def __str__(self):

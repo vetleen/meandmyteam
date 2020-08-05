@@ -453,6 +453,8 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
         rti = create_test_data(2)
         rti['instrument']['name'] = "Another instrument"
         rti['instrument']['slug_name'] = "another_instrument"
+        rti['instrument']['name_nb'] = "Another instrument"
+        rti['instrument']['slug_name_nb'] = "another_instrument"
         rti['scales'][0]['name'] = "Another Scale"
         setup_instrument.setup_instrument(rti)
         i2=Instrument.objects.get(id=2)

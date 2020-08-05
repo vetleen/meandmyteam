@@ -1111,7 +1111,7 @@ msgstr ""
 #: surveys/templates/setup_instrument.html:14
 #, python-format
 msgid "Set up %(instrument_name)s tracking"
-msgstr "Konfigurer %(instrument_name)s tracking"
+msgstr "Konfigurer %(instrument_name)s-sporing"
 
 #: surveys/templates/setup_instrument.html:54
 #, python-format

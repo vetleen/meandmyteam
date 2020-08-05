@@ -152,6 +152,7 @@ def create_survey(owner, instrument_list, **kwargs):
                 rsi = RatioSurveyItem(
                     survey=survey,
                     item_formulation=i.formulation,
+                    item_formulation_nb=i.formulation_nb,
                     item_inverted=i.inverted,
                     item_dimension=i.dimension
                 )
