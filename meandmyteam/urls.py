@@ -29,7 +29,7 @@ urlpatterns = i18n_patterns(
     path(_('surveys/'), include('surveys.surveys_urls')),
     path('', include('website.urls')),
     path(_('payments/'), include('payments.urls')),
-    prefix_default_language=True
+    prefix_default_language=False
 
 )
 

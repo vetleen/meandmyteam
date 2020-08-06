@@ -131,12 +131,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-#LANGUAGE_CODE = 'en-us'
 LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
     ('en-us', _('English')), 
     ('nb', _('Norwegian')), 
 ]
+LANGUAGE_COOKIE_NAME = "django_language"
 
 TIME_ZONE = 'Europe/Oslo'
 
