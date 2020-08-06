@@ -15,13 +15,13 @@ from django.utils.encoding import force_bytes
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import gettext as _
+from django.utils import translation
 
 from django.views import generic
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.urls import reverse_lazy
+from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
+from django.urls import reverse, reverse_lazy, resolve
 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -300,3 +300,36 @@ def edit_account_view(request):
         logger.warning("%s %s: %s tried to edit someone else's account"%(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', request.user))
         messages.error(request, _("Can't edit profile when you are not logged in."), extra_tags='alert alert-danger')
         return HttpResponseRedirect(reverse('loginc'))
+
+def change_language_view(request, **kwargs):
+    #get and validate the language user is trying to change to
+    language_code = kwargs.get('language_code', None)
+    try:
+        #assert len([lang[0] for lang in settings.LANGUAGES if lang[0] == language_code]) == 1, _("%(selected_languages)s not in %(settings_languages)s"%{language_code, settings.LANGUAGES})
+        assert len([lang[0] for lang in settings.LANGUAGES if lang[0] == language_code]), _("%(selected_languages)s not in %(settings_languages)s"%{language_code, settings.LANGUAGES})
+    except (AssertionError, TypeError) as err:
+        raise Http404(_("Couldn't find that language: "))
+    
+    #get the next path, if any
+    #create fallback values
+    next_view = 'index'
+    next_args = None
+    next_kwargs = None
+    #try to get and resolve from url
+    next_path = request.GET.get('next', None)
+    try:
+        if next_path is not None:
+            next_view, next_args, next_kwargs = resolve(next_path)
+    except Exception as err:
+            pass
+    
+    #activate translation for the intended language
+    translation.activate(language_code)
+
+    #make a new next_url, now that we are in the new language
+    next_url = reverse(next_view, args=next_args, kwargs=next_kwargs)
+
+    #make response, attachj cookie, and return it
+    response = HttpResponseRedirect(next_url)
+    response.set_cookie(settings.LANGUAGE_COOKIE_NAME, language_code)
+    return response

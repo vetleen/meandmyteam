@@ -24,6 +24,7 @@ urlpatterns = [
 
     path(_('privacy-policy/'), views.privacy_policy_view, name='privacy-policy'),
     path(_('terms-and-conditions/'), views.terms_view, name='terms-and-conditions'),
+    path(_('change-language/<language_code>/'), views.change_language_view, name='change-language'),
 
     #REDIRECTED PERMANENTLY
     path(_('your-plan/'), RedirectView.as_view(url=reverse_lazy('payments_current_plan'), permanent=True)),

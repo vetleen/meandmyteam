@@ -133,8 +133,8 @@ class ResetPasswordForm(forms.Form):
         return self.cleaned_data
 
 class LoginForm(forms.Form):
-    username = forms.EmailField(max_length = 150, label="Email address", widget=forms.TextInput(attrs={'type':'input'}))
-    password = forms.CharField(max_length = 20, label="Password", widget=forms.PasswordInput(attrs={'type':'password'}))
+    username = forms.EmailField(max_length = 150, label=_("Email address"), widget=forms.TextInput(attrs={'type':'input'}))
+    password = forms.CharField(max_length = 20, label=_("Password"), widget=forms.PasswordInput(attrs={'type':'password'}))
 
     def clean_username(self):
         if not User.objects.filter(username=self.cleaned_data['username']).exists():

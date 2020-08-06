@@ -67,7 +67,7 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               {% for language in LANGUAGES  %}
               {% get_language_info for language.0 as language_info %}
-              <a class="dropdown-item" href="#"><img src="
+              <a class="dropdown-item" href="{% url 'change-language' language.0 %}?next={{request.path}}"><img src="
                 {%if language.0 == "en-us" %}{{EN_US_FLAG}}{% elif language.0 == "nb" %}{{NB_FLAG}}{% endif %}
               " height="16px" alt="Switch language to {{language.1}}" /> {{language_info.name_local|capfirst}}</a>
               {% endfor %}
