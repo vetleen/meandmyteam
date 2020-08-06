@@ -41,10 +41,39 @@
             </li>
             {% endif %}
           </ul>
-          <span class="navbar-text">
-            {# get_available_languages as LANGUAGES #} {#{ LANGUAGES #}
+          <span class="navbar-text"> 
             {% if user.is_authenticated %}({{ user.get_username }}){% endif %}
           </span>
+         
+          <div class="dropdown">
+            {% get_current_language as CURRENT_LANGUAGE_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% static 'images/english_language_flag.png' as EN_US_FLAG %}
+            {% static 'images/norwegian_language_flag.png' as NB_FLAG %}
+            <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="text-muted">
+                {% for language in LANGUAGES  %}
+                 {% if language.0 == CURRENT_LANGUAGE_CODE %}
+                 {% get_language_info for language.0 as language_info %}
+                 <img src="
+                 {%if CURRENT_LANGUAGE_CODE == "en-us" %}{{EN_US_FLAG}}{% elif CURRENT_LANGUAGE_CODE == "nb" %}{{NB_FLAG}}{% endif %}" 
+                 height="16px" alt="Current language is {{language_info.name_local|capfirst}}" />
+                 {{language_info.name_local|capfirst}}
+                 {% endif %}
+                {% endfor %}
+                
+              </span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% for language in LANGUAGES  %}
+              {% get_language_info for language.0 as language_info %}
+              <a class="dropdown-item" href="#"><img src="
+                {%if language.0 == "en-us" %}{{EN_US_FLAG}}{% elif language.0 == "nb" %}{{NB_FLAG}}{% endif %}
+              " height="16px" alt="Switch language to {{language.1}}" /> {{language_info.name_local|capfirst}}</a>
+              {% endfor %}
+              <!-- Icons made by Freepik http://www.freepik.com/" -->
+            </div>
+          </div>
         </div><!-- navbar -->
   </div><!-- container -->
 </nav>
