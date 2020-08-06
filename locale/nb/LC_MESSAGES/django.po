@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-05 11:14+0200\n"
+"POT-Creation-Date: 2020-08-06 18:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: meandmyteam/settings.py:204
+#: meandmyteam/settings.py:205
 msgid "Employee Engagement Tracking | Motpanel"
 msgstr "Ansattengasjement - Sporing | Motpanel "
 
@@ -457,6 +457,10 @@ msgstr ""
 "Vi forsøkte å oppdatere abonnementet ditt, men det kan være at det ikke "
 "gikk. Prøv igjen senere, eller kontakt brukerstøtten vår"
 
+#: surveys/core/survey_logic.py:753
+msgid "*Unable to retrieve user*"
+msgstr "*Finner ikke bruker*"
+
 #: surveys/dashboard_urls.py:12
 msgid "add-or-remove-employees/"
 msgstr "legg-til-eller-fjern-ansatte/"
@@ -470,7 +474,7 @@ msgid "delete-employee/<uidb64>/"
 msgstr "slett-ansatt/<uidb64>/"
 
 #: surveys/forms.py:11 website/forms.py:18 website/forms.py:121
-#: website/forms.py:172
+#: website/forms.py:136 website/forms.py:172
 msgid "Email address"
 msgstr "Epost-adresse"
 
@@ -621,9 +625,9 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"Undersøkelsen er ferdig besvart, og svarene dine lagret. Du kan "
-"oppdatere svarene dine frem til %(date_close)s ved å bruke knappen under. "
-"Linken fra epostinvitasjonen får deg tilbake hit.\n"
+"Undersøkelsen er ferdig besvart, og svarene dine lagret. Du kan oppdatere "
+"svarene dine frem til %(date_close)s ved å bruke knappen under. Linken fra "
+"epostinvitasjonen får deg tilbake hit.\n"
 "            "
 
 #: surveys/templates/answer_survey.html:40
@@ -675,8 +679,8 @@ msgid ""
 "Read our full <a href=\"%(pp_url)s\" target=\"_blank\">privacy policy&#11016;"
 "</a>."
 msgstr ""
-"Les hele <a href=\"%(pp_url)s\" target=\"_blank\">personvernerklæringen&#11016;"
-"</a> vår."
+"Les hele <a href=\"%(pp_url)s\" target=\"_blank"
+"\">personvernerklæringen&#11016;</a> vår."
 
 #: surveys/templates/answer_survey.html:103
 msgid "Start survey"
@@ -1404,6 +1408,10 @@ msgstr ""
 msgid "There is no user with that email (%(attempted)s)."
 msgstr "Vi har ikke en bruker med den epostaddressen (%(attempted)s)."
 
+#: website/forms.py:137
+msgid "Password"
+msgstr "Passord"
+
 #: website/forms.py:158
 msgid "Please enter the password again."
 msgstr "Please enter the password again."
@@ -1489,7 +1497,7 @@ msgid ""
 "\n"
 "        <span class=\"text-muted\"><small>© 2020 <span class=\"text-info "
 "font-weight-bold\" style=\"font-family: serif;\">motpanel</span>, an "
-"Engesbak Promotions brand. All rights reserved.\" <br /><br />\n"
+"Engesbak Promotions brand. All rights reserved. <br /><br />\n"
 "        "
 msgstr ""
 "\n"
@@ -1602,7 +1610,7 @@ msgstr "Start her"
 #: website/templates/includeable/navbar.html:37
 #: website/templates/includeable/navbar.html:40
 msgid "(current)"
-msgstr "(nåværende)"
+msgstr "(denne siden)"
 
 #: website/templates/includeable/navbar.html:21
 msgid "Account"
@@ -2344,23 +2352,27 @@ msgstr "personvernerklæring/"
 msgid "terms-and-conditions/"
 msgstr "vilkår-og-betingelser"
 
-#: website/urls.py:29
+#: website/urls.py:27
+msgid "change-language/<language_code>/"
+msgstr "endre-språk/<language_code>/"
+
+#: website/urls.py:30
 msgid "your-plan/"
 msgstr "din-plan/"
 
-#: website/urls.py:30
+#: website/urls.py:31
 msgid "choose-plan/"
 msgstr "velg-plan/"
 
-#: website/urls.py:31
+#: website/urls.py:32
 msgid "change-plan/"
 msgstr "endre-plan/"
 
-#: website/urls.py:32
+#: website/urls.py:33
 msgid "cancel-plan/"
 msgstr "avbryt-plan/"
 
-#: website/urls.py:33
+#: website/urls.py:34
 msgid "show-interest-in-unavailable-plan/"
 msgstr "vis-interesse-i-utilgjengelig-plan/"
 
@@ -2418,6 +2430,15 @@ msgstr "Profilen din ble oppdatert."
 #: website/views.py:301
 msgid "Can't edit profile when you are not logged in."
 msgstr "Du kan ikke endre profilen din når du ikke er logget inn."
+
+#: website/views.py:309
+#, python-format
+msgid "%(selected_languages)s not in %(settings_languages)s"
+msgstr "%(selected_languages)s finnes ikke i %(settings_languages)s"
+
+#: website/views.py:311
+msgid "Couldn't find that language: "
+msgstr "Kunne ikke finne det språket:"
 
 #~ msgid "Employee Engagement"
 #~ msgstr "Ansattengasjement"

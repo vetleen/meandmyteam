@@ -13,8 +13,9 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
           <ul class="navbar-nav">
             {% if user.is_authenticated %}
-            <li class="nav-item {% if request.path == '/dashboard/' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'surveys-dashboard' %}"> {% trans "Start here" %} {% if request.path == '/dashboard/' %}<span class="sr-only">{% trans "(current)" %}</span>{% endif %}</a>
+            {% url 'surveys-dashboard' as dashboard_url %}
+            <li class="nav-item {% if request.path == dashboard_url %}active{% endif %}">
+              <a class="nav-link" href="{{ dashboard_url }}"> {% trans "Start here" %} {% if request.path == dashboard_url %}<span class="sr-only">{% trans "(current)" %}</span>{% endif %}</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -30,21 +31,24 @@
               </div>
             </li>
             {% else %}
-            <li class="nav-item {% if request.path == '/' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'index' %}">{% trans "Home" %} {% if request.path == '/' %}<span class="sr-only">{% trans "(current)" %}</span>{% endif %}</a>
+            {% url 'index' as index_url %}
+            <li class="nav-item {% if request.path == index_url %}active{% endif %}">
+              <a class="nav-link" href="{{ index_url }}">{% trans "Home" %} {% if request.path == index_url %}<span class="sr-only">{% trans "(current)" %}</span>{% endif %}</a>
             </li>
-            <li class="nav-item {% if request.path == '/accounts/login/' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'loginc'%}">{% trans "Login" %} {% if request.path == '/login/' %}<span class="sr-only">({% trans "(current)" %}</span>{% endif %}</a>
+            {% url 'loginc' as login_url %}
+            <li class="nav-item {% if request.path == login_url %}active{% endif %}">
+              <a class="nav-link" href="{{ login_url }}">{% trans "Login" %} {% if request.path == login_url %}<span class="sr-only">({% trans "(current)" %}</span>{% endif %}</a>
             </li>
-            <li class="nav-item {% if request.path == '/sign-up' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'sign-up'%}">{% trans "Sign up" %}{% if request.path == '/sign-up/' %}<span class="sr-only">{% trans "(current)" %}</span>{% endif %}</a>
+            {% url 'sign-up' as sign_up_url %}
+            <li class="nav-item {% if request.path == sign_up_url %}active{% endif %}">
+              <a class="nav-link" href="{{ sign_up_url }}">{% trans "Sign up" %}{% if request.path == sign_up_url %}<span class="sr-only">{% trans "(current)" %}</span>{% endif %}</a>
             </li>
             {% endif %}
           </ul>
           <span class="navbar-text"> 
             {% if user.is_authenticated %}({{ user.get_username }}){% endif %}
           </span>
-         
+          
           <div class="dropdown">
             {% get_current_language as CURRENT_LANGUAGE_CODE %}
             {% get_available_languages as LANGUAGES %}
@@ -72,8 +76,9 @@
               " height="16px" alt="Switch language to {{language.1}}" /> {{language_info.name_local|capfirst}}</a>
               {% endfor %}
               <!-- Icons made by Freepik http://www.freepik.com/" -->
-            </div>
-          </div>
+            </div><!-- dropdown-menu -->
+          </div><!-- dropdown -->
+          
         </div><!-- navbar -->
   </div><!-- container -->
 </nav>

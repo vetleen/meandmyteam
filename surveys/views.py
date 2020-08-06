@@ -307,7 +307,7 @@ def survey_details_view(request, **kwargs):
         assert survey.is_closed == True, \
             "Cannot view details of a survey that is not closed."
     except (Survey.DoesNotExist, DjangoUnicodeDecodeError, AssertionError) as err:
-        logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."\
+        logger.exception("%s %s: survey_details_view: (user: %s) %s: %s."\
             %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         raise Http404(_("We couldn't find the survey you were looking for."))
 
@@ -316,7 +316,7 @@ def survey_details_view(request, **kwargs):
         assert request.user == survey.owner.owner, \
             "This survey does not belong to the user that is requesting it."
     except AssertionError as err:
-        logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."\
+        logger.exception("%s %s: survey_details_view: (user: %s) %s: %s."\
             %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         return HttpResponseForbidden()
 
@@ -325,7 +325,7 @@ def survey_details_view(request, **kwargs):
         instrument_slug_name = kwargs.get('instrument', None)
         instrument = Instrument.objects.get(slug_name=instrument_slug_name)
     except Instrument.DoesNotExist as err:
-        logger.exception("%s %s: edit_employee_view: (user: %s) %s: %s."\
+        logger.exception("%s %s: survey_details_view: (user: %s) %s: %s."\
             %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', request.user, type(err), err))
         raise Http404(_("We couldn't find the instrument you were looking for."))
 

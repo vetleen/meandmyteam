@@ -5,7 +5,7 @@ from website.models import Organization, Event
 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView #dont think this is needed anymore
 from payments.tools.stripe_logic import *
-
+from surveys.models import Instrument
 from operator import itemgetter
 import datetime
 
@@ -21,7 +21,7 @@ from django.views import generic
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
-from django.urls import reverse, reverse_lazy, resolve
+from django.urls import reverse, reverse_lazy, resolve, Resolver404
 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -305,8 +305,7 @@ def change_language_view(request, **kwargs):
     #get and validate the language user is trying to change to
     language_code = kwargs.get('language_code', None)
     try:
-        #assert len([lang[0] for lang in settings.LANGUAGES if lang[0] == language_code]) == 1, _("%(selected_languages)s not in %(settings_languages)s"%{language_code, settings.LANGUAGES})
-        assert len([lang[0] for lang in settings.LANGUAGES if lang[0] == language_code]), _("%(selected_languages)s not in %(settings_languages)s"%{language_code, settings.LANGUAGES})
+        assert [lang[0] for lang in settings.LANGUAGES if lang[0] == language_code], _("%(selected_languages)s not in %(settings_languages)s"%{language_code, settings.LANGUAGES})
     except (AssertionError, TypeError) as err:
         raise Http404(_("Couldn't find that language: "))
     
@@ -320,6 +319,12 @@ def change_language_view(request, **kwargs):
     try:
         if next_path is not None:
             next_view, next_args, next_kwargs = resolve(next_path)
+            #sad hack to make translation work on pages with instrument name in url PART 1
+            if 'instrument' in next_kwargs:
+                try:
+                    instrument = Instrument.objects.get(slug_name=next_kwargs['instrument'])
+                except Exception as err:
+                    instrument = None
     except Exception as err:
             pass
     
@@ -327,9 +332,23 @@ def change_language_view(request, **kwargs):
     translation.activate(language_code)
 
     #make a new next_url, now that we are in the new language
+    #sad hack to make translation work on pages with instrument name in url PART 2
+    if 'instrument' in next_kwargs:
+        try:
+            next_kwargs['instrument'] = instrument.slug_name
+        except:
+            pass
+
     next_url = reverse(next_view, args=next_args, kwargs=next_kwargs)
 
-    #make response, attachj cookie, and return it
+    #double check that this url will work
+    try:
+        check_view, check_args, check_kwargs = resolve(next_url)
+        
+    except (Resolver404) as err:
+        next_url = reverse('index')
+
+    #make response, attach cookie, and return it
     response = HttpResponseRedirect(next_url)
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, language_code)
     return response
