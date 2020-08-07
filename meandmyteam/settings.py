@@ -133,8 +133,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
-    ('en-us', 'English'), 
-    ('nb', 'Norsk'), 
+    ('en-us', _('English')), 
+    ('nb', _('Norwegian')), 
 ]
 LANGUAGE_COOKIE_NAME = "django_language"
 

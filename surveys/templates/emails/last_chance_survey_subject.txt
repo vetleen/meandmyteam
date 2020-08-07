@@ -1,1 +1,1 @@
-Last chance to answer {{ organization }}'s employee survey! - it's closing today
+{% load i18n %}{% blocktrans %}Last chance to answer {{ organization }}'s employee survey! - it's closing today{% endblocktrans %}

@@ -258,6 +258,7 @@ def setup_instrument_view(request, **kwargs):
         'is_active':  survey_setting.is_active,
         'survey_interval': survey_setting.survey_interval,
         'surveys_remain_open_days': survey_setting.surveys_remain_open_days,
+        'survey_language_preference': request.user.organization.survey_language_preference,
     }
     form = EditSurveySettingsForm(initial=data)
 
@@ -270,6 +271,8 @@ def setup_instrument_view(request, **kwargs):
             survey_setting.survey_interval = form.cleaned_data['survey_interval']
             survey_setting.surveys_remain_open_days = form.cleaned_data['surveys_remain_open_days']
             survey_setting.save()
+            request.user.organization.survey_language_preference = form.cleaned_data['survey_language_preference']
+            request.user.organization.save()
             #report back
             if survey_setting.is_active == True:
                 success_string = _("Your settings were updated successfully, %(instrument_name)s tracking is ACTIVE!"\

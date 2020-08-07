@@ -402,7 +402,8 @@ class TestViews(TestCase):
         data = {
             'is_active': False,
             'survey_interval': 180,
-            'surveys_remain_open_days': 21
+            'surveys_remain_open_days': 21,
+            'survey_language_preference': 'nb',
         }
         response = self.client.post(reverse('surveys-setup-instrument', args=[instrument.slug_name]), data, follow=True, secure=True)
         #test that we were successfully redirected

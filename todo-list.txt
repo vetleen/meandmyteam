@@ -1,10 +1,13 @@
 ##MeAndMyTeam
 
 #dev
+organization objects should have a language_preference which is set to current language on sign-up and updated when changing language
+translations for emails and links that get sent out -> also add to instrument_configuration a løanguage choice, which defaults to organizatiopns
 
 
 #AFTER LAUNCH
 search engine optimization
+additional instrument
 
 contact us page and about us page
 add 'about us' explaining scientific background of test (if any...)

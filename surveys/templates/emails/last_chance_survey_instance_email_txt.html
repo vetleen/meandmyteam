@@ -1,12 +1,13 @@
-Hi!
+{% load i18n %}{% url 'surveys-answer-survey' token=token as survey_url %}
+{% trans "Hi!" %}
 
-Some time ago we sent you an email regarding {{ organization }}'s regular surveys to investigate {% if instrument_list|length == 1  %}{{ instrument_list.0.name|lower }}.{% else %}{% for i in instrument_list %}{% if forloop.last %}and {{ i.name|lower }}.{% else %}{{ i.name|lower }}, {% endif %}{% endfor %}{% endif %}
+{% blocktrans %}Some time ago we sent you an email regarding {{ organization }}'s regular surveys to investigate {% endblocktrans %}{% if instrument_list|length == 1  %}{{ instrument_list.0.name|lower }}.{% else %}{% for i in instrument_list %}{% if forloop.last %}and {{ i.name|lower }}.{% else %}{{ i.name|lower }}, {% endif %}{% endfor %}{% endif %}
 
-{{ contact_person }} on behalf of {{ organization }} would greatly appreciate it if you took the time to fill out the survey at this link:
-https://{{ hostname }}{% url 'surveys-answer-survey' token=token %}
+{% blocktrans %}{{ contact_person }} on behalf of {{ organization }} would greatly appreciate it if you took the time to fill out the survey at this link:
+https://{{ hostname }}{{ survey_url }}{% endblocktrans %}
 
-This is your last chance!
-Please contact {{ contact_person }} if you have any questions.
+{% blocktrans %}This is your last chance!
+Please contact {{ contact_person }} if you have any questions.{% endblocktrans %}
 
-Best regards,
-The www.motpanel.com team
+{% blocktrans %}Best regards,
+The www.motpanel.com team{% endblocktrans %}

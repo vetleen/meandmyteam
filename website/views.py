@@ -331,21 +331,36 @@ def change_language_view(request, **kwargs):
     #activate translation for the intended language
     translation.activate(language_code)
 
-    #make a new next_url, now that we are in the new language
+    #update user's language preference
+    if request.user.is_authenticated:
+        try:
+            request.user.organization.language_preference = language_code
+            request.user.organization.save()
+        except:
+            logger.exception("%s - %s in %s: tried to change language preference of organizaton %s, but failed. They wanted %s. Got error:"\
+                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION', __name__, request.user.organization, language_code, err))
+    
     #sad hack to make translation work on pages with instrument name in url PART 2
     if 'instrument' in next_kwargs:
         try:
             next_kwargs['instrument'] = instrument.slug_name
-        except:
-            pass
+        except Exception as err:
+            pass    
 
+    #make a new next_url, now that we are in the new language
     next_url = reverse(next_view, args=next_args, kwargs=next_kwargs)
 
+    #replace special characters
+    next_url = next_url.replace("%C3%A6", "æ")
+    next_url = next_url.replace("%C3%B8", "ø")
+    next_url = next_url.replace("%C3%A5", "å")
+    
     #double check that this url will work
     try:
         check_view, check_args, check_kwargs = resolve(next_url)
         
     except (Resolver404) as err:
+        print(err)
         next_url = reverse('index')
 
     #make response, attach cookie, and return it

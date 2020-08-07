@@ -1,6 +1,8 @@
+from django.conf import settings
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
+from django.utils import translation
 from surveys.models import Respondent
 from django_countries.widgets import CountrySelectWidget
 from django_countries.fields import CountryField
@@ -64,6 +66,13 @@ class EditSurveySettingsForm(forms.Form):
             (21, _('Three weeks')),
             (30, _('One month')),
             )
+    )
+    survey_language_preference = forms.ChoiceField(
+        label=_("Set default survey language (this affects all instruments):"),
+        required = True,
+        choices=settings.LANGUAGES,
+        initial=translation.get_language()
+        
     )
 
 class ConsentToAnswerForm(forms.Form):

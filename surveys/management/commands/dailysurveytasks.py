@@ -43,7 +43,10 @@ class Command(BaseCommand):
         for survey in survey_list:
             survey_instance_list = survey.surveyinstance_set.all()
             for survey_instance in survey_instance_list:
-                survey_logic.send_email_for_survey_instance(survey_instance)
+                try:
+                    survey_logic.send_email_for_survey_instance(survey_instance)
+                except AssertionError as err:
+                    print("tried to send emails for survey instance with id #%s, belonging to organization %s. Got error: %s."%(survey_instance, survey_instance.owner, err))
         #
         logger.warning("... done.")
         logger.warning("All done.")

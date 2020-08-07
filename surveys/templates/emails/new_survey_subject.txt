@@ -1,1 +1,1 @@
-Employee survey for {{ organization }}
+{% load i18n %}{% blocktrans %}Employee survey for {{ organization }}{% endblocktrans %}

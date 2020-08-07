@@ -62,13 +62,14 @@
                  <img src="
                  {%if CURRENT_LANGUAGE_CODE == "en-us" %}{{EN_US_FLAG}}{% elif CURRENT_LANGUAGE_CODE == "nb" %}{{NB_FLAG}}{% endif %}" 
                  height="16px" alt="Current language is {{language_info.name_local|capfirst}}" />
-                 {{language_info.name_local|capfirst}}
+                 <!--{{language_info.name_local|capfirst}}-->
                  {% endif %}
                 {% endfor %}
                 
               </span>
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <span class="dropdown-item">Languages:</span>
               {% for language in LANGUAGES  %}
               {% get_language_info for language.0 as language_info %}
               <a class="dropdown-item" href="{% url 'change-language' language.0 %}?next={{request.path}}"><img src="

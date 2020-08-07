@@ -1,10 +1,10 @@
-Hi!
+{% load i18n %}{% url 'surveys-answer-survey' token=token as survey_url %}{% trans "Hi!" %}
 
-You have been invited by {{ contact_person }} to participate in {{ organization }}'s survey investigating {% if instrument_list|length == 1  %}{{ instrument_list.0.name|lower }}.{% else %}{% for i in instrument_list %}{% if forloop.last %}and {{ i.name|lower }}.{% else %}{{ i.name|lower }}, {% endif %}{% endfor %}{% endif %}
-They would appreciate it if you took the time to fill out the survey at this link:
-https://{{ hostname }}{% url 'surveys-answer-survey' token=token %}
+{% blocktrans %}You have been invited by {{ contact_person }} to participate in {{ organization }}'s survey investigating {% endblocktrans %}{% if instrument_list|length == 1  %}{{ instrument_list.0.name|lower }}.{% else %}{% for i in instrument_list %}{% if forloop.last %}and {{ i.name|lower }}.{% else %}{{ i.name|lower }}, {% endif %}{% endfor %}{% endif %}
+{% blocktrans %}They would appreciate it if you took the time to fill out the survey at this link:
+https://{{ hostname }}{{ survey_url }}{% endblocktrans %}
 
-Our contact person at {{ organization }} is {{ contact_person }}. Please contact him or her if you have any questions.
+{% blocktrans %}Our contact person at {{ organization }} is {{ contact_person }}. Please contact him or her if you have any questions.{% endblocktrans %}
 
-Best regards,
-The www.motpanel.com team
+{% blocktrans %}Best regards,
+The www.motpanel.com team{% endblocktrans %}

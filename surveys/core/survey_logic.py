@@ -2,6 +2,7 @@ from surveys.models import *
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
+from django.utils import translation
 
 import datetime
 import os
@@ -733,6 +734,8 @@ def send_email_for_survey_instance(survey_instance):
         "'survey_instance' must be a SurveyInstance object, but was %s"%(type(survey_instance))
     assert survey_instance.survey.is_closed == False, \
         "'survey_instance' must belong to an open survey"
+    assert survey_instance.respondent is not None, \
+        "respondent for this 'survey_instance' doesn't exist"
 
     #define the function that actually sends the emails
     def create_and_send_single_email_about_survey_instance(survey_instance, email_txt_template, email_html_template, subject_template):
@@ -743,14 +746,14 @@ def send_email_for_survey_instance(survey_instance):
         #Make a Token so the Respondent can find the instance
         url_token = survey_instance.get_url_token()
 
-        #Get a string representation fon the owner of the Survey
+        #Get a string representation for the owner of the Survey
         try:
             contact_person = survey_instance.survey.owner.owner
             contact_person_str = contact_person.email
             if contact_person.first_name !='' and contact_person.last_name !='':
                 contact_person_str = '%s %s'%(survey_instance.survey.owner.owner.first_name, survey_instance.survey.owner.owner.last_name)
         except AttributeError as err:
-            contact_person_str = _("*Unable to retrieve user*")
+            contact_person_str = _("Unable to retrieve user")
             logger.warning(
                 "%s %s: %s: unable to find contact person for survey instance sent to %s, for survey is: %s."\
                 %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'EXCEPTION: ', __name__, survey_instance.respondent.email, survey_instance.survey.id)
@@ -773,11 +776,14 @@ def send_email_for_survey_instance(survey_instance):
                 }
         #print (os.environ)
         #gather content for the email
-        subject=render_to_string(subject_template, context).rstrip("\n\r")
+        subject=render_to_string(subject_template, context).replace("\n", "")
         text_content=render_to_string(email_txt_template, context)
         html_content=render_to_string(email_html_template, context)
-        from_email='surveys@motpanel.com'
+        from_email=_('surveys@motpanel.com')
         to=[survey_instance.respondent.email]
+        #print("subject is: %s"%(subject))
+        #print("subject template was:")
+        #print(subject_template)
 
         #make and send email
         email_message = EmailMultiAlternatives(subject, text_content, from_email, to)
@@ -832,22 +838,26 @@ def send_email_for_survey_instance(survey_instance):
     if survey_instance.check_completed() == True:
         return None
 
+    #get the preferred language
+    preferred_survey_language = survey_instance.survey.owner.survey_language_preference
+
     #an initial invitation should be sent out if it hasn't already been done
     try:
         initial_email = survey_instance.respondentemail_set.get(category='initial')
     except RespondentEmail.DoesNotExist:
-        initial_email = configure_and_call_send_email(
-            email_txt_template='emails/new_survey_instance_email_txt.html',
-            email_html_template='emails/new_survey_instance_email_html.html',
-            subject_template='emails/new_survey_subject.txt',
-            category='initial'
-        )
-        if initial_email.category == 'failure':
-            logger.warning(
-                "%s %s: %s: Tried to send 'initial' email to %s about the survey %s, but failed."\
-                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey_instance.respondent.email, survey_instance.survey)
+        with translation.override(preferred_survey_language):
+            initial_email = configure_and_call_send_email(
+                email_txt_template='emails/new_survey_instance_email_txt.html',
+                email_html_template='emails/new_survey_instance_email_html.html',
+                subject_template='emails/new_survey_subject.txt',
+                category='initial'
             )
-        return initial_email
+            if initial_email.category == 'failure':
+                logger.warning(
+                    "%s %s: %s: Tried to send 'initial' email to %s about the survey %s, but failed."\
+                    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey_instance.respondent.email, survey_instance.survey)
+                )
+            return initial_email
 
     #Deal with reminders
     #some settings for reminders
@@ -868,32 +878,34 @@ def send_email_for_survey_instance(survey_instance):
         return None
     #send last_chance if that date has come
     elif datetime.date.today() >= send_last_reminder_date:
-        last_chance_email = configure_and_call_send_email(
-            email_txt_template='emails/last_chance_survey_instance_email_txt.html',
-            email_html_template='emails/last_chance_survey_instance_email_html.html',
-            subject_template='emails/last_chance_survey_subject.txt',
-            category='last_chance'
-        )
-        if last_chance_email.category == 'failure':
-            logger.warning(
-                "%s %s: %s: Tried to send 'last chance' email to %s about the survey %s, but failed."\
-                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey_instance.respondent.email, survey_instance.survey)
+        with translation.override(preferred_survey_language):
+            last_chance_email = configure_and_call_send_email(
+                email_txt_template='emails/last_chance_survey_instance_email_txt.html',
+                email_html_template='emails/last_chance_survey_instance_email_html.html',
+                subject_template='emails/last_chance_survey_subject.txt',
+                category='last_chance'
             )
-        return last_chance_email
+            if last_chance_email.category == 'failure':
+                logger.warning(
+                    "%s %s: %s: Tried to send 'last chance' email to %s about the survey %s, but failed."\
+                    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey_instance.respondent.email, survey_instance.survey)
+                )
+            return last_chance_email
     #or, send normal reminder if max reminders have not been reached (saving one for 'last_chance', AND if some time has passed since the last email)
     elif len(email_list) <= max_reminders_per_survey-1 and datetime.date.today() >= (email_list[0].email_date+datetime.timedelta(days=remind_after_days)):
-        reminder_email = configure_and_call_send_email(
-            email_txt_template='emails/remind_survey_instance_email_txt.html',
-            email_html_template='emails/remind_survey_instance_email_html.html',
-            subject_template='emails/remind_survey_subject.txt',
-            category='reminder'
-        )
-        if reminder_email.category == 'failure':
-            logger.warning(
-                "%s %s: %s: Tried to send 'reminder' email to %s about the survey %s, but failed."\
-                %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey_instance.respondent.email, survey_instance.survey)
+        with translation.override(preferred_survey_language):
+            reminder_email = configure_and_call_send_email(
+                email_txt_template='emails/remind_survey_instance_email_txt.html',
+                email_html_template='emails/remind_survey_instance_email_html.html',
+                subject_template='emails/remind_survey_subject.txt',
+                category='reminder'
             )
-        return reminder_email
+            if reminder_email.category == 'failure':
+                logger.warning(
+                    "%s %s: %s: Tried to send 'reminder' email to %s about the survey %s, but failed."\
+                    %(datetime.datetime.now().strftime('[%d/%m/%Y %H:%M:%S]'), 'WARNING: ', __name__, survey_instance.respondent.email, survey_instance.survey)
+                )
+            return reminder_email
     #or, ...?
     else:
         #print("catchall, return None")

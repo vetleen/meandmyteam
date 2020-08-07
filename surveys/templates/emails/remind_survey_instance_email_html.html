@@ -1,11 +1,12 @@
-<p>Hi!</p>
+{% load i18n %}{% url 'surveys-answer-survey' token=token as survey_url %}
+<p>{% trans "Hi!" %}</p>
 
-<p>A few days ago we sent you an email regarding {{ organization }}'s regular surveys to investigate {% if instrument_list|length == 1  %}{{ instrument_list.0.name|lower }}.{% else %}{% for i in instrument_list %}{% if forloop.last %}and {{ i.name|lower }}.{% else %}{{ i.name|lower }}, {% endif %}{% endfor %}{% endif %}</p>
+<p>{% blocktrans %}A few days ago we sent you an email regarding {{ organization }}'s regular surveys to investigate {% endblocktrans %}{% if instrument_list|length == 1  %}{{ instrument_list.0.name|lower }}.{% else %}{% for i in instrument_list %}{% if forloop.last %}and {{ i.name|lower }}.{% else %}{{ i.name|lower }}, {% endif %}{% endfor %}{% endif %}</p>
 
-<p>They would appreciate it if you took the time to fill out the survey at this link:<br />
-<a href="https://{{ hostname }}{% url 'surveys-answer-survey' token=token %}">https://{{ hostname }}{% url 'surveys-answer-survey' token=token %}</a></p>
+<p>{% blocktrans %}They would appreciate it if you took the time to fill out the survey at this link:<br />
+<a href="https://{{ hostname }}{{ survey_url }}">https://{{ hostname }}{{ survey_url }}</a></p>{% endblocktrans %}
 
-<p>Our contact person at {{ organization }} is {{ contact_person }}. Please contact him or her if you have any questions.</p>
+<p>{% blocktrans %}Our contact person at {{ organization }} is {{ contact_person }}. Please contact him or her if you have any questions.{% endblocktrans %}</p>
 
-<p>Best regards,<br />
-The www.motpanel.com team</p>
+{% blocktrans %}<p>Best regards,<br />
+The www.motpanel.com team</p>{% endblocktrans %}

@@ -34,7 +34,19 @@ class Organization(models.Model):
     accepted_terms_and_conditions = models.BooleanField(default=False, help_text='Organization has accepted the terms and conditions and the privacy policy.')
     has_free_access = models.BooleanField(default=False, help_text='This organization should have free access.')
     subscription_paid_until = models.DateField(auto_now=False, auto_now_add=False, blank=True, null=True, help_text='Organization has full access until')
-
+    language_preference = models.CharField(
+        max_length=25,
+        choices=settings.LANGUAGES,
+        blank=True,
+        null=True,
+        help_text='Language preference',
+    )
+    survey_language_preference = models.CharField(
+        max_length=25,
+        choices=settings.LANGUAGES,
+        default='en-us',
+        help_text='What language should surveys have when sent out?'
+    )
     #stripe
     stripe_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='Subscribers Customer object ID in Stripe API')
     stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True, default=None, help_text='Subscribers Subscription object ID in Stripe API')

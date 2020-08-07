@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 18:49+0200\n"
+"POT-Creation-Date: 2020-08-07 13:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,27 +18,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: meandmyteam/settings.py:136
+msgid "English"
+msgstr "Engelsk"
+
+#: meandmyteam/settings.py:137
+msgid "Norwegian"
+msgstr "Norsk"
+
 #: meandmyteam/settings.py:205
 msgid "Employee Engagement Tracking | Motpanel"
 msgstr "Ansattengasjement - Sporing | Motpanel "
 
-#: meandmyteam/urls.py:25
+#: meandmyteam/urls.py:10
 msgid "admin/"
 msgstr "admin/"
 
-#: meandmyteam/urls.py:26
+#: meandmyteam/urls.py:11
 msgid "accounts/"
 msgstr "konto/"
 
-#: meandmyteam/urls.py:28
+#: meandmyteam/urls.py:13
 msgid "dashboard/"
 msgstr "dashbord/"
 
-#: meandmyteam/urls.py:29
+#: meandmyteam/urls.py:14
 msgid "surveys/"
 msgstr "undersøkelser/"
 
-#: meandmyteam/urls.py:31
+#: meandmyteam/urls.py:16
 msgid "payments/"
 msgstr "betaling/"
 
@@ -457,9 +465,13 @@ msgstr ""
 "Vi forsøkte å oppdatere abonnementet ditt, men det kan være at det ikke "
 "gikk. Prøv igjen senere, eller kontakt brukerstøtten vår"
 
-#: surveys/core/survey_logic.py:753
-msgid "*Unable to retrieve user*"
-msgstr "*Finner ikke bruker*"
+#: surveys/core/survey_logic.py:754
+msgid "Unable to retrieve user"
+msgstr "Finner ikke bruker"
+
+#: surveys/core/survey_logic.py:780
+msgid "surveys@motpanel.com"
+msgstr "undersokelser@motpanel.com"
 
 #: surveys/dashboard_urls.py:12
 msgid "add-or-remove-employees/"
@@ -473,28 +485,28 @@ msgstr "rediger-ansatt/<uidb64>/"
 msgid "delete-employee/<uidb64>/"
 msgstr "slett-ansatt/<uidb64>/"
 
-#: surveys/forms.py:11 website/forms.py:18 website/forms.py:121
+#: surveys/forms.py:13 website/forms.py:18 website/forms.py:121
 #: website/forms.py:136 website/forms.py:172
 msgid "Email address"
 msgstr "Epost-adresse"
 
-#: surveys/forms.py:11
+#: surveys/forms.py:13
 msgid "Required"
 msgstr "Påkrevd"
 
-#: surveys/forms.py:12
+#: surveys/forms.py:14
 msgid "First name"
 msgstr "Fornavn"
 
-#: surveys/forms.py:12 surveys/forms.py:13
+#: surveys/forms.py:14 surveys/forms.py:15
 msgid "Optional"
 msgstr "Ikke påkrevd"
 
-#: surveys/forms.py:13
+#: surveys/forms.py:15
 msgid "Last name"
 msgstr "Etternavn"
 
-#: surveys/forms.py:19 surveys/forms.py:36
+#: surveys/forms.py:21 surveys/forms.py:38
 #, python-format
 msgid ""
 "An employee with that email already exists in our database (%(taken_email)s)."
@@ -502,66 +514,70 @@ msgstr ""
 "Vi har allerede en ansatt med den epostadressen i databasen vår "
 "(%(taken_email)s)."
 
-#: surveys/forms.py:45
+#: surveys/forms.py:47
 msgid "Activate tracking?"
 msgstr "Aktiver sporing?"
 
-#: surveys/forms.py:50
+#: surveys/forms.py:52
 msgid "How often should employees in your organization be surveyed?"
 msgstr "Hvor skal ansatte i din organisasjon motta spørreundersøkelser?"
 
-#: surveys/forms.py:53
+#: surveys/forms.py:55
 msgid "Every 3 months (reccomended)"
 msgstr "Hver tredje måned (anbefalt)"
 
-#: surveys/forms.py:54
+#: surveys/forms.py:56
 msgid "Every 6 months"
 msgstr "Hver sjette måned"
 
-#: surveys/forms.py:55
+#: surveys/forms.py:57
 msgid "Every year"
 msgstr "Hvert år"
 
-#: surveys/forms.py:59
+#: surveys/forms.py:61
 msgid "How much time should employees be given to answer a survey?"
 msgstr "Hvor mye tid skal de ansatte få til å svare på undersøkelsen"
 
-#: surveys/forms.py:62
+#: surveys/forms.py:64
 msgid "One week (recommended)"
 msgstr "En uke (anbefalt)"
 
-#: surveys/forms.py:63
+#: surveys/forms.py:65
 msgid "Two weeks"
 msgstr "To uker"
 
-#: surveys/forms.py:64
+#: surveys/forms.py:66
 msgid "Three weeks"
 msgstr "Tre uker"
 
-#: surveys/forms.py:65
+#: surveys/forms.py:67
 msgid "One month"
 msgstr "En måned"
 
 #: surveys/forms.py:71
+msgid "Set default survey language (this affects all instruments):"
+msgstr "Velg standardspråk på spørreundersøkelser fra din organisasjon:"
+
+#: surveys/forms.py:80
 msgid "I consent to the collection of information in this survey"
 msgstr ""
 "Jeg samtykker til innsamling av informasjon i denne spørreundersøkelsen"
 
-#: surveys/forms.py:78
+#: surveys/forms.py:87
 msgid "Please indicate that you consent to answer this survey to continue."
 msgstr ""
 "Vennligst kryss av for at du samtykker til å svare på undersøkelsen for å "
 "fortsette."
 
-#: surveys/forms.py:86
+#: surveys/forms.py:95
 msgid "Disagree"
 msgstr "Uenig"
 
-#: surveys/forms.py:87
+#: surveys/forms.py:96
 msgid "Agree"
 msgstr "Enig"
 
-#: surveys/forms.py:114
+#: surveys/forms.py:123
 msgid "I don't know, or I don't want to answer"
 msgstr "Jeg vet ikke, eller jeg vil ikke svare"
 
@@ -692,7 +708,7 @@ msgstr "Fremdrift"
 
 #: surveys/templates/answer_survey.html:168
 #: surveys/templates/includeable/render_add_or_remove_employee_form.html:75
-#: surveys/templates/setup_instrument.html:113
+#: surveys/templates/setup_instrument.html:143
 #: website/templates/edit_account_form.html:212
 #: website/templates/includeable/form_renderer.html:32
 #: website/templates/sign_up_form.html:280
@@ -893,6 +909,194 @@ msgstr "Ansatte i %(organization_name)s"
 #: surveys/templates/edit_employee.html:8
 msgid "Edit employee"
 msgstr "Rediger ansatt"
+
+#: surveys/templates/emails/last_chance_survey_instance_email_html.html:1
+#: surveys/templates/emails/last_chance_survey_instance_email_txt.html:2
+#: surveys/templates/emails/new_survey_instance_email_html.html:1
+#: surveys/templates/emails/new_survey_instance_email_txt.html:1
+#: surveys/templates/emails/remind_survey_instance_email_html.html:2
+#: surveys/templates/emails/remind_survey_instance_email_txt.html:2
+msgid "Hi!"
+msgstr "Hei!"
+
+#: surveys/templates/emails/last_chance_survey_instance_email_html.html:3
+#: surveys/templates/emails/last_chance_survey_instance_email_txt.html:4
+#, python-format
+msgid ""
+"Some time ago we sent you an email regarding %(organization)s's regular "
+"surveys to investigate "
+msgstr ""
+"For en stund siden sente vi deg en epost angående %(organization)ss "
+"regelmessige spørreundersøkelse som undersøker "
+
+#: surveys/templates/emails/last_chance_survey_instance_email_html.html:5
+#, python-format
+msgid ""
+"<p>%(contact_person)s on behalf of %(organization)s would greatly appreciate "
+"it if you took the time to fill out the survey at this link:<br />\n"
+"<a href=\"https://%(hostname)s%(survey_url)s\">https://%(hostname)s"
+"%(survey_url)s</a></p>"
+msgstr ""
+"<p>%(contact_person)s på vegne av %(organization)s setter pris på det om du "
+"tar deg tid til å fylle ut undersøkelsen på denne lenken:<br />\n"
+"<a href=\"https://%(hostname)s%(survey_url)s\">https://%(hostname)s"
+"%(survey_url)s</a></p>"
+
+#: surveys/templates/emails/last_chance_survey_instance_email_html.html:8
+#, python-format
+msgid ""
+"<p>This is your last chance! <br />\n"
+"Please contact %(contact_person)s if you have any questions.</p>"
+msgstr ""
+"<p>Dette er siste sjanse! <br />\n"
+"Vennligst kontakt %(contact_person)s hvis du har spørsmål.</p>"
+
+#: surveys/templates/emails/last_chance_survey_instance_email_html.html:11
+#: surveys/templates/emails/remind_survey_instance_email_html.html:11
+msgid ""
+"<p>Best regards,<br />\n"
+"The www.motpanel.com team</p>"
+msgstr ""
+"<p>Vennlig hilsen,<br />\n"
+"Teamet bak www.motpanel.com</p>"
+
+#: surveys/templates/emails/last_chance_survey_instance_email_txt.html:6
+#, python-format
+msgid ""
+"%(contact_person)s on behalf of %(organization)s would greatly appreciate it "
+"if you took the time to fill out the survey at this link:\n"
+"https://%(hostname)s%(survey_url)s"
+msgstr ""
+"%(contact_person)s på vegne av %(organization)s setter pris på det om du tar "
+"deg tid til å fylle ut undersøkelsen på denne lenken:\n"
+"https://%(hostname)s%(survey_url)s"
+
+#: surveys/templates/emails/last_chance_survey_instance_email_txt.html:9
+#, python-format
+msgid ""
+"This is your last chance!\n"
+"Please contact %(contact_person)s if you have any questions."
+msgstr ""
+"Dette er siste sjanse!\n"
+"Vennligst kontakt %(contact_person)s hvis du har spørsmål."
+
+#: surveys/templates/emails/last_chance_survey_instance_email_txt.html:12
+#: surveys/templates/emails/new_survey_instance_email_txt.html:9
+#: surveys/templates/emails/remind_survey_instance_email_txt.html:11
+msgid ""
+"Best regards,\n"
+"The www.motpanel.com team"
+msgstr ""
+"Vennlig hilsen,\n"
+"Teamet bak www.motpanel.com"
+
+#: surveys/templates/emails/last_chance_survey_subject.txt:1
+#, python-format
+msgid ""
+"Last chance to answer %(organization)s's employee survey! - it's closing "
+"today"
+msgstr ""
+"Siste sjanse til å svare på %(organization)s sin ansattundersøkelse! - den avsluttes i dag"
+
+#: surveys/templates/emails/new_survey_instance_email_html.html:3
+#: surveys/templates/emails/new_survey_instance_email_txt.html:3
+#, python-format
+msgid ""
+"You have been invited by %(contact_person)s to participate in "
+"%(organization)s's survey investigating "
+msgstr ""
+"%(contact_person)s har invitert deg til å delta i %(organization)s sin "
+"ansattundersøkelse som undersøker "
+
+#: surveys/templates/emails/new_survey_instance_email_html.html:5
+#, python-format
+msgid ""
+"<p>They would appreciate it if you took the time to fill out the survey at "
+"this link:<br />\n"
+"<a href=\"https://%(hostname)s%(survey_url)s\">https://%(hostname)s"
+"%(survey_url)s</a></p>"
+msgstr ""
+"<p>De ville satt stor pris på det dersom du tok deg tid til å fylle ut "
+"undersøkelsen på denne lenken:<br />\n"
+"<a href=\"https://%(hostname)s%(survey_url)s\">https://%(hostname)s"
+"%(survey_url)s</a></p>"
+
+#: surveys/templates/emails/new_survey_instance_email_html.html:8
+#, python-format
+msgid ""
+"<p>Our contact person at %(organization)s is %(contact_person)s. Please "
+"contact him or her if you have any questions.</p>"
+msgstr ""
+"<p>Vår kontaktperson i %(organization)s er %(contact_person)s. Ta gjerne "
+"kontakt med vedkommende om du har noen spørsmål.</p>"
+
+#: surveys/templates/emails/new_survey_instance_email_html.html:10
+msgid ""
+"<p>Best regards,<br/>\n"
+"The www.motpanel.com team</p>"
+msgstr ""
+"<p>Vennlig hilsen,<br />\n"
+"Teamet bak www.motpanel.com</p>"
+
+#: surveys/templates/emails/new_survey_instance_email_txt.html:4
+#: surveys/templates/emails/remind_survey_instance_email_txt.html:6
+#, python-format
+msgid ""
+"They would appreciate it if you took the time to fill out the survey at this "
+"link:\n"
+"https://%(hostname)s%(survey_url)s"
+msgstr ""
+"De vil satt stor pris på det dersom du tok deg tid til å fylle ut "
+"undersøkelsen på denne lenken:\n"
+"https://%(hostname)s%(survey_url)s"
+
+#: surveys/templates/emails/new_survey_instance_email_txt.html:7
+#: surveys/templates/emails/remind_survey_instance_email_html.html:9
+#: surveys/templates/emails/remind_survey_instance_email_txt.html:9
+#, python-format
+msgid ""
+"Our contact person at %(organization)s is %(contact_person)s. Please contact "
+"him or her if you have any questions."
+msgstr ""
+"Vår kontaktperson i %(organization)s er %(contact_person)s. Vennligst "
+"kontakt vedkommende om du har noen spørsmål."
+
+#: surveys/templates/emails/new_survey_subject.txt:1
+#, python-format
+msgid "Employee survey for %(organization)s"
+msgstr "Ansattundersøkelse i %(organization)s"
+
+#: surveys/templates/emails/remind_survey_instance_email_html.html:4
+#: surveys/templates/emails/remind_survey_instance_email_txt.html:4
+#, python-format
+msgid ""
+"A few days ago we sent you an email regarding %(organization)s's regular "
+"surveys to investigate "
+msgstr ""
+"For en stund siden sente vi deg en epost angående %(organization)ss "
+"regelmessige spørreundersøkelse som undersøker "
+
+#: surveys/templates/emails/remind_survey_instance_email_html.html:6
+#, python-format
+msgid ""
+"They would appreciate it if you took the time to fill out the survey at this "
+"link:<br />\n"
+"<a href=\"https://%(hostname)s%(survey_url)s\">https://%(hostname)s"
+"%(survey_url)s</a></p>"
+msgstr ""
+"De ville satt stor pris på det dersom du tok deg tid til å fylle ut "
+"undersøkelsen på denne lenken:<br />\n"
+"<a href=\"https://%(hostname)s%(survey_url)s\">https://%(hostname)s"
+"%(survey_url)s</a></p>"
+
+#: surveys/templates/emails/remind_survey_subject.txt:2
+#, python-format
+msgid ""
+"Reminder: %(organization)s is conducting a survey among its employees - "
+"please take the time to fill it out "
+msgstr ""
+"Påminnelse om at %(organization)s utfører en spørreundersøkelse blant sine "
+"ansatte - gjerne ta deg tid til å fylle den ut "
 
 #: surveys/templates/includeable/display_single_dimension_result.html:41
 msgid "Score hidden"
@@ -1122,7 +1326,7 @@ msgstr "Konfigurer %(instrument_name)s-sporing"
 msgid "Track %(instrument_name)s? "
 msgstr "Spor %(instrument_name)s? "
 
-#: surveys/templates/setup_instrument.html:114 surveys/views.py:117
+#: surveys/templates/setup_instrument.html:144 surveys/views.py:117
 #: website/views.py:76 website/views.py:215 website/views.py:239
 msgid "Cancel"
 msgstr "Avbryt"
@@ -1156,7 +1360,7 @@ msgid "%(email)s was permanently deleted, and will not receive future surveys."
 msgstr ""
 "%(email)s ble slettet permanent og vil ikke motta fremtidige undersøkelser."
 
-#: surveys/views.py:275
+#: surveys/views.py:278
 #, python-format
 msgid ""
 "Your settings were updated successfully, %(instrument_name)s tracking is "
@@ -1164,7 +1368,7 @@ msgid ""
 msgstr ""
 "Instillingene dine ble oppdatert, sporing av %(instrument_name)s er AKTIVERT!"
 
-#: surveys/views.py:282
+#: surveys/views.py:285
 #, python-format
 msgid ""
 "Your settings were updated successfully, %(instrument_name)s tracking is "
@@ -1173,19 +1377,19 @@ msgstr ""
 "Instillingene dine ble oppdatert, sporing av %(instrument_name)s er "
 "DEAKTIVERT!"
 
-#: surveys/views.py:297
+#: surveys/views.py:300
 msgid "Update settings"
 msgstr "Oppdater innstillinger"
 
-#: surveys/views.py:312
+#: surveys/views.py:315
 msgid "We couldn't find the survey you were looking for."
 msgstr "Vi fant ikke undersøkelsen du ser etter."
 
-#: surveys/views.py:330
+#: surveys/views.py:333
 msgid "We couldn't find the instrument you were looking for."
 msgstr "Vi fant ikke verktøyet du ba om."
 
-#: surveys/views.py:367
+#: surveys/views.py:370
 msgid ""
 "The survey you asked for does not exist. If you pasted a link, make sure you "
 "got the entire link."
@@ -1193,18 +1397,18 @@ msgstr ""
 "Undersøkelsen du ba om eksisterer ikke. Hvis du limte inn en lenke, "
 "dobbeltsjekk at du fikk med hele lenken."
 
-#: surveys/views.py:378
+#: surveys/views.py:381
 msgid "Continue"
 msgstr "Fortsett"
 
-#: surveys/views.py:414
+#: surveys/views.py:417
 msgid ""
 "Welcome back! We saved your place, so you can continue where you left off."
 msgstr ""
 "Velkommen tilbake! Vi merket av hvor du var, så du kan fortsette der du "
 "slapp!"
 
-#: surveys/views.py:425
+#: surveys/views.py:428
 msgid ""
 "Thank you for taking the time to answer this survey! Please indicate that "
 "you consent to answer the survey to continue."
@@ -1459,7 +1663,7 @@ msgstr ""
 "En bruker med den epostadressen fins allerede i systemet vårt "
 "(%(taken_email)s)."
 
-#: website/models.py:49
+#: website/models.py:61
 #, python-format
 msgid ""
 "Tried to create an organization with an invalid phone number "
@@ -1470,7 +1674,7 @@ msgstr ""
 
 #: website/templates/change_password_form.html:3
 #: website/templates/edit_account_form.html:67
-#: website/templates/includeable/navbar.html:27
+#: website/templates/includeable/navbar.html:28
 msgid "Change password"
 msgstr "Endre passord"
 
@@ -1480,7 +1684,7 @@ msgstr "Endre passordet ditt"
 
 #: website/templates/edit_account_form.html:4
 #: website/templates/edit_account_form.html:9
-#: website/templates/includeable/navbar.html:25
+#: website/templates/includeable/navbar.html:26
 msgid "Account details"
 msgstr "Kontodetaljer"
 
@@ -1529,7 +1733,7 @@ msgid "Site"
 msgstr "Nettsted"
 
 #: website/templates/includeable/full_footer.html:15
-#: website/templates/includeable/navbar.html:40
+#: website/templates/includeable/navbar.html:44
 #: website/templates/sign_up_form.html:4 website/templates/sign_up_form.html:9
 #: website/views.py:148
 msgid "Sign up"
@@ -1601,34 +1805,34 @@ msgstr ""
 "Engesbak Promotions merkevare. Alle rettigheter er reservert.<br /><br />\n"
 "        "
 
-#: website/templates/includeable/navbar.html:17
+#: website/templates/includeable/navbar.html:18
 msgid "Start here"
 msgstr "Start her"
 
-#: website/templates/includeable/navbar.html:17
-#: website/templates/includeable/navbar.html:34
-#: website/templates/includeable/navbar.html:37
+#: website/templates/includeable/navbar.html:18
+#: website/templates/includeable/navbar.html:36
 #: website/templates/includeable/navbar.html:40
+#: website/templates/includeable/navbar.html:44
 msgid "(current)"
 msgstr "(denne siden)"
 
-#: website/templates/includeable/navbar.html:21
+#: website/templates/includeable/navbar.html:22
 msgid "Account"
 msgstr "Konto"
 
-#: website/templates/includeable/navbar.html:26
+#: website/templates/includeable/navbar.html:27
 msgid "Subscription details"
 msgstr "Abonnementsdetaljer"
 
-#: website/templates/includeable/navbar.html:29
+#: website/templates/includeable/navbar.html:30
 msgid "Log out"
 msgstr "Logg ut"
 
-#: website/templates/includeable/navbar.html:34
+#: website/templates/includeable/navbar.html:36
 msgid "Home"
 msgstr "Hjem"
 
-#: website/templates/includeable/navbar.html:37 website/views.py:214
+#: website/templates/includeable/navbar.html:40 website/views.py:214
 #: website/views.py:238
 msgid "Login"
 msgstr "Log inn"
@@ -1837,8 +2041,6 @@ msgid ""
 msgstr ""
 
 #: website/templates/includeable/terms_and_conditions_text.html:2
-#, fuzzy
-#| msgid "Terms and conditions"
 msgid "Terms and Conditions"
 msgstr "Vilkår og betingelser"
 
@@ -2431,14 +2633,23 @@ msgstr "Profilen din ble oppdatert."
 msgid "Can't edit profile when you are not logged in."
 msgstr "Du kan ikke endre profilen din når du ikke er logget inn."
 
-#: website/views.py:309
+#: website/views.py:308
 #, python-format
 msgid "%(selected_languages)s not in %(settings_languages)s"
 msgstr "%(selected_languages)s finnes ikke i %(settings_languages)s"
 
-#: website/views.py:311
+#: website/views.py:310
 msgid "Couldn't find that language: "
 msgstr "Kunne ikke finne det språket:"
+
+#~ msgid ""
+#~ "\n"
+#~ "<p>Best regards,<br />\n"
+#~ "The www.motpanel.com team</p>\n"
+#~ msgstr ""
+#~ "\n"
+#~ "<p>Vennlig hilsen,<br />\n"
+#~ "Teamet bak www.motpanel.com</p>\n"
 
 #~ msgid "Employee Engagement"
 #~ msgstr "Ansattengasjement"

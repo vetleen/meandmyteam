@@ -1,1 +1,2 @@
-Reminder: {{ organization }} is conducting a survey among its employees - please take the time to fill it out
+{% load i18n %}
+{% blocktrans %}Reminder: {{ organization }} is conducting a survey among its employees - please take the time to fill it out {% endblocktrans %}

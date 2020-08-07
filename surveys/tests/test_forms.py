@@ -133,7 +133,8 @@ class FormsTest(TestCase):
         data = {
             'is_active': True,
             'survey_interval': 90,
-            'surveys_remain_open_days': 7
+            'surveys_remain_open_days': 7,
+            'survey_language_preference': 'nb',
         }
         test_form = EditSurveySettingsForm(data=data)
         self.assertTrue(test_form.is_valid())
@@ -142,7 +143,8 @@ class FormsTest(TestCase):
         data2 = {
             'is_active': True,
             'survey_interval': 75,
-            'surveys_remain_open_days': 7
+            'surveys_remain_open_days': 7,
+            'survey_language_preference': 'nb',
         }
         test_form2 = EditSurveySettingsForm(data=data2)
         self.assertFalse(test_form2.is_valid())
@@ -152,7 +154,8 @@ class FormsTest(TestCase):
         data3 = {
             'is_active': True,
             'survey_interval': 90,
-            'surveys_remain_open_days': 17
+            'surveys_remain_open_days': 17,
+            'survey_language_preference': 'nb',
         }
         test_form3 = EditSurveySettingsForm(data=data3)
         self.assertFalse(test_form3.is_valid())
@@ -162,7 +165,8 @@ class FormsTest(TestCase):
         data4 = {
             'is_active': True,
             'survey_interval': "ever so often",
-            'surveys_remain_open_days': 7
+            'surveys_remain_open_days': 7,
+            'survey_language_preference': 'nb',
         }
         test_form4 = EditSurveySettingsForm(data=data4)
         self.assertFalse(test_form4.is_valid())
@@ -172,11 +176,23 @@ class FormsTest(TestCase):
         data5 = {
             'is_active': True,
             'survey_interval': 90,
-            'surveys_remain_open_days': "Now and then"
+            'surveys_remain_open_days': "Now and then",
+            'survey_language_preference': 'nb',
         }
         test_form5 = EditSurveySettingsForm(data=data5)
         self.assertFalse(test_form5.is_valid())
         self.assertIn("Select a valid choice. Now and then is not one of the available choices.", test_form5.errors['surveys_remain_open_days'])
+
+        #test: invalid 'survey_language_preference'
+        data6 = {
+            'is_active': True,
+            'survey_interval': 90,
+            'surveys_remain_open_days': 7,
+            'survey_language_preference': 'de',
+        }
+        test_form6 = EditSurveySettingsForm(data=data6)
+        self.assertFalse(test_form6.is_valid())
+        self.assertIn("Select a valid choice. de is not one of the available choices.", test_form6.errors['survey_language_preference'])
 
 
     def test_AnswerSurveyForm(self):
