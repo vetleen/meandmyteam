@@ -806,7 +806,7 @@ class SurveyLogicTest_dailytaskfunctions(TestCase):
             self.assertIn(address, [r.email for r in respondent_list])
         self.assertEqual(mail.outbox[1].from_email, "surveys@motpanel.com")
         self.assertIn("A few days ago we sent you an email regarding %s's regular surveys to investigate"%(o.name), mail.outbox[1].body)
-        self.assertEqual("Reminder: %s is conducting a survey among its employees - please take the time to fill it out"%(o.name), mail.outbox[1].subject)
+        self.assertEqual("Reminder: %s is conducting a survey among its employees - please take the time to fill it out "%(o.name), mail.outbox[1].subject)
 
 
         #move time & save (DAY +4)

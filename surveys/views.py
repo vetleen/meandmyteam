@@ -357,12 +357,12 @@ def answer_survey_view(request, **kwargs):
         assert survey_instance.get_hash_string() == url_token_args[1], \
             "Faulty link (invalid hash)"
         #ensure the Survey that the SurveyInstance belongs to is still open
-        assert survey_instance.survey.date_close >= datetime.date.today(), \
+        assert survey_instance.survey.is_closed == False, \
             "This survey has already closed, closed %s."%(survey_instance.survey.date_close)
 
     except (AssertionError, SurveyInstance.DoesNotExist, DjangoUnicodeDecodeError) as err:
         #mark an event 
-        comment = "url-token: %s"%(url_token)
+        comment = "url-token: %s.\n Error: %s "%(url_token, err)
         event = Event(category='failed_to_open_survey_instance_link', comment=comment)
         event.save()
         #log and redirect

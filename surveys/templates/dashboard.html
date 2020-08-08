@@ -106,7 +106,7 @@
                       {% if active_instrument.open_survey is not None %}
                       {% with active_instrument.open_survey.date_close as date_close %}
                         {% blocktrans %}
-                          But fear not, we are currently collecting data, and it will be available for review {{ date_close }}.
+                          But fear not, we are currently collecting data, and it will be available for review after {{ date_close }}.
                         {% endblocktrans %}
                       {% endwith %}
                       {% else %}{# if active_instrument.open_survey is not None #}

@@ -94,7 +94,9 @@ def setup_instrument(raw_instrument):
                 description=raw_instrument['instrument']['description'],
                 slug_name=raw_instrument['instrument']['slug_name'],
                 #NB
-                name_nb=raw_instrument['instrument']['name_nb']
+                name_nb=raw_instrument['instrument']['name_nb'],
+                description_nb=raw_instrument['instrument']['description_nb'],
+                slug_name_nb=raw_instrument['instrument']['slug_name_nb']
             )
         instrument.save()
         new_instrument = True

@@ -996,7 +996,8 @@ msgid ""
 "Last chance to answer %(organization)s's employee survey! - it's closing "
 "today"
 msgstr ""
-"Siste sjanse til å svare på %(organization)s sin ansattundersøkelse! - den avsluttes i dag"
+"Siste sjanse til å svare på %(organization)s sin ansattundersøkelse! - "
+"den avsluttes i dag"
 
 #: surveys/templates/emails/new_survey_instance_email_html.html:3
 #: surveys/templates/emails/new_survey_instance_email_txt.html:3
@@ -1528,7 +1529,7 @@ msgstr "(f.eks +99989796 eller +999 89 796)"
 
 #: website/forms.py:25
 msgid "Street address*"
-msgstr "Gateaddresse"
+msgstr "Gateaddresse*"
 
 #: website/forms.py:27
 msgid "Zip*"

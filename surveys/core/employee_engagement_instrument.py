@@ -168,7 +168,7 @@ i009 = {
 
 i010 = {
     'dimension_location': 1, #index of dimensions-variable(list) where the dimension is located
-    'formulation': "I am proud on the work that I do.",
+    'formulation': "I am proud of the work that I do.",
     'active': True,
     'inverted': False,
 
