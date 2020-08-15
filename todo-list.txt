@@ -1,13 +1,19 @@
 ##MeAndMyTeam
 
 #dev
-organization objects should have a language_preference which is set to current language on sign-up and updated when changing language
-translations for emails and links that get sent out -> also add to instrument_configuration a løanguage choice, which defaults to organizatiopns
+employees should have some more fields:
+- tags (team, management etc.)
+- email bounced
 
+instrument report should show per tag results given that the minimum of 4 respondent requirement holds
+-> could add tag m2m on survey too, and create dimension results for tags
+
+more info about instruments
+more control to user over which instrument to send
 
 #AFTER LAUNCH
 search engine optimization
-additional instrument
+additional instruments (MTU, innovation culture etc.)
 
 contact us page and about us page
 add 'about us' explaining scientific background of test (if any...)
