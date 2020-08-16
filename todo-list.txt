@@ -1,17 +1,24 @@
 ##MeAndMyTeam
 
 #dev
+
+new survey tool
+new text targeting norwegian market
+a page with info about the tool
+more compact answer-form with less repetition
+split signup in two parts, or separate organization, or otherwise make easier?
+"send survey button" + clearer text about when it's sent
+.no-domain
+
+
+
+#AFTER LAUNCH
 employees should have some more fields:
 - tags (team, management etc.)
 - email bounced
-
 instrument report should show per tag results given that the minimum of 4 respondent requirement holds
 -> could add tag m2m on survey too, and create dimension results for tags
 
-more info about instruments
-more control to user over which instrument to send
-
-#AFTER LAUNCH
 search engine optimization
 additional instruments (MTU, innovation culture etc.)
 
